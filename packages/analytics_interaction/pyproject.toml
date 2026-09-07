@@ -1,0 +1,102 @@
+[build-system]
+requires = ["hatchling==1.27.0"]
+build-backend = "hatchling.build"
+
+# T013: the third additive sibling package. `packages/semantic_catalog` and
+# `packages/analytics_query` are upstream dependencies and are never edited by
+# this feature — the single exception, ADR 0010's composed entry point, was a
+# prerequisite phase and is already merged.
+[project]
+name = "analytics-interaction"
+version = "0.1.0"
+description = "Natural-language analytics interaction: governed interpretation and evidence-backed presentation."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "Proprietary" }
+
+# Pinned exactly, and byte-matched to `001`'s and `002`'s — Constitution
+# § Reproducibility requires pinned, reproducible dependencies, and three
+# packages in one repository resolving the same library to different versions is
+# a reproducibility defect.
+#
+# `semantic-catalog` and `analytics-query` are **path dependencies** within this
+# monorepo: neither is published, so both are installed editable before this
+# package. Declaring the bare names rather than absolute `file://` URLs keeps the
+# file portable across checkouts; the install order supplies them.
+#
+# **No new runtime dependency.** Sealing uses the standard library, and the model
+# port has no implementation while `D-20` is undeclared — so no LLM SDK, no
+# provider client and no HTTP client is declared here. A provider client would
+# need its own ADR and its own confined adapter subpackage, as `002`'s ADR 0007
+# did for BigQuery.
+dependencies = [
+  "analytics-query==0.1.0",
+  "semantic-catalog==0.1.0",
+  "pydantic==2.11.9",
+  "PyYAML==6.0.2",
+  # Canonical business time zone is America/Sao_Paulo, resolved through the IANA
+  # database rather than a fixed offset. Windows ships no system tz database, so
+  # `zoneinfo` has nothing to read without this.
+  "tzdata==2026.3",
+]
+
+# The dev extra exists from the first commit, matching `002`. `hypothesis` is the
+# only dependency this feature adds anywhere, it is **dev-only**, and its pin is
+# fixed here rather than left floating — a property suite that drifts with its
+# generator library is a suite whose failures nobody can reproduce.
+[project.optional-dependencies]
+dev = [
+  "pytest==8.4.2",
+  "ruff==0.14.0",
+  "pyright==1.1.406",
+  "hypothesis==6.140.3",
+]
+
+# The steward CLI arrives in Phase 14 (T144-T146). `python -m
+# analytics_interaction.cli` stays equivalent, and CI uses that form so it does
+# not depend on install state. No console script is declared until the entry
+# point exists.
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/analytics_interaction"]
+
+# --- T014: linting, type checking, tests -------------------------------------
+# Mirrors `packages/analytics_query/pyproject.toml`, which mirrors `001`'s.
+# Divergence between the three packages' gates would let a defect pass in one
+# that the others would catch.
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "A", "C4", "SIM", "RUF"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["analytics_interaction"]
+
+[tool.pyright]
+include = ["src", "tests"]
+pythonVersion = "3.12"
+typeCheckingMode = "strict"
+reportMissingTypeStubs = false
+# Both upstream packages are monorepo path dependencies installed editable.
+# Pyright cannot follow the editable finder, so their source roots are named
+# directly — otherwise every upstream type resolves as Unknown and strict mode
+# reports hundreds of false errors that hide the real ones.
+extraPaths = ["src", "../analytics_query/src", "../semantic_catalog/src"]
+venvPath = "../.."
+venv = ".venv"
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+addopts = "-ra --strict-markers --strict-config"
+markers = [
+  "contract: validates an authored artifact or boundary against its contract",
+  "unit: isolated deterministic unit test",
+  "integration: exercises the ordered interpretation sequence",
+  "adversarial: asserts a governed refusal against a hostile input",
+  "property: asserts an invariant over generated inputs",
+]

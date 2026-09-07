@@ -1,0 +1,1209 @@
+#!/usr/bin/env bash
+#
+# pre-push — the gate that bites on its own.
+#
+# =============================================================================
+# WHY THIS FILE EXISTS
+#
+# On 2026-08-26 a commit went to the remote with a gate RED. The gate had been
+# run. Its output said FAILED. And the commit happened anyway, because the
+# command was written like this:
+#
+#     python -m pytest ... | tail -2  &&  git commit ...
+#
+# `tail` always exits zero, so the `&&` measured the pipe and not the test. The
+# machine said ok while the eye said failed — and the eye was the only thing
+# reading. That was finding F140, and the fix in that cycle was the *form of the
+# command*: run each gate as its own step, write its exit code to a file, and
+# read the file before committing.
+#
+# That fix worked and it does not bite on its own. This file is the part that
+# does.
+# =============================================================================
+#
+# THE TWO WAYS PAST THIS GATE, WRITTEN DOWN ON PURPOSE.
+#
+# A gate whose weakness is written is a gate. A gate whose weakness is unspoken
+# is theatre. So:
+#
+#   1. `git push --no-verify` skips this file entirely. That is git's design, it
+#      cannot be disabled from here, and pretending otherwise would be the lie
+#      this repository keeps refusing. It is there for the case where a push is
+#      genuinely more urgent than a check — and using it is a decision somebody
+#      makes, not something that happens by accident.
+#
+#   2. If the interpreter below is absent — a fresh clone with no `.venv` — this
+#      hook SKIPS with a loud message instead of blocking. That is failing open,
+#      and it is the deliberate choice: blocking every push on a machine that
+#      cannot run the gates would get `core.hooksPath` set back to default, and
+#      a gate somebody removed guards nothing at all. The skip is loud so that
+#      it is never mistaken for a pass.
+#
+# WHAT THIS GATE RUNS, AND WHAT IT DELIBERATELY DOES NOT.
+#
+# WHAT IT RUNS, AND WHY THE LIST IS DERIVED RATHER THAN WRITTEN.
+#
+# It ran the cross-artifact citation guard and ONE package suite, named here by
+# hand: `anomaly_investigation`. That name was written on the `005` branch and
+# travelled to every branch cut from it -- so on the `006` branch this gate
+# measured another feature's suite and NEVER the one being worked on. The push it
+# blocked was blocked for a credential belonging to somebody else's tests, and the
+# 195 green tests of the branch's own package were measured by hand and by nothing
+# else.
+#
+# So the list is now DERIVED: every directory under `packages/` that has a
+# `tests/` directory is gated. That is the same shape the `006` branch used for
+# its component order -- derived from the registry rather than written twice, so
+# the two cannot disagree -- and a name written by hand in a gate is that debt in
+# another file.
+#
+# Deriving also dissolves the collision it would otherwise create: no branch has
+# to know which packages another branch has, and a package added later is gated
+# without anyone remembering to add it.
+#
+# It still does NOT run the local CI executor, which takes over half an hour.
+#
+# THE COST IS REAL AND IT IS MEASURED RATHER THAN GUESSED. The earlier version of
+# this paragraph argued that a four-minute hook gets `--no-verify`'d by the third
+# push. That argument is still true and it is now a MEASUREMENT somebody has to
+# act on rather than a reason to gate less: the timing is reported at the end of
+# every run, and if it becomes intolerable the answer is to make the suites
+# faster or to split the gate, never to quietly go back to naming one package.
+#
+# ACTIVATION. The body lives in the repository so it is reviewable; nothing is
+# copied into `.git/hooks`. It is switched on with one line and off with one:
+#
+#     git config core.hooksPath tools/git-hooks     # on
+#     git config --unset core.hooksPath             # off
+#
+# =============================================================================
+
+set -u
+
+ROOT="$(git rev-parse --show-toplevel)"
+
+# WHOSE TYPES ARE CHECKED HERE, AND WHY IT IS NOW EVERY SUITE THAT DECLARES A CHECKER.
+#
+# This gate measured TESTS and never TYPES, so green-on-push and red-on-type coexisted for
+# three cycles with nobody seeing it: `run_local_ci.py` reported 19 strict `pyright` errors
+# in the harness, then 44 more across three packages, then 33 more in a sixth package that
+# no workflow covers at all. SEVENTY-SEVEN, and ONE OF THEM WAS A LIVE DEFECT IN PRODUCTION
+# CODE -- `figures_port` read `violation.reason_code`, which does not exist, so every
+# governed refusal it was written to carry raised `AttributeError` instead.
+#
+# It was the harness alone for one cycle, and the entry said so rather than implying it.
+# That was the honest narrow version; this is the wide one, and the criterion is DERIVED:
+# a suite is type-checked when its own `pyproject.toml` declares `[tool.pyright]`. A list
+# written here would be the debt cycles 362 and 367 paid to remove, in a third file.
+#
+# A SUITE THAT DECLARES NO CHECKER IS NOT GIVEN ONE, and that gap is named rather than
+# filled by invention: adding a checker to a package is a decision made in that package.
+typed_suites() {
+  for suite in $(gated_suites); do
+    grep -q '^\[tool\.pyright\]' "${ROOT}/${suite}/pyproject.toml" 2>/dev/null || continue
+    printf '%s
+' "${suite}"
+  done
+}
+
+# THE FORMAT GATE, added 2026-09-06 by his order (OD-134), and the reason is measured.
+#
+# `ruff` was the one checker this gate never ran. On 06/09 the bot carried SEVEN files the
+# formatter would rewrite and TWENTY lint findings, landed on 04/09 and pushed twice through
+# twenty green gates -- because nothing here looked. `verde por nao medir` is the same defect
+# this file spent cycles 362 and 367 removing one instrument over, and it was still true of a
+# third.
+#
+# The criterion is DERIVED exactly like `typed_suites`: a suite is format-checked when its own
+# `pyproject.toml` declares `[tool.ruff]`. A list written here would be the debt again.
+#
+# THE LINT HALF ARRIVED WITH ITS OWN ORDER -- `OD-135`, 06/09. The format gate shipped
+# NAMING this hole instead of filling it: `ruff check` was measured by CI and by hand and by
+# nothing here, and widening a gate past the order that created it is how a gate stops being
+# his. He then gave the order, so the hole closes by his word rather than by invention -- and
+# the difference between those two is the whole reason the gap was written down.
+#
+# BOTH KINDS RIDE ONE DERIVATION, deliberately: the criterion for `ruff format` and for
+# `ruff check` is the SAME `[tool.ruff]` declaration, so a second function reading the same
+# line would be the two-copies-of-a-rule defect this file spends its length warning about.
+# Measured before wiring, 06/09 12:4x: all TEN suites answer `All checks passed!`, so this
+# gate does not block the next push -- which is the same thing `OD-134` measured before
+# shipping, and for the same reason.
+formatted_suites() {
+  for suite in $(gated_suites); do
+    grep -q '^\[tool\.ruff\]' "${ROOT}/${suite}/pyproject.toml" 2>/dev/null || continue
+    printf '%s
+' "${suite}"
+  done
+}
+
+# A GUARDA DOS MARCADORES, MOVIDA DA WORKFLOW PARA CA -- `OD-155`, 2026-09-07.
+#
+# Ela vivia so no `harness.yml`, e foi ela que apanhou CINCO nos sem marcador que este portao
+# deixou passar durante quatro commits: o ficheiro que a peca 6 da `T1334` acrescentou nasceu sem
+# `pytestmark` e as 40 luzes verdes daqui nao viram nada. **O portao local e a CI nunca mediram o
+# mesmo conjunto**, e nos usamos os dois numeros como se fossem substituiveis.
+#
+# Com as workflows desligadas por ordem dele, esta guarda desaparecia inteira. Mover e o que
+# impede a `OD-155` de trocar um vermelho falso por um cego.
+#
+# ## Os nomes vem de CADA pyproject, e nao da lista de quatro do harness
+#
+# Medido antes de escrever, e e o que faz a diferenca entre mover e partir: o harness declara
+# QUATRO marcadores (`unit`, `integration`, `adversarial`, `security`) e os outros pacotes
+# declaram conjuntos diferentes -- `daily_reporting` tem seis, `semantic_catalog` tem tres.
+# Aplicar a lista do harness a todos daria **6.302** nos "sem marcador" que estao marcados com
+# palavras que a lista nao conhece.
+#
+# Entao a derivacao e a mesma de `typed_suites` e `formatted_suites`: a suite entra quando o seu
+# proprio `pyproject.toml` declara `markers`, e os nomes saem desse mesmo bloco. Duas copias da
+# lista seriam a segunda a envelhecer sozinha.
+marked_suites() {
+  for suite in $(gated_suites); do
+    grep -q '^markers = \[' "${ROOT}/${suite}/pyproject.toml" 2>/dev/null || continue
+    printf '%s\n' "${suite}"
+  done
+}
+
+# Os marcadores que UMA suite declara, um por linha, lidos do bloco `markers = [` ate ao `]`.
+# O nome e o que vem antes dos dois pontos: `unit: isolated deterministic unit test` -> `unit`.
+markers_of() {
+  sed -n '/^markers = \[/,/^\]/p' "${ROOT}/${1}/pyproject.toml" 2>/dev/null \
+    | sed -n 's/^ *"\([a-z_]*\):.*/\1/p'
+}
+
+# The derivation itself, in one place. Printed on demand with --list-suites so a test
+# can DRIVE this function instead of describing what it believes it does: a node that
+# re-implemented the rule here would pass while this rule rotted.
+#
+# THE CRITERION IS "A DIRECTORY THAT HAS A tests/ IN IT", and nothing else. It used to
+# read `packages/*/` and emit a basename, which gated six suites and left the seventh --
+# the bot harness, which lives in `tools/` -- ungated. A node nobody runs guards nothing,
+# and that was the same defect the 362 cycle paid for one directory over.
+#
+# So it walks TWO levels from the root and names neither root. Measured: the glob answers
+# exactly the seven suites and nothing else -- `.venv` contributes none, because no
+# directory one level inside it holds a `tests/`.
+#
+# Paths are repo-relative rather than basenames, because a basename cannot say which of
+# two roots it came from and the runner has to cd somewhere real.
+gated_suites() {
+  for directory in "${ROOT}"/*/*/; do
+    [ -d "${directory}tests" ] || continue
+    printf '%s
+' "${directory#"${ROOT}"/}" | sed 's:/$::'
+  done | sort
+}
+
+if [ "${1:-}" = "--list-suites" ]; then
+  gated_suites
+  exit 0
+fi
+
+# The JOB list -- the suites plus the two steps no derivation covers -- in the order it is
+# reported. It is a function so that the run below and `--list-jobs` cannot disagree: a node
+# checking a list this file rebuilt separately would be checking its own copy.
+gated_jobs() {
+  echo "cross-artifact citations"
+  for suite in $(typed_suites); do
+    echo "strict types: ${suite}"
+  done
+  for suite in $(formatted_suites); do
+    echo "format: ${suite}"
+  done
+  for suite in $(formatted_suites); do
+    echo "lint: ${suite}"
+  done
+  for suite in $(marked_suites); do
+    echo "markers: ${suite}"
+  done
+  gated_suites
+}
+
+# WHICH WAVE A JOB BELONGS TO, in ONE place. It used to be an `if` written twice -- once in
+# `--waves` and once in the run -- and two copies of a rule are two rules waiting to disagree,
+# which is the thing this file says about lists and then did about this. The format checks are
+# cheaper than the type checks, so they ride the light wave.
+wave_of() {
+  case "$1" in
+    "strict types: "*|"format: "*|"lint: "*|"markers: "*) echo light ;;
+    *) echo heavy ;;
+  esac
+}
+
+if [ "${1:-}" = "--list-jobs" ]; then
+  gated_jobs
+  exit 0
+fi
+
+# --------------------------------------------------------------------------- #
+# THE NODE FLOOR, AND WHY IT MOVED HERE.
+#
+# `harness.yml` carries `HARNESS_NODE_FLOOR: 916` and compares the passing count against
+# it. That guard failed twice at once, measured on 2026-08-27:
+#
+#   * THIS COMMENT ONCE SAID "IT NEVER RUNS", AND THAT WAS FALSE. The owner corrected it
+#     on 2026-08-27: "ci local, nao esqueca, o ci do github e apenas uma porta a mais,
+#     temos que considerar o ci local". `tools/local-ci/run_local_ci.py` TRANSLATES AND
+#     EXECUTES the workflow's steps and propagates its `env:` block into each one, so
+#     `HARNESS_NODE_FLOOR` reaches the step and the comparison RUNS. The workflow is
+#     executable content, not dead paper. THAT HALF IS A PROPERTY OF THIS REPOSITORY
+#     AND AINDA VALE: confere-se lendo `run_local_ci.py`, de qualquer clone, em
+#     qualquer dia.
+#
+#     O QUE VINHA A SEGUIR NAO VALIA, E E SUBSTITUIDO AQUI. A frase dizia: "What is
+#     true is narrower: GitHub has not STARTED it since the Actions budget ran out.
+#     One door is shut; the guard is alive." LEITURA do servidor em 2026-09-06 --
+#     leitura num instante, nao um estado: `gh run list --workflow=harness.yml`
+#     responde 196 corridas, e o maior intervalo entre elas e
+#     2026-08-28T15:28:20Z -> 2026-09-01T04:16:15Z. O GitHub voltou a arrancar a
+#     `harness.yml` nesse segundo carimbo (corrida 33469207746) e nunca mais parou,
+#     entao a frase era falsa desde 01/09 e nada neste arquivo podia dar por isso.
+#
+#     A CORRECAO NAO E UMA FRASE DE ESTADO NOVA. **ESTE ARQUIVO NAO AFIRMA NADA
+#     SOBRE O QUE O GITHUB ESTA A CORRER.** Quem precisar da resposta corre:
+#
+#         gh run list --workflow=harness.yml --limit 10
+#
+#     O piso abaixo depende da porta LOCAL, que e o motivo de ele ter vindo para
+#     aqui: duas portas que contam. Se a porta remota esta aberta nao muda nada no
+#     raciocinio do piso -- e esse e o ponto. A frase velha fazia o argumento local
+#     parecer condicionado a um facto remoto de que nao precisava e que nao
+#     conseguia manter atualizado.
+#   * it was THIRTY-NINE BEHIND. The suite was 955 passed of 971 collected; 916 means
+#     thirty-nine nodes could vanish and the comparison would still be satisfied.
+#
+# And the gate that runs ON EVERY PUSH -- this file, which started gating the harness in
+# cycle 367 -- had no floor at all, while the door that did count ran only when somebody
+# invoked it by hand. TWO DOORS THAT BOTH COUNT is the point; one door believing the
+# other counts is the defect.
+#
+# The floor is therefore declared HERE as well, and it stays a FLOOR rather than an
+# equality: the reasoning already written in `harness.yml` is right and is not rewritten.
+# `harness.yml` stays exactly as it is.
+#
+# **The number is MEASURED at the moment it is written, never copied.** 974, from
+# `pytest -q` on 2026-08-27 -- the run that reports ZERO skipped. It was 955 with sixteen
+# skips beside it; those skips became an asserted partition rather than unmeasured nodes.
+# Lowering it is a decision somebody makes in a diff, and it has not been lowered.
+#
+# **WHAT THE NUMBER IS COMPARED AGAINST CHANGED ON 2026-08-28, AND THE NUMBER DID NOT.**
+# It was compared against `passed`, and the sentence above -- *the run that reports ZERO
+# skipped* -- is the tell: that run only exists on a machine with a live BigQuery
+# credential, so the floor silently required one, and nothing here said so. The day the
+# credential lapsed the gate blocked every push at 971 passed while the suite COLLECTED
+# 975, one MORE than this floor. The comparison is against the COLLECTED count now; the
+# reasoning is at `read_results`, where the comparison actually happens.
+#
+# ONLY THE HARNESS HAS ONE, AND THAT IS SAID RATHER THAN IMPLIED. The other six suites
+# are gated for pass/fail and NOT for disappearance: a push that deletes a test in them
+# is green here. That is the shape of the debt this entry pays for one directory, and
+# naming it is what keeps it from reading as coverage nobody has.
+floor_for() {
+  case "$1" in
+    apps/telegram-bot) echo 974 ;;
+    *) echo "" ;;
+  esac
+}
+
+# The floor, printed on demand. A node that wants to check the floor's BEHAVIOUR needs the
+# number, and copying it into a test would put the same figure in two files -- the `F136`
+# shape, where the declaration lives in the place that ages. So the test asks.
+if [ "${1:-}" = "--floor-for" ]; then
+  floor_for "${2:-}"
+  exit 0
+fi
+
+# --------------------------------------------------------------------------- #
+# A PARTICAO DE SKIPS E UM CONJUNTO DE MOTIVOS, E NAO UM CONJUNTO DE ARQUIVOS.
+#
+# O `harness.yml` carregava isto como um `grep -vE` escrito a mao nomeando DOIS arquivos de
+# teste literalmente. Em 2026-09-04 um TERCEIRO arquivo passou a pular por um motivo que a
+# lista JA tolerava -- "no Google credential is configured" -- e o portao ficou vermelho pelo
+# ENDERECO. Acrescentar o terceiro caminho compraria umas oito semanas. E o `F136`, e estava a
+# quatro linhas da chamada `--floor-for` que existe exatamente para curar isso.
+#
+# O que aquele workflow declara no topo e uma propriedade do RUNNER: sem token de bot, sem
+# chave de modelo, sem credencial de armazem, e `.env` git-ignored e portanto ausente por
+# construcao. O unico campo de uma linha SKIPPED que se compara com uma afirmacao sobre o
+# AMBIENTE e o MOTIVO. O arquivo nunca foi a propriedade; foi onde a propriedade morava.
+#
+# O CUSTO E NOMEADO EM VEZ DE ESCONDIDO. Tolerar por motivo significa que qualquer no da suite
+# pode pular por um motivo declarado e ser tolerado. Duas coisas impedem isso de ser pior que
+# um portao vermelho:
+#
+#   1. O CASAMENTO E ANCORADO NO PRIMEIRO CARACTERE DO MOTIVO. Um motivo tem de COMECAR por
+#      uma frase declarada. "o modelo demorou e alias no Google credential is configured" NAO
+#      e tolerado. Casar por substring seria lavagem, e um portao que tolera demais e pior que
+#      um vermelho.
+#   2. UMA LINHA QUE NAO SE LE NAO E TOLERADA. "nao consegui ler" nunca e "foi explicado", que
+#      e a regra deste arquivo em todo o resto.
+#
+# UMA SUITE DESCONHECIDA E RECUSA, NAO LISTA VAZIA -- a mesma regra que o piso ja aplica.
+# "Nao ha particao para esta suite" jamais pode ler como "nada precisava de explicacao".
+tolerated_skip_reasons() {
+  case "$1" in
+    apps/telegram-bot)
+      # Cada linha e um PREFIXO de motivo, casado a partir do caractere um. Medido dos oito
+      # sitios de skip em `apps/telegram-bot/tests` em 2026-09-06.
+      cat <<'REASONS'
+no Google credential is configured
+the BigQuery credential is absent or expired
+google-cloud-bigquery is not installed
+google-auth is not installed
+the caller is not in this checkout
+.env is git-ignored and absent here
+.env is absent here
+REASONS
+      ;;
+    packages/semantic_catalog)
+      # UM motivo, e os dois sitios de skip usam-no: `test_the_declared_direction_matches_the_source`
+      # (contract, OD-113) e `test_ext_a_readiness_conditions` (integration, T109/D-12). Ambos
+      # MEDEM o armazem de verdade e dizem isso no proprio motivo.
+      cat <<'REASONS'
+no Google credential is configured
+REASONS
+      ;;
+    packages/analytics_interaction)
+      # PARTICAO DECLARADA E VAZIA. Os dois skips desta suite -- "no message registry is
+      # authored yet" e o guarda de caso duplicado do grader -- nao sao sobre segredo nenhum:
+      # se disparam, alguma coisa esta MESMO por authorar, e o portao deve acender. O
+      # docstring do test_upstream_node_ids ja tinha nomeado o primeiro como falso positivo
+      # de uma varredura estatica; declarar vazio diz a mesma coisa sem legislar estilo.
+      cat <<'REASONS'
+REASONS
+      ;;
+    packages/analytics_query)
+      # PARTICAO DECLARADA E VAZIA, e isso nao e o mesmo que suite desconhecida. Medido em
+      # 2026-09-06: `1823 passed`, zero skipped. Esta suite nao tolera skip nenhum, e dizer
+      # isso explicitamente e o que impede que um skip novo aqui passe por baixo do silencio.
+      cat <<'REASONS'
+REASONS
+      ;;
+    *) return 1 ;;
+  esac
+}
+
+if [ "${1:-}" = "--tolerated-skip-reasons" ]; then
+  if ! tolerated_skip_reasons "${2:-}"; then
+    echo "pre-push: no skip partition is declared for '${2:-}'" >&2
+    exit 1
+  fi
+  exit 0
+fi
+
+# O JUIZO, E NAO A LISTA. Publicar os motivos e deixar cada porta escrever a sua propria
+# comparacao poria a SEMANTICA em dois arquivos, que e o defeito um nivel acima do que isto
+# substitui. Le a saida do pytest em stdin e imprime as linhas SKIPPED que ficam FORA da
+# particao; sai 0 quando julgou e 1 quando nao tinha particao para julgar.
+unexplained_skips() {
+  declared=$(tolerated_skip_reasons "$1") || return 1
+  awk -v declared="$declared" '
+    BEGIN { total = split(declared, prefix, "\n") }
+    /^SKIPPED/ {
+      rest = $0
+      sub(/^SKIPPED +(\[[0-9]+\] +)?/, "", rest)
+      at = index(rest, ": ")
+      if (at == 0) { print $0; next }
+      reason = substr(rest, at + 2)
+      for (i = 1; i <= total; i++) {
+        if (prefix[i] != "" && substr(reason, 1, length(prefix[i])) == prefix[i]) next
+      }
+      print $0
+    }
+  '
+}
+
+if [ "${1:-}" = "--unexplained-skips" ]; then
+  if ! unexplained_skips "${2:-}"; then
+    echo "pre-push: no skip partition is declared for '${2:-}'" >&2
+    exit 1
+  fi
+  exit 0
+fi
+
+read_results() {
+  skips=0
+  machine_failures=0
+  environment_failures=0
+  index=0
+  while IFS= read -r job; do
+    index=$((index + 1))
+    # A TRAILING CARRIAGE RETURN WOULD DISABLE THE FLOOR IN SILENCE, and this runs on
+    # Windows. The gate writes its own job list with LF, but anything that reads a run
+    # directory written by another tool -- a test harness, an editor, a Python
+    # `write_text` -- gets CRLF for free, and `tools/x` with a carriage return glued to it matches no
+    # case label. It was found by a node that expected a refusal and got a pass.
+    job=${job%$'\r'}
+    echo "  [${index}/${total}] ${job}"
+    if [ -f "${runs}/${index}.out" ]; then
+      cat "${runs}/${index}.out"
+    fi
+    # A JOB THE MACHINE KILLED IS NOT A TEST THAT REPROVED, and until 2026-09-03 this read
+    # them as the same thing (S-42). The two ask for OPPOSITE actions: a red test means fix
+    # the code, a dead process means the run could not be held -- and someone who reads
+    # "FAILED" goes looking for a defect in a suite that is green. So the three states are
+    # named apart. Both still BLOCK: "the machine could not run it" is never "it passed".
+    if [ ! -f "${runs}/${index}.rc" ]; then
+      echo "  [${index}/${total}] MACHINE FAILURE: the job never reported an exit code." >&2
+      echo "             The process died before it could write one -- this is the machine," >&2
+      echo "             not a red test. Blocking anyway: did not measure is not passed." >&2
+      failed=1
+      machine_failures=$((machine_failures + 1))
+      continue
+    fi
+    rc=$(cat "${runs}/${index}.rc")
+    if [ "${rc}" -ne 0 ]; then
+      # THE THIRD THING A NON-ZERO CODE CAN MEAN -- `OD-137`, 06/09.
+      #
+      # `127` is "command not found". It is not an assertion and it is not a corpse: the
+      # checker was never launched, so nothing in the suite was measured and nothing in the
+      # suite is broken. Until today it fell through to `FAILED, exit 127`, and the sentence
+      # that printed was `A gate above exited non-zero` -- which sent a reader to debug a
+      # suite that is green.
+      #
+      # **Measured, 06/09**: push #15 blocked on `strict types: packages/daily_reporting`
+      # with `rc=127` and an output holding nothing but pyright's version warning. The job
+      # was then run alone TWICE: `0 errors, rc=0` both times. Thirty-nine of the forty
+      # gates were green, and the fortieth was the launcher, not the code.
+      #
+      # The boundary was `rc >= 128` and `127` sits exactly one below it. That is the whole
+      # bug: the gate had learnt not to confuse a KILLED PROCESS with a red test, and still
+      # confused an ABSENT COMMAND with one.
+      #
+      # ONLY 127, and the narrowness is deliberate: his order says not to widen this to
+      # codes nobody measured. Every other non-zero code keeps meaning what it meant.
+      if [ "${rc}" -eq 127 ]; then
+        echo "  [${index}/${total}] ENVIRONMENT FAILURE, exit 127: the command was not" >&2
+        echo "             found. Nothing in this suite ran, so nothing in it is broken --" >&2
+        echo "             this is the checker's launcher, not a red test. Blocking anyway:" >&2
+        echo "             did not measure is not passed." >&2
+        failed=1
+        environment_failures=$((environment_failures + 1))
+        continue
+      fi
+      # A native death rather than an assertion: a signal (128+n), a Windows fatal
+      # exception, or the interpreter itself falling over. Matched on what the job PRINTED
+      # as well as on the code, because Windows reports these through neither alone.
+      if [ "${rc}" -ge 128 ] \
+        || grep -qE 'Windows fatal exception|access violation|Fatal Python error|MemoryError|Killed|Cannot allocate memory' \
+             "${runs}/${index}.out" 2>/dev/null; then
+        echo "  [${index}/${total}] MACHINE FAILURE, exit ${rc}: the process was killed or" >&2
+        echo "             died natively -- out of memory, a signal, or a fatal exception." >&2
+        echo "             This is NOT a failing test. The suite is not the thing to fix." >&2
+        failed=1
+        machine_failures=$((machine_failures + 1))
+      else
+        echo "  [${index}/${total}] FAILED, exit ${rc}" >&2
+        failed=1
+      fi
+    fi
+
+    # The floor, for the suites that declare one. The count is read from the FILE the step
+    # already wrote -- no pipe stands between a command and the code it returned.
+    #
+    # A COUNT THAT CANNOT BE READ IS A FAILURE, not an absence of one. It is the same rule
+    # as a missing exit code, in the same place, for the same reason: "did not measure" is
+    # never "passed".
+    # Both counts come from the FILE the step already wrote, and they are read ONCE, here,
+    # because the floor and the skip total are two readings of one fact -- and two copies of
+    # one fact disagree the day one of them moves.
+    step_passed=$(sed -n 's/^\([0-9][0-9]*\) passed.*/\1/p' "${runs}/${index}.out" | tail -1)
+    step_skips=$(sed -n 's/^\([0-9][0-9]*\) skipped.*/\1/p;s/.*, \([0-9][0-9]*\) skipped.*/\1/p' "${runs}/${index}.out" | tail -1)
+    [ -n "${step_skips}" ] && skips=$((skips + step_skips))
+
+    # THE FLOOR MEASURES WHAT WAS COLLECTED, NOT WHAT PASSED, AND THAT CHANGED ON 2026-08-28.
+    #
+    # It compared `passed`, and on that day it blocked every push on this machine with
+    # 971 passed, 4 skipped against a floor of 974 -- while the suite COLLECTED 975, one
+    # MORE than the floor. Nothing had vanished and the floor was not stale. The cause was a
+    # third thing the old message could not express: FOUR NODES THAT EXIST AND COULD NOT RUN
+    # HERE, because the BigQuery credential had lapsed.
+    #
+    # **And the number carried an unwritten pre-condition.** The comment above says 974 came
+    # from the run that reports ZERO skipped -- a run that only exists with a live
+    # credential. So the floor silently required a BigQuery credential on the pushing
+    # machine, and nothing said so. That is `F136`: a number whose validity depends on a
+    # condition nobody wrote down.
+    #
+    # Comparing the COLLECTED count fixes it at the root rather than by lowering anything:
+    #
+    #   * the floor exists to catch DISAPPEARANCE, and the collected count falls only when a
+    #     node is DELETED -- which is exactly what it was raised to catch;
+    #   * `passed` varies legitimately with the environment, which is why the number was
+    #     carrying an invisible pre-condition in the first place;
+    #   * a silent skip is ALREADY covered -- the skip total is accumulated above and the run
+    #     prints it as *reported, not tolerated*, so nothing disappears into a skip;
+    #   * AND THE NUMBER DOES NOT DESCEND. 974 stays. Lowering it would accept less
+    #     measurement forever, which is the defect that raised it from 916 in the first place.
+    floor=$(floor_for "${job}")
+    if [ -n "${floor}" ]; then
+      if [ -z "${step_passed}" ] && [ -z "${step_skips}" ]; then
+        echo "  [${index}/${total}] NO NODE COUNT COULD BE READ -- treated as a failure" >&2
+        failed=1
+      else
+        collected=$(( ${step_passed:-0} + ${step_skips:-0} ))
+        if [ "${collected}" -lt "${floor}" ]; then
+          echo "  [${index}/${total}] BELOW THE FLOOR: ${collected} collected (${step_passed:-0} passed, ${step_skips:-0} skipped), floor is ${floor}." >&2
+          echo "               A node was DELETED, or the floor is stale. Both are decisions." >&2
+          echo "               It is NOT a node that exists and could not run here: that one is" >&2
+          echo "               still collected, and this count is why it no longer blocks." >&2
+          failed=1
+        fi
+      fi
+    fi
+  done < "${jobs_file}"
+}
+
+
+# The blocked message, in ONE place. `--read-run` and the real run both print it, and two
+# copies of one sentence disagree the day one of them moves -- which is how the machine
+# failure of S-42 would have been named in the run and stayed unnamed in the mode a node
+# drives. `limit` is unset under `--read-run`, and the message says so rather than inventing
+# a number it did not measure.
+report_blocked() {
+  echo "" >&2
+  if [ "${environment_failures:-0}" -ne 0 ]; then
+    echo "  PUSH BLOCKED, and ${environment_failures} of the gates above was an ENVIRONMENT" >&2
+    echo "  FAILURE, not a red test: a command was not found, so that suite never ran. Do" >&2
+    echo "  not go looking for a defect in it -- run the step alone and see." >&2
+  fi
+  if [ "${machine_failures:-0}" -ne 0 ]; then
+    echo "  PUSH BLOCKED, and ${machine_failures} of the gates above was a MACHINE FAILURE," >&2
+    echo "  not a red test: a process died natively or never reported. Do not go looking for" >&2
+    echo "  a defect in the suite that was killed." >&2
+    if [ -n "${limit:-}" ]; then
+      echo "  The run was limited to ${limit} at a time ($(memory_note)). If that still did" >&2
+      echo "  not fit, free memory and run again." >&2
+    fi
+  elif [ "${environment_failures:-0}" -eq 0 ]; then
+    # THE GENERIC SENTENCE IS THE ONE FOR WHEN NOTHING ELSE EXPLAINED IT, and it has to be
+    # last. Written as a plain `else` it printed AFTER the environment sentence and
+    # contradicted it -- "not a red test" followed by "a gate exited non-zero" is worse than
+    # either alone, because the reader now has to guess which half to believe.
+    echo "  PUSH BLOCKED. A gate above exited non-zero, or did not report at all." >&2
+  fi
+  echo "  Fix it, or push with --no-verify and own that decision." >&2
+  echo "" >&2
+}
+
+# --read-run DIR reports on a run directory that ALREADY EXISTS, without running a single
+# suite. It exists so a node can DRIVE the verdict -- above all the rule that a step which
+# reported no exit code is a FAILURE and never an absence of one. Describing that rule in a
+# test would be the G-1 defect: a check that reads the shape instead of the behaviour.
+if [ "${1:-}" = "--read-run" ]; then
+  runs="${2:-}"
+  [ -d "${runs}" ] || { echo "  --read-run needs a directory" >&2; exit 2; }
+  jobs_file="${runs}/jobs"
+  [ -f "${jobs_file}" ] || { echo "  ${jobs_file} is missing" >&2; exit 2; }
+  total=$(wc -l < "${jobs_file}")
+  failed=0
+  read_results
+  if [ "${failed}" -ne 0 ]; then
+    report_blocked
+    exit 1
+  fi
+  echo "  ${skips} test(s) skipped across the run -- reported, not tolerated."
+  exit 0
+fi
+
+started_at=$(date +%s)
+PY="${ROOT}/.venv/Scripts/python.exe"
+[ -x "${PY}" ] || PY="${ROOT}/.venv/bin/python"
+
+# PERGUNTAR PELO PLANO NAO PRECISA DE INTERPRETADOR, e ate 2026-09-06 precisava.
+#
+# `--heavy-plan`, `--concurrency` e `--waves` sao derivacao pura: memoria livre, contagem de
+# CPU e a lista de jobs. Nenhuma toca em `${PY}` -- conferido lendo os corpos de `heavy_plan`,
+# `concurrency_limit`, `cpu_total` e `wave_of`. Mas os seus despachos vivem abaixo desta
+# guarda, entao num runner sem `.venv` a pergunta recebia "pre-push SKIPPED" em vez de resposta.
+#
+# MEDIDO no GitHub em 2026-09-06: 15 nos de `insights_prioritisation` vermelhos, todos a dizer
+# `limit not reported in: ''` ou `o hook nao deu veredito nenhum: ''`. O hook recusava e o no
+# lia a recusa como AUSENCIA DE VEREDITO -- que e a coisa que este arquivo inteiro existe para
+# nao deixar passar, cometida por ele proprio. Estiveram escondidos porque a `every-package.yml`
+# morria no pacote 4 e nunca chegava ao 7; corrigido o no partilhado, o laco desenterrou-os.
+#
+# A cura E ESTA e nao mover os despachos: as funcoes sao DEFINIDAS abaixo desta linha, e subir
+# os despachos deu `concurrency_limit: command not found` -- tentado, medido, desfeito.
+#
+# OS DOIS AUTOTESTES NAO ENTRAM NA LISTA: `--selftest-cleanup` e `--concurrency-selftest`
+# precisam do diretorio de run, criado bem mais abaixo, e nao sao derivacao. Continuam a
+# receber a recusa, e isso continua certo.
+needs_no_interpreter=0
+case "${1:-}" in
+  --heavy-plan|--concurrency|--waves) needs_no_interpreter=1 ;;
+esac
+
+# E UMA PERGUNTA NAO E UM PUSH: O FAIL-OPEN PROTEGE UM E NAO O OUTRO.
+#
+# O paragrafo 2 la em cima decide, com razao, que a AUSENCIA de interpretador nao bloqueia o
+# push: bloquear toda a gente numa maquina sem gates faria repor o `core.hooksPath`, e um portao
+# removido nao guarda nada. Essa decisao fica INTEIRA e nao e tocada aqui.
+#
+# Mas o raciocinio inteiro e sobre o PUSH. `--format-check` e `--lint-check` sao PERGUNTAS que um
+# chamador faz -- "esta suite esta formatada?" -- e nao ha push nenhum para proteger. Sair 0 ali
+# nao e falhar aberto: e responder QUE SIM a uma pergunta que ninguem mediu.
+#
+# MEDIDO em 2026-09-06, e o REVIEWER corrigiu-me o diagnostico: eu tinha escrito "ausencia de
+# veredito" e o log do runner diz outra coisa --
+# `o portao aceitou um arquivo desformatado; assert 0 != 0`
+# (`test_the_push_gate_covers_every_package.py:329`, e o mesmo para lint em :402). O no pede
+# BLOQUEIO e recebe ACEITACAO. Reproduzido aqui com um interpretador inexistente: com `.venv`
+# `--format-check` sobre um arquivo torto da rc=1; sem `.venv` da **rc=0**, depois de imprimir
+# "pre-push SKIPPED, and this is not a pass".
+#
+# A FRASE E O CODIGO DE SAIDA CONTRADIZIAM-SE, e o codigo e o que um chamador le. Este arquivo
+# inteiro existe para que "nao mediu" nunca leia como "passou", e cometia-o na unica ramificacao
+# que diz em voz alta que nao e passagem.
+needs_interpreter_to_answer=0
+case "${1:-}" in
+  --format-check|--lint-check) needs_interpreter_to_answer=1 ;;
+esac
+
+if [ ! -x "${PY}" ] && [ "${needs_interpreter_to_answer}" -eq 1 ]; then
+  echo "" >&2
+  echo "  pre-push: NAO CONSIGO RESPONDER a ${1}." >&2
+  echo "  No interpreter at .venv, and this flag runs ruff through it. Saio NAO-ZERO porque" >&2
+  echo "  quem pergunta le o codigo de saida, e um 0 aqui dizia que a suite esta limpa quando" >&2
+  echo "  ninguem a mediu. O push continua a falhar ABERTO (paragrafo 2); uma pergunta nao." >&2
+  echo "" >&2
+  exit 2
+fi
+
+if [ ! -x "${PY}" ] && [ "${needs_no_interpreter}" -eq 0 ]; then
+  echo "" >&2
+  echo "  pre-push SKIPPED, and this is not a pass." >&2
+  echo "  No interpreter at .venv — the gates could not run, so nothing was" >&2
+  echo "  checked. See the second numbered paragraph of tools/git-hooks/pre-push." >&2
+  echo "" >&2
+  exit 0
+fi
+
+# The format check itself, as a function, so that the job below and the node that drives it
+# run THE SAME command. A node that re-typed `ruff format --check` would be checking its own
+# copy -- the very shape `--list-suites` exists to avoid.
+format_check() {
+  ( cd "$1" && "${PY}" -m ruff format --check . )
+}
+
+# `--markers-check <suite>` responde a UMA suite: total, soma por marcador, e o residuo.
+#
+# Existe como flag pela mesma razao que `--format-check` e `--unexplained-skips`: um no tem de
+# poder DRIVAR a guarda em vez de descrever o que acredita que ela faz. Uma guarda que so corre
+# dentro do laco do push e uma guarda que ninguem viu falhar.
+#
+# **Um no sem marcador e um no que ninguem classificou**, e `--strict-markers` nao o ve: ele
+# recusa marcadores DESCONHECIDOS e cala-se sobre a ausencia deles. A soma por marcador contra o
+# total e o que torna a ausencia visivel.
+if [ "${1:-}" = "--markers-check" ]; then
+  suite="${2:-}"
+  [ -n "${suite}" ] || { echo "usage: pre-push --markers-check <suite>" >&2; exit 2; }
+  markers="$(markers_of "${suite}")"
+  [ -n "${markers}" ] || {
+    echo "gate failed: ${suite} declares no markers, so this check has nothing to measure" >&2
+    exit 1
+  }
+  cd "${ROOT}/${suite}" || exit 1
+  total=$("${PY}" -m pytest --collect-only -q --strict-markers 2>/dev/null | grep -c '::' || true)
+  sum=0
+  absent=""
+  for marker in ${markers}; do
+    n=$("${PY}" -m pytest --collect-only -q --strict-markers -m "${marker}" 2>/dev/null \
+      | grep -c '::' || true)
+    echo "scope evidence: ${suite} ${marker} = ${n}"
+    sum=$((sum + n))
+    absent="${absent:+${absent} and }not ${marker}"
+  done
+  unmarked=$("${PY}" -m pytest --collect-only -q --strict-markers -m "${absent}" 2>/dev/null \
+    | grep -c '::' || true)
+  echo "scope evidence: ${suite} total = ${total}, markers sum = ${sum}, unmarked = ${unmarked}"
+  if [ "${total}" -eq 0 ]; then
+    echo "gate failed: ${suite} collected ZERO nodes, so nothing was measured" >&2
+    exit 1
+  fi
+  if [ "${unmarked}" -ne 0 ]; then
+    echo "gate failed: ${unmarked} node(s) in ${suite} carry no marker" >&2
+    exit 1
+  fi
+  if [ "${sum}" -ne "${total}" ]; then
+    echo "gate failed: ${suite} marker residue -- sum ${sum} against total ${total}" >&2
+    exit 1
+  fi
+  exit 0
+fi
+
+if [ "${1:-}" = "--format-check" ]; then
+  format_check "${2:?--format-check needs a directory}"
+  exit "$?"
+fi
+
+# The lint check, `OD-135`. Same shape as the format one, and for the same reason: the job
+# below and the node that drives it run THE SAME function, so a node cannot pass by checking
+# a command it typed itself.
+lint_check() {
+  ( cd "$1" && "${PY}" -m ruff check . )
+}
+
+if [ "${1:-}" = "--lint-check" ]; then
+  lint_check "${2:?--lint-check needs a directory}"
+  exit "$?"
+fi
+
+echo ""
+echo "  pre-push: running the gates. --no-verify skips this."
+echo ""
+
+failed=0
+
+# --------------------------------------------------------------------------- #
+# Each gate is its own step. NO PIPE on the command whose exit code matters --
+# that is the whole lesson of F140. `$?` is read immediately, before anything
+# else can overwrite it.
+# --------------------------------------------------------------------------- #
+
+# --------------------------------------------------------------------------- #
+# THE EIGHT STEPS RUN AT ONCE, AND WHY THAT IS NOT A SHORTCUT.
+#
+# Measured before this change: the steps summed to between 543 s and 604 s depending
+# on whether each ran in its own process. Two suites this work never touched --
+# channel_integration at 192 s and semantic_catalog at 126 s -- are half of it. A gate
+# past ten minutes is a gate somebody routes around, and the two honest ways out were
+# named long before the number was: make the suites faster, or split the gate.
+#
+# SPLITTING BY FEATURE WOULD REINSTALL THE HAND-WRITTEN NAME -- exactly the debt cycles
+# 362 and 367 paid to remove. So the steps run in PARALLEL instead: nothing leaves the
+# coverage, no root is named, and the wall clock becomes the slowest single suite.
+#
+# Each step writes its OUTPUT and its EXIT CODE to its own file, and the files are read
+# afterwards. That is what makes the parallel run readable, and it is also what makes
+# the skip total possible without a pipe -- see below.
+# --------------------------------------------------------------------------- #
+
+# --------------------------------------------------------------------------- #
+# HOW MANY AT ONCE, AND WHY IT IS NOT "ALL OF THEM" -- finding S-42 (2026-09-03).
+#
+# The parallel dispatch above replaced a 543-604 s serial gate, and it fired ALL of the
+# jobs at once. On this machine that is twenty processes, ten of them `pyright`. The gate
+# then blocked two pushes in a row, in DIFFERENT jobs each time: once with a nested pytest
+# dying at "1 error during collection", once with `Windows fatal exception: code
+# 0xc000070a` and an access violation. Neither was a test. **The machine ran out of
+# memory**, and a different victim each run is the signature.
+#
+# MEASURED on the machine that failed, not estimated: 16 logical CPUs and 15.8 GiB of RAM;
+# ten `pyright` in parallel cost ~2.3 GiB TOTAL (~240 MiB each -- far less than feared);
+# and `channel_integration`'s pytest ALONE peaks at ~1.8 GiB. So the ceiling is set by the
+# heavy pytest suites, not by the type checkers, and it is MEMORY and not CPU: sixteen CPUs
+# is exactly what authorised twenty processes and exhausted the RAM.
+#
+# **And the memory that matters is what is FREE, not what is installed.** Measured across
+# this session the same machine had between 2.0 and 5.7 GiB free depending on what else was
+# open. A limit derived from the total would authorise a run the machine cannot hold, which
+# is the bug restated with a bigger number.
+#
+# So: free memory divided by one slot's worth, floored at 2 and capped at the CPU count.
+# The floor is a judgement and it is written down: a serial gate is the 604 s gate the
+# parallel dispatch existed to remove, and a gate that slow is the gate somebody routes
+# around with `--no-verify`. If two slots still do not fit, the run does not lie about it
+# -- see the machine-failure classification in `read_results`.
+#
+# Nothing leaves the job list. This changes only how many run at the same moment.
+# --------------------------------------------------------------------------- #
+
+#: TWO slot sizes, because the measurement found two populations and one number wastes the
+#: cheaper one. A `pyright` job measured ~240 MiB; the heaviest pytest suite measured
+#: ~1.8 GiB -- seven times more. Charging every job the heavy rate ran the whole gate two at
+#: a time and took 634 s, which is WORSE than the 604 s serial gate the parallel dispatch
+#: was built to replace, and this file already says a gate past ten minutes is a gate
+#: somebody routes around. So the type checks run in their own wave at their own rate.
+#: Neither number is a preference; change one when a job is measured heavier than it.
+SLOT_KB=2097152
+LIGHT_SLOT_KB=524288
+#: Never fewer than this many at once, IN THE LIGHT WAVE. See the paragraph above for why
+#: serial is refused: a light slot is 512 MiB, and two of those fit on any machine that can
+#: run this repository at all.
+MIN_SLOTS=2
+
+# THE FLOOR THAT LIED, and the incident that measured it -- `OD-136`, 06/09.
+#
+# The heavy wave carried the same floor of two, and a floor is a promise about memory that
+# memory does not have to keep. On 06/09 the machine had **1.928 MiB free against 2.048 MiB
+# per heavy slot**: the derivation computed `1928/2048 = 0` slots, the floor raised it to
+# TWO, and the gate dispatched two 1,8 GiB suites into 1,9 GiB. Four jobs died without
+# writing an exit code, and a job that dies for memory writes NO REASON AT ALL -- so the run
+# looked exactly like a blocked push. It cost a wrong diagnosis: a peer read three run
+# directories as one push, called it dead, and was about to take a memory budget to the
+# owner over a push that had actually passed.
+#
+# **A silent red has the same face as a block, and that is the `verde por nao medir` defect
+# from the other side.** The repair is not a bigger number -- his order says the budget does
+# not move without measurement -- it is that MEASUREMENT WINS OVER PREFERENCE: the heavy
+# wave runs as many as fit, ONE at a time when only one fits, and when not even one fits the
+# gate REFUSES IN WRITING instead of dying without a sentence.
+HEAVY_MIN_SLOTS=1
+
+cpu_total() {
+  if command -v nproc > /dev/null 2>&1; then
+    nproc
+  elif command -v getconf > /dev/null 2>&1 && getconf _NPROCESSORS_ONLN > /dev/null 2>&1; then
+    getconf _NPROCESSORS_ONLN
+  else
+    echo "${MIN_SLOTS}"
+  fi
+}
+
+# Free memory in kB, or empty when this machine will not say. `MemAvailable` is the honest
+# figure on Linux; MSYS on Windows publishes only `MemFree`, and there it IS the figure
+# Windows reports as available. macOS has neither, so it falls through to the CPU cap --
+# and a gate that cannot measure memory says so rather than inventing a number.
+free_kb() {
+  # The one seam, and it exists so a node can DRIVE the derivation rather than describe it.
+  # Without it the only way to check that memory reaches the limit is to change how much
+  # memory the machine has -- so a limit derived from CPU alone would pass every node while
+  # being exactly the bug (measured: it did, until this was added). Unset in every real run,
+  # and the value is read, never written.
+  if [ -n "${PREPUSH_FREE_KB:-}" ]; then
+    echo "${PREPUSH_FREE_KB}"
+    return 0
+  fi
+  if [ -r /proc/meminfo ]; then
+    awk '/^MemAvailable:/ {print $2; found=1; exit}
+         END {if (!found) exit 1}' /proc/meminfo 2>/dev/null && return 0
+    awk '/^MemFree:/ {print $2; exit}' /proc/meminfo 2>/dev/null && return 0
+  fi
+  return 1
+}
+
+# The limit for a slot size. Both waves derive theirs the same way, from the same reading,
+# so the light wave cannot drift into being an exception to the rule. The FLOOR is a
+# parameter rather than a constant read from the environment, because the two waves no
+# longer share one -- see `HEAVY_MIN_SLOTS` and the incident that measured it.
+limit_for() {
+  slot_kb="$1"
+  floor="$2"
+  cpus=$(cpu_total)
+  free=$(free_kb) || free=""
+  if [ -z "${free}" ]; then
+    # No memory reading: fall back to the CPU count. Named in `memory_note` so the report
+    # never presents an unmeasured limit as a measured one.
+    echo "${cpus}"
+    return 0
+  fi
+  by_memory=$((free / slot_kb))
+  [ "${by_memory}" -lt "${floor}" ] && by_memory=${floor}
+  [ "${by_memory}" -gt "${cpus}" ] && by_memory=${cpus}
+  echo "${by_memory}"
+}
+
+concurrency_limit() { limit_for "${SLOT_KB}" "${HEAVY_MIN_SLOTS}"; }
+light_concurrency_limit() { limit_for "${LIGHT_SLOT_KB}" "${MIN_SLOTS}"; }
+
+# WHAT THE HEAVY WAVE MAY DO, decided from a reading taken AT THE MOMENT IT IS ASKED.
+#
+# This is the function the run consults BETWEEN the waves rather than before them, and the
+# distinction is the whole point: the light wave holds nineteen processes of its own, so the
+# figure measured before it starts is not the figure the suites will meet. The old code read
+# the memory ONCE, at the top, and then dispatched the suites against a number that was
+# already stale by nine minutes.
+#
+# It prints one of two verdicts, and never both:
+#   `limit=N basis=...`  -- N suites at a time, and where N came from
+#   `refuse=N`           -- N MiB free, and not even one suite fits
+#
+# A machine that will not report its memory keeps the old behaviour and says so: refusing
+# a push on a platform that cannot measure would be inventing a reason, which is the thing
+# this file exists to not do.
+heavy_plan() {
+  free=$(free_kb) || free=""
+  if [ -z "${free}" ]; then
+    echo "limit=$(cpu_total) basis=cpu"
+    return 0
+  fi
+  if [ "$((free / SLOT_KB))" -lt 1 ]; then
+    echo "refuse=$((free / 1024))"
+    return 0
+  fi
+  echo "limit=$(concurrency_limit) basis=memory"
+}
+
+memory_note() {
+  free=$(free_kb) || free=""
+  if [ -z "${free}" ]; then
+    echo "no memory reading on this platform; limited by CPU count $(cpu_total)"
+  else
+    echo "$((free / 1024)) MiB free, $((SLOT_KB / 1024)) MiB per heavy slot, $((LIGHT_SLOT_KB / 1024)) MiB per light slot, $(cpu_total) CPUs"
+  fi
+}
+
+# The ONE dispatch loop. `run_gated_job` below is the real work; the self-test replaces it
+# with a sleep and drives THIS function, so the node checking the limit checks the loop the
+# push actually uses rather than a copy of it.
+#
+# Each job records the span it occupied, and the spans are what make the limit CHECKABLE
+# after the fact: reading this loop for a `wait` proves nothing, and overlapping spans
+# prove everything.
+# Lines are "INDEX<TAB>JOB", so a wave can carry a SUBSET of the list and every job keeps
+# the index it has in the report. Splitting by re-numbering would put the type checks and
+# the suites under the same indices and the report would name the wrong job.
+dispatch_jobs() {
+  jobs_path="$1"
+  runner="$2"
+  running=0
+  while IFS=$'	' read -r index job; do
+    [ -n "${index}" ] || continue
+    if [ "${running}" -ge "${limit}" ]; then
+      # Waits for ONE job, so a slot opens rather than the whole batch draining. If more
+      # than one finished meanwhile, the count is left conservative: fewer at once than the
+      # limit is safe, more is the bug this exists to prevent.
+      wait -n 2>/dev/null || true
+      running=$((running - 1))
+    fi
+    (
+      echo "$(date +%s) start" > "${runs}/${index}.span"
+      "${runner}" "${index}" "${job}"
+      echo "$(date +%s) end" >> "${runs}/${index}.span"
+    ) &
+    running=$((running + 1))
+  done < "${jobs_path}"
+  wait
+}
+
+run_gated_job() {
+  job_index="$1"
+  job="$2"
+  if [ "${job}" = "cross-artifact citations" ]; then
+    "${PY}" -m pytest \
+      "${ROOT}/packages/semantic_catalog/tests/contract/test_cross_artifact_links.py" -q \
+      > "${runs}/${job_index}.out" 2>&1
+  elif [ "${job#strict types: }" != "${job}" ]; then
+    # The suite is read back OUT of the job label, so the label a reader sees and the
+    # directory the checker runs in cannot disagree.
+    cd "${ROOT}/${job#strict types: }" && "${PY}" -m pyright > "${runs}/${job_index}.out" 2>&1
+  elif [ "${job#format: }" != "${job}" ]; then
+    format_check "${ROOT}/${job#format: }" > "${runs}/${job_index}.out" 2>&1
+  elif [ "${job#lint: }" != "${job}" ]; then
+    lint_check "${ROOT}/${job#lint: }" > "${runs}/${job_index}.out" 2>&1
+  elif [ "${job#markers: }" != "${job}" ]; then
+    # Chama o PROPRIO flag em vez de repetir a contagem aqui: uma segunda copia da regra e a
+    # que envelhece sozinha, e o no que DRIVA a guarda drivaria a copia errada.
+    "$0" --markers-check "${job#markers: }" > "${runs}/${job_index}.out" 2>&1
+  else
+    cd "${ROOT}/${job}" && "${PY}" -m pytest -q > "${runs}/${job_index}.out" 2>&1
+  fi
+  # The exit code is written to its own file, ON ITS OWN LINE, before anything else can
+  # overwrite `$?`. No pipe touches the command whose code matters -- redirection is not
+  # a pipe, and this is the same shape every step already used one at a time.
+  echo "$?" > "${runs}/${job_index}.rc"
+}
+
+runs="${ROOT}/.git/pre-push-runs.$$"
+rm -rf "${runs}" 2>/dev/null
+mkdir -p "${runs}" || {
+  echo "  pre-push could not create its run directory; refusing to report a pass" >&2
+  exit 1
+}
+# THE EVIDENCE USED TO LEAVE WITH THE VERDICT -- `OD-137`, second half.
+#
+# The trap deleted the run directory on every exit, including the blocked ones. So the
+# reader got the sentence and nothing else: no `.out`, no `.rc`, no way to tell WHICH gate
+# was red or what it printed. On 06/09 the `127` above was only diagnosable because it was
+# caught mid-run; a minute later the whole directory was gone.
+#
+# **This is the half that makes the other half investigable**, which is why his order put
+# them in one slice.
+#
+# A GREEN RUN STILL CLEANS UP. Keeping every directory would fill `.git` with runs nobody
+# will read, and a directory left behind by a passing push is the orphan that made a live
+# push look dead twice this week.
+keep_runs=0
+cleanup_runs() {
+  if [ "${keep_runs}" -eq 0 ]; then
+    rm -rf "${runs}"
+    return 0
+  fi
+  echo "" >&2
+  echo "  The run directory was KEPT so the verdict can be read:" >&2
+  echo "    ${runs}" >&2
+  echo "  Each job has N.out and N.rc there, numbered as reported above. It used to be" >&2
+  echo "  deleted on the way out, which left the sentence and threw away the evidence." >&2
+  echo "" >&2
+}
+trap 'cleanup_runs' EXIT
+
+# The seam, so a node drives THE SAME function the exit takes instead of describing it.
+if [ "${1:-}" = "--selftest-cleanup" ]; then
+  # The real run directory was already created above; drop it BEFORE pointing at the one
+  # under test. Leaving it would be this slice creating the very orphan it exists to stop.
+  rm -rf "${runs}"
+  trap - EXIT
+  runs="${2:?--selftest-cleanup needs a directory}"
+  # The third argument is OPTIONAL, and that is what lets a node drive the DEFAULT rather
+  # than only the two values it passes itself. Measured: with the argument required, flipping
+  # `keep_runs=0` to `1` -- which would leave an orphan after every GREEN push -- left every
+  # node in this file green, because none of them ever exercised the default.
+  keep_runs="${3:-${keep_runs}}"
+  cleanup_runs
+  [ -d "${runs}" ] && echo "kept=1" || echo "kept=0"
+  exit 0
+fi
+
+# --- the two ways to ask this file about its own concurrency, without a push ------------
+#
+# `--concurrency` prints the limit and how it was derived. `--concurrency-selftest N S`
+# drives `dispatch_jobs` -- the SAME loop the push uses -- over N jobs that sleep S
+# seconds, and prints the greatest number that were ever in flight at once, computed from
+# the spans the loop itself recorded. A node reading this file for a `wait` would be
+# describing a shape; a node running this measures the behaviour.
+# `--heavy-plan` answers the question the run asks between the waves, so a node drives THE
+# SAME function instead of re-deriving the rule and then agreeing with itself.
+if [ "${1:-}" = "--heavy-plan" ]; then
+  heavy_plan
+  exit 0
+fi
+
+if [ "${1:-}" = "--concurrency" ]; then
+  # BOTH floors are named, because they stopped being one number on 06/09 and a line
+  # that printed only one would describe the light wave while reporting the heavy limit.
+  echo "limit=$(concurrency_limit) cpus=$(cpu_total) slot_kb=${SLOT_KB} min_slots=${HEAVY_MIN_SLOTS} light_min_slots=${MIN_SLOTS}"
+  echo "note=$(memory_note)"
+  exit 0
+fi
+
+# The split itself, printable. Two waves are two chances to drop a job silently, and the
+# only defence that is not a comment is a node that adds them back up.
+if [ "${1:-}" = "--waves" ]; then
+  gated_jobs | while IFS= read -r job; do
+    printf '%s	%s
+' "$(wave_of "${job}")" "${job}"
+  done
+  exit 0
+fi
+
+if [ "${1:-}" = "--concurrency-selftest" ]; then
+  selftest_n="${2:-8}"
+  selftest_sleep="${3:-1}"
+  limit="${SELFTEST_LIMIT:-$(concurrency_limit)}"
+  selftest_jobs="${runs}/selftest-jobs"
+  : > "${selftest_jobs}"
+  i=0
+  while [ "${i}" -lt "${selftest_n}" ]; do
+    i=$((i + 1))
+    printf '%s	%s
+' "${i}" "sleep ${i}" >> "${selftest_jobs}"
+  done
+  run_sleep_job() { sleep "${selftest_sleep}"; echo 0 > "${runs}/${1}.rc"; }
+  dispatch_jobs "${selftest_jobs}" run_sleep_job
+  # The greatest overlap, from the recorded spans. Half-open intervals: a job that ended in
+  # the same second another started did not share a slot with it.
+  overlap=$(awk '
+    /start$/ {starts[++s] = $1}
+    /end$/   {ends[++e] = $1}
+    END {
+      max = 0
+      for (i = 1; i <= s; i++) {
+        n = 0
+        for (j = 1; j <= s; j++) {
+          if (starts[j] <= starts[i] && ends[j] > starts[i]) n++
+        }
+        if (n > max) max = n
+      }
+      print max
+    }' "${runs}"/*.span)
+  echo "limit=${limit} jobs=${selftest_n} max_in_flight=${overlap}"
+  [ "${overlap}" -le "${limit}" ] || exit 1
+  exit 0
+fi
+
+# The jobs, in the order they are REPORTED. The citation guard is a single named test
+# and no derivation covers it, so it is listed rather than derived -- and a node asserts
+# it is still here.
+jobs_file="${runs}/jobs"
+gated_jobs > "${jobs_file}"
+total=$(wc -l < "${jobs_file}")
+
+# TWO WAVES, one list. The type checks are cheap and go first at the light rate; the suites
+# follow at the heavy one. Nothing leaves the list, every job keeps its reported index, and
+# the split is by the job LABEL the list already carries -- no second list to disagree.
+light_limit=$(light_concurrency_limit)
+echo "  pre-push: ${total} jobs ($(memory_note))."
+echo "             type, format and lint checks: at most ${light_limit} at a time."
+echo "             the suites are measured AGAIN after them, not now."
+
+light_file="${runs}/wave-light"
+heavy_file="${runs}/wave-heavy"
+: > "${light_file}"
+: > "${heavy_file}"
+index=0
+while IFS= read -r job; do
+  index=$((index + 1))
+  if [ "$(wave_of "${job}")" = "light" ]; then
+    printf '%s	%s
+' "${index}" "${job}" >> "${light_file}"
+  else
+    printf '%s	%s
+' "${index}" "${job}" >> "${heavy_file}"
+  fi
+done < "${jobs_file}"
+
+limit=${light_limit}
+dispatch_jobs "${light_file}" run_gated_job
+
+# BETWEEN THE WAVES, the memory is read AGAIN -- see `heavy_plan` and `HEAVY_MIN_SLOTS`.
+# The number printed in the header above was measured before nineteen light jobs ran; using
+# it for the suites is using a reading that is minutes old about a machine that moved.
+plan=$(heavy_plan)
+case "${plan}" in
+  refuse=*)
+    free_mib="${plan#refuse=}"
+    echo "" >&2
+    echo "  PUSH REFUSED BY THE GATE, and this is the MACHINE and not a red test." >&2
+    echo "" >&2
+    echo "  Re-measured between the waves: ${free_mib} MiB free, and one suite needs" >&2
+    echo "  $((SLOT_KB / 1024)) MiB. Not even ONE fits, so the suites were not started." >&2
+    echo "" >&2
+    echo "  The gate used to raise this to two and dispatch anyway. The suites were then" >&2
+    echo "  killed for memory WITHOUT WRITING A REASON, which reads exactly like a blocked" >&2
+    echo "  push and once cost a wrong diagnosis. It refuses in writing instead." >&2
+    echo "" >&2
+    echo "  Free memory and run again, or push with --no-verify and own that decision." >&2
+    echo "  The type and format checks above DID run, and their results stand." >&2
+    echo "" >&2
+    #: And they stay READABLE, not just claimed -- the directory survives this exit too.
+    keep_runs=1
+    exit 1
+    ;;
+esac
+limit="${plan#limit=}"
+limit="${limit%% *}"
+echo "  pre-push: suites re-measured between the waves ($(memory_note))."
+echo "             at most ${limit} at a time."
+dispatch_jobs "${heavy_file}" run_gated_job
+
+# --------------------------------------------------------------------------- #
+# READING THE RESULTS. Two rules, and the second is the one that matters.
+#
+# 1. Reported per step, in the order of the derivation, never live in eight voices:
+#    interleaved output from eight processes is unreadable, and a gate nobody reads is
+#    a gate nobody obeys.
+#
+# 2. A MISSING EXIT-CODE FILE IS A FAILURE, NOT AN ABSENCE OF ONE. "It did not run" must
+#    never read as "it passed" -- that is the same defect as a skip counted green, and it
+#    is the one thing parallelism makes easy to get wrong.
+# --------------------------------------------------------------------------- #
+
+read_results
+
+if [ "${failed}" -ne 0 ]; then
+  # The evidence stays: see `cleanup_runs`. A verdict without the run behind it is a
+  # sentence somebody has to take on faith, and taking a gate on faith is the shape of
+  # every defect this file has removed.
+  keep_runs=1
+  report_blocked
+  exit 1
+fi
+
+echo ""
+echo "  pre-push: gates green by exit code, in $(( $(date +%s) - started_at )) s."
+echo "  ${skips} test(s) skipped across the run -- reported, not tolerated."
+echo ""
+exit 0

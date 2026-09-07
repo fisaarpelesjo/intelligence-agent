@@ -1,0 +1,39 @@
+# T090 fixture — NOT production data, NOT a production approval.
+#
+# A self-contained miniature catalog whose source IS approved, so the gate
+# pipeline is reachable at all. The production catalog is deliberately
+# unpublishable while D-1 and D-8 are open; faking an approval there would be
+# inventing governance history.
+
+# Deprecated, pointing at a RESTRICTED replacement. A standard requester gets
+# the refusal without the replacement id; disclosing it would leak that the two
+# metrics are related, which authorisation was meant to hide (FR-064).
+
+catalog_schema_version: 1
+kind: metric
+name: fixture_pointer_metric
+owner: fixture_owner
+access: standard
+grain_family: day
+versions:
+  - version: 1
+    effective_from: 2026-01-01
+    source_view: semantic.fixture_daily
+    grain: date x product
+    aggregation: sum
+    additivity: additive
+    unit: events
+    time_dimension: date
+    calculation_basis: Eventos registrados no dia.
+    content:
+      lang: pt-BR
+      label: Eventos do aplicativo
+      description: Eventos registrados no dia.
+deprecation:
+  deprecated_from: 2026-06-01
+  replacement_metric_id: fixture_guarded_metric
+source_availability:
+  - source: fixture_source
+    status: available
+    available_from: 2026-01-01
+    effective_from: 2026-01-01

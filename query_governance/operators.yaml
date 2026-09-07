@@ -1,0 +1,37 @@
+# Governed operator allowlist — T017 (FR-005; SC-001).
+#
+# The baseline asserts `operator_allowlist: true` but enumerates no operators,
+# and 001 defines none. This file is therefore new governed content, and the
+# GovernedOperator enum is generated from it — a contract test asserts the two
+# agree, so drift fails CI rather than diverging silently.
+#
+# DENY-BY-DEFAULT: an operator absent from this list is refused at parse with
+# OPERATOR_NOT_GOVERNED.
+#
+# No pattern operator (`like`, regex) and no nullity operator (`is_null`) may be
+# added. Pattern operators make value content semantically active, which is the
+# property bound parameters exist to remove; a nullity operator would drag SQL
+# three-valued logic into a surface that otherwise never needs it.
+
+schema_version: 1
+kind: operator_allowlist
+
+operators:
+  - id: eq
+    arity: exactly_one
+    description: Igualdade com um único valor governado.
+  - id: ne
+    arity: exactly_one
+    description: Diferença de um único valor governado.
+  - id: in
+    arity: one_or_more
+    description: Pertence ao conjunto informado.
+  - id: not_in
+    arity: one_or_more
+    description: Não pertence ao conjunto informado.
+  - id: between
+    arity: exactly_two
+    description: >-
+      Intervalo inclusivo [inferior, superior]. Sem par permitido na matriz
+      atual; mantido no vocabulário para que a recusa seja específica e para que
+      um tipo ordenado futuro tenha um operador governado ao qual se ligar.

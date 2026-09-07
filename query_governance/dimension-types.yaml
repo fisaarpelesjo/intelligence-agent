@@ -1,0 +1,44 @@
+# Governed dimension-type vocabulary — T018 (FR-005; SC-001).
+#
+# 001 declares NO dimension type: `Dimension.permitted_values` is
+# `tuple[PtBrText, ...] | "open"` with no datatype, ordering or temporal field.
+# The operator x type matrix therefore cannot be derived from 001, and this
+# vocabulary is authored here (research.md, BO-6).
+#
+# DENY-BY-DEFAULT: a governed dimension with no assignment below is refused with
+# DIMENSION_TYPE_UNDECLARED rather than defaulting to the most permissive type.
+
+schema_version: 1
+kind: dimension_type_vocabulary
+
+types:
+  - id: enumerated_text
+    ordered: false
+    description: permitted_values é uma lista fechada. Sem semântica de ordem.
+  - id: open_text
+    ordered: false
+    description: permitted_values é aberto. Sem semântica de ordem ou comparação.
+  - id: temporal_date
+    ordered: true
+    description: >-
+      Datas de calendário no fuso canônico. Ordenado, porém NÃO filtrável -
+      o período é definido exclusivamente por date_range.
+
+# Every dimension 001 exposes maps to exactly one type.
+assignments:
+  - dimension: platform
+    type: enumerated_text
+  - dimension: product
+    type: enumerated_text
+  - dimension: store
+    type: enumerated_text
+  - dimension: country
+    type: open_text
+  # app_version is unordered by deliberate choice. Version strings look
+  # orderable, but 001 declares no ordering for them, and inventing one here
+  # would mean this feature deciding what "greater than 3.10.2" means on 001's
+  # behalf. Promoting it requires an upstream declaration, not a local guess.
+  - dimension: app_version
+    type: open_text
+  - dimension: date
+    type: temporal_date

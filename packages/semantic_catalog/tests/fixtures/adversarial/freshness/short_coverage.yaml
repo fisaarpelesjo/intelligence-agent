@@ -1,0 +1,20 @@
+# T099 adversarial freshness fixture — UNIT FIXTURE ONLY.
+#
+# Healthy source, coverage that stops in the middle of the requested period. The
+# tempting answer is the half that exists; the correct one is a refusal naming
+# where the coverage ends.
+
+observed_at: 2026-08-11T06:00:00Z
+snapshot_id: adversarial_short_coverage
+records:
+  - source: app_a
+    status: complete
+    observed_at: 2026-08-11T06:00:00Z
+    last_successful_update: 2026-08-11T05:00:00Z
+    completeness_ratio: 1.0
+coverage:
+  - metric: app_sessions
+    source: app_a
+    min_date: 2026-01-01
+    max_date: 2026-07-15
+    observed_at: 2026-08-11T06:00:00Z

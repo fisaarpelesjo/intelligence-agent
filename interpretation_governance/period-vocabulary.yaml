@@ -1,0 +1,120 @@
+# Governed period vocabulary — D-18. Owned by data governance, with the metric
+# owners' sign-off on period semantics.
+#
+# AUTHORED ON 2026-09-02 BY THE OWNER'S CLICKED DECISIONS (OD-104, all on the
+# recommended options; cycle 533). What was empty-by-design until today is now
+# the governed convention, and the emptiness rationale above it retired with the
+# decision it was waiting for:
+#
+#   - Click 1: the week starts on MONDAY, and the convention is DECLARED here on
+#     boundary rules that carry the substring "week", so the schema validator
+#     (`PeriodExpression._convention_is_complete`) refuses an instance that
+#     omits it — the declaration has teeth, it is not prose. The month
+#     convention rides the same click: `civil_month`, on rules carrying
+#     "month". This turns the resolver's own disclosure ("MVP convention, not
+#     approved content") into approved content.
+#   - Click 3: the ELEVEN deterministic expressions the product already
+#     resolves, promoted verbatim (ids and pt-BR surface forms measured from
+#     the resolver). Deliberately NOT here: `july_2026` (a demo artefact) and
+#     the expressions the order names as ambiguous (`recentemente`, `começo do
+#     ano`, `último período`) — an entry would make them resolvable.
+#
+# The eleven surface forms carry no causal connective and every id matches the
+# schema pattern; `interaction validate-governance` runs clean over this file.
+
+schema_version: 1
+kind: period_vocabulary
+
+# A list of versioned instances. Each instance declares version,
+# effective_from, an optional effective_to, an `approval` mapping and its
+# `expressions`. Each expression declares id, surface_forms (pt-BR),
+# boundary_rule, inclusivity, and week_start or month_rule where the boundary
+# rule is relative to one.
+instances:
+  - version: "1"
+    effective_from: 2026-09-02
+    effective_to: null
+    approval:
+      approver_role: data_governance
+      # Not a repository path, deliberately — the same rule as the formulas
+      # file: the decision lives in the governed loop channel.
+      evidence_ref: >-
+        owner decision OD-104 recorded in the governed loop channel on
+        2026-09-02 (~23:2x America/Sao_Paulo), five clicks all on the
+        recommended options; carries the metric owners' sign-off on period
+        semantics per the click
+      approved_on: 2026-09-02
+    expressions:
+      - id: today
+        surface_forms:
+          - hoje
+        boundary_rule: deterministic_temporal_rule
+        inclusivity: inclusive_both
+      - id: yesterday
+        surface_forms:
+          - ontem
+        boundary_rule: deterministic_temporal_rule
+        inclusivity: inclusive_both
+      - id: day_before_yesterday
+        surface_forms:
+          - anteontem
+        boundary_rule: deterministic_temporal_rule
+        inclusivity: inclusive_both
+      - id: this_week
+        surface_forms:
+          - esta semana
+          - essa semana
+          - semana atual
+        boundary_rule: current_civil_week_monday_start
+        inclusivity: inclusive_both
+        week_start: monday
+      - id: last_week
+        surface_forms:
+          - semana passada
+          - semana anterior
+          - ultima semana
+        boundary_rule: previous_civil_week_monday_start
+        inclusivity: inclusive_both
+        week_start: monday
+      - id: this_month
+        surface_forms:
+          - este mes
+          - esse mes
+          - mes atual
+        boundary_rule: current_civil_month
+        inclusivity: inclusive_both
+        month_rule: civil_month
+      - id: last_month
+        surface_forms:
+          - mes passado
+          - mes anterior
+          - ultimo mes
+        boundary_rule: previous_civil_month
+        inclusivity: inclusive_both
+        month_rule: civil_month
+      - id: this_quarter
+        surface_forms:
+          - este trimestre
+          - trimestre atual
+        boundary_rule: deterministic_temporal_rule
+        inclusivity: inclusive_both
+      - id: last_quarter
+        surface_forms:
+          - trimestre passado
+          - trimestre anterior
+        boundary_rule: deterministic_temporal_rule
+        inclusivity: inclusive_both
+      - id: this_year
+        surface_forms:
+          - este ano
+          - esse ano
+          - ano atual
+        boundary_rule: deterministic_temporal_rule
+        inclusivity: inclusive_both
+      - id: last_year
+        surface_forms:
+          - ano passado
+          - ano anterior
+          - ultimo ano
+        boundary_rule: deterministic_temporal_rule
+        inclusivity: inclusive_both

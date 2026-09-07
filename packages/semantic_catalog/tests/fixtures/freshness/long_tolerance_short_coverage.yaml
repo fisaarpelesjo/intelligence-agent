@@ -1,0 +1,23 @@
+# T063 freshness fixture — UNIT FIXTURE ONLY.
+#
+# Never production data, never an observation of a real warehouse, and never a
+# claim that EXT-A (D-12) is ready. `load_snapshot` forces `is_fixture: true`
+# regardless of what this file says, so a fixture cannot present itself as a
+# production reading.
+
+# The FR-071 case: punctual, and its coverage ends before the period does.
+# Being on time does not manufacture the missing days.
+observed_at: 2026-08-11T06:00:00Z
+snapshot_id: fixture_long_tolerance_short_coverage
+records:
+  - source: store_a
+    status: complete
+    observed_at: 2026-08-11T06:00:00Z
+    last_successful_update: 2026-08-11T05:00:00Z
+    completeness_ratio: 1.0
+coverage:
+  - metric: store_downloads
+    source: store_a
+    min_date: 2026-01-01
+    max_date: 2026-07-20
+    observed_at: 2026-08-11T06:00:00Z

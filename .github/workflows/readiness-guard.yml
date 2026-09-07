@@ -1,0 +1,92 @@
+# External readiness guard — T101 (FR-009; SC-001).
+#
+# Fixtures are how this feature is testable without a warehouse. They are also
+# how a feature quietly ships claiming a readiness it does not have. This
+# workflow is the difference.
+#
+# **Before EXT-A is declared** the guard permits fixture evidence and requires
+# every report to state the limitation. **After it is declared**, a fixture
+# standing in for it in integration or release mode fails closed — a run that
+# fell back would be reporting on a fixture while presenting itself as reporting
+# on the warehouse.
+#
+# The guard does **not** require EXT-A to be ready. It is in place first, so the
+# day readiness is declared nothing has to be remembered:
+# T109 depends on this workflow, not the reverse.
+
+name: readiness-guard
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    # Readiness is declared by editing a governed file, which can happen on a
+    # branch this workflow never sees. A daily run means the guard notices.
+    - cron: "17 6 * * *"
+
+permissions:
+  contents: read
+
+env:
+  CATALOG_PACKAGE: packages/semantic_catalog
+  PYTHON_VERSION: "3.12"
+  READINESS: docs/readiness/external-readiness.yaml
+
+jobs:
+  guard:
+    name: fixture fallback is permitted only while nothing is declared
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python at the declared floor
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      # The dev extra, matching catalog.yml. The last step in this job is a
+      # pytest run, and a runtime-only install leaves it with no pytest to run
+      # — the guard then fails on its own installation instead of on what it
+      # guards. The extra is test tooling only; runtime dependencies are
+      # unchanged, and no step here is advisory.
+      - name: Install the package and its pinned dev extras
+        run: python -m pip install -e ".[dev]"
+        working-directory: ${{ env.CATALOG_PACKAGE }}
+
+      - name: The readiness record loads and declares only what has evidence
+        run: python -m semantic_catalog.compliance.readiness --readiness "${READINESS}"
+
+      # Integration mode is the strict one: a fixture may stand in only for a
+      # capability nobody has declared ready.
+      #
+      # These two steps assert the VERDICT, not the exit code, and they read which
+      # verdict is due from the record above rather than carrying a copy of today's
+      # answer. Wired to demand success, they asserted only the first regime — and so
+      # they went red on 2026-09-03 for the guard doing its job, the day `ext_a` was
+      # declared (S-40). Demanding the refusal instead keeps the step true in both
+      # regimes, and a run that got PERMITTED where a refusal is due is now the red.
+      - name: Compliance in integration mode against fixture coverage
+        run: >-
+          python tools/ci/assert_fixture_fallback.py
+          --path semantic --mode integration
+          --coverage packages/semantic_catalog/tests/fixtures/coverage/observed.yaml
+          --readiness "${READINESS}"
+          --codeowners .github/CODEOWNERS
+          --capability ext_a
+
+      - name: Release mode refuses a fixture for anything already declared
+        run: >-
+          python tools/ci/assert_fixture_fallback.py
+          --path semantic --mode release
+          --coverage packages/semantic_catalog/tests/fixtures/coverage/observed.yaml
+          --readiness "${READINESS}"
+          --codeowners .github/CODEOWNERS
+          --capability ext_a
+
+      - name: No unmarked external dependency is presented as delivered
+        run: python -m pytest packages/semantic_catalog/tests/unit/test_readiness_guard.py -q

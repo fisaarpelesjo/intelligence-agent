@@ -1,0 +1,32 @@
+# O ESCOPO do relatorio diario das 08:00 -- OD-107 (split diario/semanal), FR-1319, T1329 (F7).
+#
+# Palavra dele, OD-107 (state.yml.bak-542-pre-PASS, OD_107_OS_DOIS_RELATORIOS): "Diario as 08:00
+# com trials, sales e conversion -- cada um com as SUAS dimensoes (trials: pais e jogo; sales e
+# conversion: pais, jogo, plano, gateway). Semanal na SEXTA as 09:00, completo, comparando semana
+# fechada vs semana anterior." (A spec 013 escreve o semanal na SEGUNDA: contradicao registrada no
+# handoff do ciclo 554, decisao dele.)
+# FR-1319: "the 08:00 daily is split to the three indicators (OD-107), which is what keeps F1's
+# breakdowns under the 4096-character ceiling". O DIARIO carrega SO os indicadores desta lista;
+# os demais KPIs ativos saem do 08:00 e sao materia do SEMANAL (T1330/T1331).
+#
+# MEDIDO ANTES DE TOCAR (2026-09-05, ciclo 554): o 08:00 de hoje saiu com 19 KPIs em 5 secoes,
+# 4.970 B de texto x3 destinatarios; com a F5+F6 o --dry deu 5.087 caracteres (como a API conta)
+# -> split_for_telegram em DOIS envios, o corte caindo dentro do bloco "Quem puxou o desvio".
+#
+# NENHUM NOME FOI AUTORADO AQUI: os tres sao os do exemplo do DIARIO no contrato aprovado
+# (docs/exemplos-analise-dimensional.md, linhas 11-22: New trials, Sales, Conversion) e os MESMOS tres de
+# `kpis` em report_governance/breakdown.yaml; a grafia e a da view
+# (semantic.subscription_daily_metrics.kpi_name), como em breakdown.yaml.
+#
+# Um indicador listado aqui que nenhum contrato ativo carregue e RECUSA (scope.scoped_kpis):
+# um nome errado nao pode sumir em silencio. Lista vazia tambem recusa.
+#
+# Este arquivo e conteudo governado: muda com decisao dele, datada.
+schema_version: 1
+kind: report_daily_scope
+decided_by: OD-107
+decided_on: 2026-09-05
+indicators:
+  - New trials
+  - Sales (qty)
+  - Trial conversion (%)

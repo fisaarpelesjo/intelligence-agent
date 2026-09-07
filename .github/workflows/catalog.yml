@@ -1,0 +1,165 @@
+# Semantic catalog CI — T100 (FR-038, FR-069; SC-001, SC-013, SC-032, SC-037).
+#
+# **Every step here is blocking. None is advisory.** A gate that warns is a gate
+# that gets ignored, and the failures this pipeline catches — a semantic edit
+# with no version bump, a schema that drifted from its model, a leaked value —
+# are all silent at the point they are introduced and expensive at the point
+# they are discovered.
+#
+# No step is allowed to swallow its own failure. A test scans this file for the
+# shapes that would let one — failure suppression, unconditional success, and
+# always-run conditions — and fails if any appears.
+#
+# The runtime is pinned to the declared floor (`requires-python = ">=3.12"`).
+# Running CI on a newer interpreter than the one the project claims to support
+# would let a 3.13-only construct merge and break every steward still on 3.12.
+
+name: catalog
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  # The evaluation date is passed explicitly so a run is reproducible: a check
+  # whose outcome depends on the day it ran is not a gate.
+  CATALOG_PACKAGE: packages/semantic_catalog
+  PYTHON_VERSION: "3.12"
+
+jobs:
+  catalog:
+    name: validate, type-check, test and scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+        with:
+          # `catalog diff` resolves a base ref, so the history has to be there.
+          fetch-depth: 0
+
+      - name: Set up Python at the declared floor
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install the package and its pinned dev extras
+        run: python -m pip install -e ".[dev]"
+        working-directory: ${{ env.CATALOG_PACKAGE }}
+
+      - name: Confirm the interpreter matches the declared floor
+        run: |
+          python - <<'PY'
+          import sys, tomllib, pathlib
+          spec = tomllib.loads(pathlib.Path("pyproject.toml").read_text())["project"]["requires-python"]
+          floor = tuple(int(part) for part in spec.removeprefix(">=").split("."))
+          assert sys.version_info[: len(floor)] == floor, (
+              f"CI runs {sys.version_info[:2]} but the project declares {spec}; "
+              "CI must run the floor so a newer-only construct cannot merge"
+          )
+          print(f"python {sys.version.split()[0]} matches {spec}")
+          PY
+        working-directory: ${{ env.CATALOG_PACKAGE }}
+
+      # --- formatting and linting -----------------------------------------
+      - name: Ruff format check
+        run: python -m ruff format --check .
+        working-directory: ${{ env.CATALOG_PACKAGE }}
+
+      - name: Ruff lint
+        run: python -m ruff check .
+        working-directory: ${{ env.CATALOG_PACKAGE }}
+
+      # --- strict typing ---------------------------------------------------
+      - name: Pyright (strict)
+        run: python -m pyright
+        working-directory: ${{ env.CATALOG_PACKAGE }}
+
+      # --- tests -----------------------------------------------------------
+      - name: pytest
+        working-directory: ${{ env.CATALOG_PACKAGE }}
+        # T109/D-12 (ciclo 539), padrao 240631f: o runner NAO tem credencial Google por
+        # desenho deste workflow, e os tres nos das condicoes 2-4 dizem isso no proprio
+        # motivo do skip. A particao e comparada por ARQUIVO E MOTIVO, nao por contagem:
+        # um skip fora dela segue vermelho. A condicao 5 se cumpre LOCAL no pre-push,
+        # onde a credencial existe e os tres nos MEDEM o armazem de verdade.
+        #
+        # DOIS ARQUIVOS estao dentro da particao, e o segundo entrou tarde: as condicoes
+        # D-12 (T109, 03/09) e a concordancia contrato-vs-view do OD-113 (472763b, 04/09).
+        # Ambos pedem credencial Google e ambos dizem isso no proprio motivo. A particao
+        # nasceu nomeando SO o primeiro, entao no dia seguinte este passo passou a recusar
+        # um skip que ele foi escrito para permitir -- e ficou invisivel tres dias porque
+        # corre DEPOIS do pyright, que estava vermelho por outro motivo.
+        #
+        # Um terceiro arquivo NAO entra aqui sozinho: test_the_declared_skip_partition_is_current
+        # deriva a lista viva da fonte e falha nomeando a particao, que e onde o defeito
+        # se le, em vez de num pipeline de shell tres dias depois.
+        run: |
+          set -o pipefail
+          out=$(python -m pytest -q -rs 2>&1) || { echo "$out"; exit 1; }
+          echo "$out" | tail -5
+          # A PARTICAO PASSA A SER PEDIDA AO PUSH HOOK -- 2026-09-06. Ela vivia aqui como um
+          # `awk` que nomeava DOIS arquivos, e o `nl-analytics` corria a mesma suite com uma
+          # regra diferente e mais dura. Duas declaracoes da mesma decisao sao duas listas a
+          # espera de discordar, e a que discorda em silencio e sempre a que ninguem le.
+          # Agora ha UMA, no hook, e este passo pergunta -- a mesma porta de onde o piso vem.
+          unexplained=$(echo "$out" | bash ../../tools/git-hooks/pre-push --unexplained-skips packages/semantic_catalog)
+          if [ -n "$unexplained" ]; then
+            echo "gate failed: a node skipped outside the declared no-credential partition:"
+            echo "$unexplained"
+            exit 1
+          fi
+          skipped=$(echo "$out" | awk '/[0-9]+ skipped/ {for(i=1;i<=NF;i++) if ($(i+1)=="skipped,"||$(i+1)=="skipped") print $i}' | head -1)
+          echo "scope evidence: ${skipped:-0} skips, all inside the declared no-credential partition (D-12 conditions)"
+
+      # --- generated artifacts must match their models ---------------------
+      - name: JSON Schema drift
+        run: python -m semantic_catalog.cli schema export --check --out schemas
+
+      - name: Authoritative field classification is exhaustive and consistent
+        run: python -m pytest packages/semantic_catalog/tests/contract -q
+
+      # --- the catalog itself ----------------------------------------------
+      - name: catalog validate --strict --check-schema-version
+        run: >-
+          python -m semantic_catalog.cli validate
+          --path semantic --strict --check-schema-version
+          --codeowners .github/CODEOWNERS
+
+      - name: Whole-release atomic validation
+        run: >-
+          python -m semantic_catalog.cli validate
+          --path semantic --release --commit "${GITHUB_SHA}"
+          --codeowners .github/CODEOWNERS
+
+      # The reconciliation runs against a FIXTURE observation, so the verdict it must get
+      # depends on whether the capability that fixture stands in for is declared ready.
+      # Asserting the compliance verdict — rather than demanding the command succeed —
+      # keeps both regimes checked: permitted-with-limitation while nothing is declared,
+      # refused once something is. The runner reaches no warehouse; the live
+      # reconciliation is the `--coverage-live` gate, which runs where a credential exists.
+      - name: Declared-versus-observed reconciliation — the fixture-backed compliance verdict
+        run: >-
+          python tools/ci/assert_fixture_fallback.py
+          --path semantic --mode integration
+          --coverage packages/semantic_catalog/tests/fixtures/coverage/observed.yaml
+          --readiness docs/readiness/external-readiness.yaml
+          --codeowners .github/CODEOWNERS
+          --capability ext_a
+
+      # --- SC-013 ----------------------------------------------------------
+      - name: Static leakage scan
+        run: python -m semantic_catalog.cli leakage-scan --path semantic --repo .
+
+      # --- the version gate, steward-facing half ---------------------------
+      - name: Classify changes against the base ref
+        if: github.event_name == 'pull_request'
+        run: >-
+          python -m semantic_catalog.cli diff
+          --path semantic --repo . --base "origin/${{ github.base_ref }}"

@@ -1,0 +1,5 @@
+# T058 decision-matrix fixture — NOT production data, NOT a production approval.
+
+catalog_schema_version: 1
+kind: pending_visibility_approvals
+approvals: []

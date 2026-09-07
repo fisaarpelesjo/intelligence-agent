@@ -1,0 +1,87 @@
+{
+  "$defs": {
+    "Owner": {
+      "additionalProperties": false,
+      "description": "One accountable team or role.",
+      "properties": {
+        "id": {
+          "description": "English identifier referenced by metrics and dimensions.",
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/OwnerKind",
+          "description": "team or role — never an individual."
+        },
+        "name": {
+          "description": "Team or role name.",
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "review_group": {
+          "description": "CODEOWNERS group that approves this owner's changes; validated at L2.",
+          "minLength": 1,
+          "title": "Review Group",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "kind",
+        "review_group"
+      ],
+      "title": "Owner",
+      "type": "object"
+    },
+    "OwnerKind": {
+      "description": "An owner is a team or a role. There is deliberately no ``person``.",
+      "enum": [
+        "team",
+        "role"
+      ],
+      "title": "OwnerKind",
+      "type": "string"
+    }
+  },
+  "$id": "https://intelligence-agent/semantic-catalog/owners.schema.json",
+  "additionalProperties": false,
+  "description": "``semantic/owners.yaml`` — the ownership record.",
+  "properties": {
+    "catalog_schema_version": {
+      "title": "Catalog Schema Version",
+      "type": "integer"
+    },
+    "kind": {
+      "const": "owners",
+      "title": "Kind",
+      "type": "string"
+    },
+    "owners": {
+      "items": {
+        "$ref": "#/$defs/Owner"
+      },
+      "minItems": 1,
+      "title": "Owners",
+      "type": "array"
+    }
+  },
+  "required": [
+    "catalog_schema_version",
+    "kind",
+    "owners"
+  ],
+  "title": "OwnerRegistry",
+  "type": "object",
+  "x-catalog-schema-version": 3,
+  "x-do-not-edit": "Generated from the Pydantic models. Edit the models, then regenerate. This file is never a source of truth.",
+  "x-generated-by": "semantic_catalog.contracts.export",
+  "x-supported-schema-versions": [
+    3,
+    2,
+    1
+  ]
+}

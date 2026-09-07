@@ -1,0 +1,158 @@
+# T099 adversarial requests — UNIT FIXTURES ONLY, never production data.
+#
+# Each case is a request built to extract an answer the catalog must not give.
+# `expect` names the outcome AND the stable reason code, because a case that
+# asserted only DENY would pass on a generic refusal (SC-004).
+#
+# `freshness` is a path relative to tests/fixtures/. Omitting it supplies no
+# observation at all, which the coverage and freshness gates treat as an unknown
+# state and refuse — never as healthy.
+
+window:
+  from: 2026-07-01
+  to: 2026-07-31
+
+cases:
+  # --- unauthorised access -------------------------------------------------
+  - id: unauthorised_metric_is_refused_before_its_shape_is_described
+    attack: >-
+      Ask for a metric holding no tag at all, hoping the refusal describes the
+      metric well enough to reconstruct it. The tag is valid in this scope, so
+      the refusal is about the requester rather than about the tag.
+    metrics: [app_sessions]
+    sources: [app_a]
+    access: []
+    scope: default
+    freshness: freshness/complete.yaml
+    expect: {outcome: DENY, reason_code: ACCESS_DENIED}
+    must_not_disclose: [freshness, segments, limitations, coverage_window]
+
+  - id: right_tag_wrong_scope_is_refused
+    attack: Hold the tag the metric requires, but present it in the wrong authorisation scope.
+    metrics: [restricted_metric]
+    sources: [app_a]
+    access: [restricted]
+    scope: default
+    freshness: freshness/complete.yaml
+    expect: {outcome: DENY, reason_code: ACCESS_TAG_SCOPE_MISMATCH}
+    must_not_disclose: [freshness, segments, limitations, coverage_window]
+
+  - id: a_retired_tag_does_not_inherit_from_its_replacement
+    attack: >-
+      Present a deprecated access tag that names a valid successor, hoping the
+      successor is granted automatically.
+    metrics: [retired_metric]
+    sources: [app_a]
+    access: [retired_tag]
+    scope: default
+    freshness: freshness/complete.yaml
+    expect: {outcome: DENY, reason_code: ACCESS_TAG_DEPRECATED}
+    must_not_disclose: [freshness, segments, limitations, coverage_window]
+
+  # --- incompatible sources ------------------------------------------------
+  - id: two_metrics_with_no_governed_rule_are_refused
+    attack: >-
+      Put two plausible-looking metrics side by side and rely on the absence of
+      a rule being read as permission.
+    metrics: [app_sessions, cross_source_metric]
+    sources: [app_a]
+    access: [standard]
+    scope: default
+    freshness: freshness/complete.yaml
+    expect: {outcome: DENY, reason_code: COMPARABILITY_RULE_MISSING}
+
+  - id: metrics_declared_not_comparable_stay_refused
+    attack: Compare two metrics a human explicitly declared non-comparable.
+    metrics: [app_sessions, store_downloads]
+    sources: [app_a, store_a]
+    access: [standard]
+    scope: default
+    freshness: freshness/complete.yaml
+    expect: {outcome: DENY, reason_code: METRICS_NOT_COMPARABLE}
+
+  - id: a_metric_is_refused_on_a_source_it_never_declared
+    attack: Ask a store metric of an app source, hoping availability is inferred.
+    metrics: [store_downloads]
+    sources: [app_a]
+    access: [standard]
+    scope: default
+    freshness: freshness/complete.yaml
+    expect: {outcome: DENY, reason_code: METRIC_NOT_AVAILABLE_FOR_SOURCE}
+
+  # --- grain and additivity ------------------------------------------------
+  - id: day_and_cohort_grain_cannot_be_mixed
+    attack: Mix a day-grained metric with a cohort-grained one and let them be summed.
+    metrics: [app_sessions, cohort_retention]
+    sources: [app_a]
+    access: [standard]
+    scope: default
+    freshness: freshness/complete.yaml
+    expect: {outcome: DENY, reason_code: GRAIN_FAMILY_MISMATCH}
+
+  - id: a_rating_cannot_be_summed
+    attack: Apply sum to a non-additive metric.
+    metrics: [store_rating]
+    sources: [store_a]
+    access: [standard]
+    scope: default
+    aggregate: sum
+    freshness: freshness/complete.yaml
+    expect: {outcome: DENY, reason_code: AGGREGATION_INVALID_FOR_ADDITIVITY}
+
+  # --- stale and incomplete data -------------------------------------------
+  - id: a_source_beyond_tolerance_refuses
+    attack: >-
+      Ask during a load outage, hoping the last good day is served as if it were
+      today.
+    metrics: [app_sessions]
+    sources: [app_a]
+    access: [standard]
+    scope: default
+    freshness: adversarial/freshness/stale.yaml
+    expect: {outcome: DENY, reason_code: SOURCE_BEYOND_TOLERANCE}
+
+  - id: a_punctual_but_incomplete_load_refuses
+    attack: >-
+      A load that finished on time with a fraction of its rows. Punctual is not
+      complete, and the shortest route to a confidently wrong number.
+    metrics: [app_sessions]
+    sources: [app_a]
+    access: [standard]
+    scope: default
+    freshness: adversarial/freshness/insufficient_sample.yaml
+    expect: {outcome: DENY, reason_code: SOURCE_STATE_PARTIAL}
+
+  - id: no_evidence_at_all_refuses
+    attack: >-
+      Supply no observation and hope silence is read as healthy. Silence is a
+      state, not the absence of one.
+    metrics: [app_sessions]
+    sources: [app_a]
+    access: [standard]
+    scope: default
+    expect: {outcome: DENY, reason_code: SOURCE_STATE_UNKNOWN}
+
+  # --- partial periods -----------------------------------------------------
+  - id: a_period_that_has_not_ended_is_flagged
+    attack: >-
+      Ask for a period running up to today and present the partial figure as a
+      complete one.
+    metrics: [app_sessions]
+    sources: [app_a]
+    access: [standard]
+    scope: default
+    from: 2026-08-01
+    to: 2026-08-11
+    freshness: adversarial/freshness/live_coverage.yaml
+    expect: {outcome: ALLOW_WITH_CAVEAT, reason_code: PERIOD_INCOMPLETE}
+
+  - id: coverage_ending_inside_the_period_refuses
+    attack: >-
+      Ask for a period the source only half covers, hoping the answer is
+      silently shortened.
+    metrics: [app_sessions]
+    sources: [app_a]
+    access: [standard]
+    scope: default
+    freshness: adversarial/freshness/short_coverage.yaml
+    expect: {outcome: DENY, reason_code: COVERAGE_ENDS_BEFORE_PERIOD}

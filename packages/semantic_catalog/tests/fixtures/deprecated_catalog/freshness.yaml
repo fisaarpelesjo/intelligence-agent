@@ -1,0 +1,39 @@
+# T090 freshness fixture — UNIT FIXTURE ONLY.
+#
+# Never production data and never a claim that EXT-A (D-12) is ready.
+# `load_snapshot` forces `is_fixture: true` regardless of what this file says.
+
+observed_at: 2026-08-11T06:00:00Z
+snapshot_id: fixture_deprecated
+records:
+  - source: fixture_source
+    status: complete
+    observed_at: 2026-08-11T06:00:00Z
+    last_successful_update: 2026-08-11T05:00:00Z
+    completeness_ratio: 1.0
+coverage:
+  - metric: fixture_metric
+    source: fixture_source
+    min_date: 2026-01-01
+    max_date: 2026-08-10
+    observed_at: 2026-08-11T06:00:00Z
+  - metric: fixture_replacement
+    source: fixture_source
+    min_date: 2026-01-01
+    max_date: 2026-08-10
+    observed_at: 2026-08-11T06:00:00Z
+  - metric: fixture_guarded_metric
+    source: fixture_source
+    min_date: 2026-01-01
+    max_date: 2026-08-10
+    observed_at: 2026-08-11T06:00:00Z
+  - metric: fixture_pointer_metric
+    source: fixture_source
+    min_date: 2026-01-01
+    max_date: 2026-08-10
+    observed_at: 2026-08-11T06:00:00Z
+  - metric: fixture_continued_metric
+    source: fixture_source
+    min_date: 2026-01-01
+    max_date: 2026-08-10
+    observed_at: 2026-08-11T06:00:00Z

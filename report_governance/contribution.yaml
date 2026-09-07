@@ -1,0 +1,273 @@
+# O bloco QUEM PUXOU O DESVIO -- FR-1308/FR-1309/FR-1310, SC-1302, fatia F3.
+#
+# Palavra dele, transcrita do contrato de exemplos aprovado em sete rodadas (OD-108).
+# As linhas citadas em cada chave sao as do contrato, para que a proxima pessoa confira a
+# transcricao em vez de confiar nela.
+#
+# DOIS ARQUIVOS, E A DIFERENCA IMPORTA -- OD-133, 2026-09-06. O contrato ATUAL e
+# docs/exemplos-analise-dimensional.md (387 linhas). O ANTERIOR, docs/contrato-013-exemplos.md
+# (177 linhas), ficou como registro historico, e nao e uma versao mais curta do mesmo texto: o
+# BLOCO DO ALERTA foi REESCRITO. As linhas 22 a 28 do antigo -- o cabecalho do alerta, os dois
+# movers com emoji por eixo, o plural em pts e a frase dos demais -- NAO EXISTEM no novo, medido
+# em 06/09 sem acento e sem caixa. Entao cada chave abaixo cita o arquivo de onde a palavra dela
+# veio DE FATO. Reapontar tudo para o novo seria adotar uma redacao nova do alerta sem ele ter
+# pedido, e mudaria o texto que ele le as 08:00.
+#
+# POR QUE A PALAVRA MORA AQUI E NAO NO PACOTE: _every_word_is_his recusa todo token com
+# letra que nao venha de um vocabulario nomeado, e o bloco inteiro e palavra. Crescer
+# AUTHORED_WORDS nao serve -- esse orcamento conta o que o PACOTE guarda. Mesmo caminho de
+# breakdown.yaml e references.yaml.
+#
+# O QUE ESTE ARQUIVO NAO DECIDE: o limiar de relevancia (D-1305, ainda em 'Recommended' na
+# spec, sem OD). Enquanto ele nao for decidido, nenhuma chave aqui responde por ele.
+schema_version: 1
+kind: report_contribution
+decided_by: OD-108
+decided_on: 2026-09-03
+
+# O cabecalho do bloco. Contrato novo linha 35: '📊 Quem puxou o desvio:'
+# No ALERTA ele escreve outra forma (contrato ANTIGO linha 22, 'Quem puxou (analise de
+# contribuicao):', que nao existe no novo); o
+# diario e esta. Duas formas, e so a do diario esta declarada porque so ela e renderizada
+# nesta fatia.
+heading: Quem puxou o desvio
+heading_emoji: 📊
+
+# A forma do ALERTA, que e outra. docs/contrato-013-exemplos.md linha 22:
+#   'Quem puxou (analise de contribuicao):'
+# CITA O CONTRATO ANTIGO DE PROPOSITO -- OD-133. Esta frase esta EM PRODUCAO (sai no alerta das
+# 08:00) e NAO ocorre no contrato novo, que traz outra redacao na linha 134 ('Quem puxou (desvio
+# de +6 acima do teto da banda):'). Apontar para o novo faria este arquivo dizer que a palavra
+# vem de um documento que nao a contem; trocar a frase mudaria o que ele le sem ele ter pedido.
+# A troca, se ele quiser, e decisao dele e vem com a linha do novo.
+# Os parenteses caem no verificador de palavras (_SEPARATORS os retira dos dois lados), entao
+# o que e conferido sao as palavras.
+heading_alert: Quem puxou (análise de contribuição)
+
+# Como a fracao e ligada ao movimento. Contrato novo linha 36: '~109% do desvio'; linha 38:
+# '60% do desvio de +72'.
+deviation_noun: do desvio
+
+# O marcador de aproximacao do percentual. Contrato novo linha 36, til ASCII.
+# ELE NAO DECLAROU A REGRA DE ARREDONDAMENTO que o justifica -- medido e nao encontrado.
+approximately: "~"
+
+# antes -> depois. Contrato novo linha 13 exige a forma ('com antes→depois') e as linhas 36 e 38
+# a mostram. E U+2192 RIGHTWARDS ARROW, nao '->' e nao U+27F6.
+became: →
+
+# A unidade do desvio em pontos. O contrato novo usa o singular na linha 36 ('−2,1 pt'); o
+# plural ('+31 pts') e do bloco do ALERTA do contrato ANTIGO, linhas 23 e 25, que o novo nao
+# tem -- por isso a citacao do plural fica em docs/contrato-013-exemplos.md.
+unit_singular: pt
+unit_plural: pts
+
+# A oracao que explica uma parte acima de 100%: outras se moveram contra e cancelaram parte
+# do movimento. Contrato novo linhas 36-37: 'os demais gateways subiram e compensaram parte'.
+#
+# ELE ESCREVEU O PLURAL DO EIXO ('gateways'), e o eixo desta fatia e pais ou jogo. 'paises'
+# e palavra dele (docs/contrato-013-exemplos.md linha 28, 'Os demais paises/gateways', que o
+# contrato novo nao tem); ate 06/09 'jogos' NAO aparecia em nenhum dos dois e a oracao caia em
+# 'valores', que ja e palavra governada (breakdown.yaml, tail_noun). Em 2026-09-06 ele deu a
+# palavra (OD-153) e o eixo jogo passa a emprestar a dele, como o eixo pais sempre fez.
+#
+# ESTA ORACAO NAO CONTA NADA e por isso fica sempre no PLURAL. Ela diz que as OUTRAS partes se
+# moveram contra; nao ha numero ao lado para uma palavra concordar. O acordo por contagem do
+# OD-153 e da cauda contada, nao daqui.
+others: os demais
+others_noun: valores
+compensated: subiram e compensaram parte
+
+# O PLURAL E O SINGULAR POR EIXO -- OD-153, 2026-09-06. PALAVRA DELE, literal: 'jogos', 'país',
+# 'jogo'. 'paises' e do contrato ANTIGO, linha 28 ('Os demais paises/gateways estao dentro da
+# banda'), ausente no novo.
+#
+# O SINGULAR EXISTE PORQUE A CAUDA CONTADA DE UM GRUPO (top_n abaixo, OD-142) pode deixar UMA
+# parte para tras, e ate 06/09 ela seria nomeada com a palavra de muitas -- o mesmo defeito de
+# acordo que o breakdown.yaml registra na mensagem real ('demais 1 países'). Um -> singular,
+# qualquer outro numero -> plural.
+#
+# DOIS ARQUIVOS E A MESMA PALAVRA, DE PROPOSITO: a quebra e o bloco sao renderizados por codigo
+# diferente lendo governanca diferente, e consertar so um deixaria a MESMA mensagem dizendo das
+# duas formas com quatro linhas de distancia -- foi o que aconteceu com a bandeira do OD-119,
+# desenhada na quebra e ausente no bloco por um dia.
+#
+# Para o eixo que NAO tiver palavra declarada aqui, a cauda cai em others_noun -- que tambem e
+# palavra governada -- em vez de alguem inventar. Os dois mapas nomeiam OS MESMOS EIXOS e o
+# carregador RECUSA quando nao nomeiam: metade do vocabulario de um eixo renderia a palavra
+# errada para uma das duas contagens sem ninguem ver (S-41, silencio nao e valor).
+axis_plural:
+  country: países
+  game: jogos
+
+axis_singular:
+  country: país
+  game: jogo
+
+# O dia quieto. Contrato novo linha 44, e o enquadramento esta na 43: 'Num dia quieto, muda so o
+# fecho'. O travessao e U+2014 EM DASH.
+# FR-1310 exige que o dia sem nada relevante DIGA isso, em vez de imprimir secao vazia.
+# O QUE FOI DESCARTADO -- peca 6 do contrato aprovado, T1334 / FR-1320.
+#
+# Palavra dele, literal, docs/exemplos-analise-dimensional.md linhas 140-141:
+#
+#     Descartado por medicao: vendas totais +8% (crescimento nao explica);
+#     demais gateways e paises dentro da banda; nenhum jogo concentrado.
+#
+# E a razao de a peca existir, linha 154: "as hipoteses medidas e eliminadas; e o que impede o
+# leitor de duvidar". Nada aqui e composto: 'os demais' ja era palavra governada acima, o plural
+# e o singular por eixo vieram da OD-153, e as tres abaixo sao transcritas da frase dele.
+#
+# ------------------------------------------------------------------------------------------
+# DUAS DAS TRES ORACOES DELE NAO SAO ESCRITAS HOJE, E CADA UMA ESPERA UMA COISA DIFERENTE
+# ------------------------------------------------------------------------------------------
+#
+# 1. "vendas totais +8% (crescimento nao explica)" -- e a evidencia de taxa-antes-de-contagem, e
+#    EXIGE UM PAR DECLARADO. O report_governance/rate_before_count.yaml diz `pairs: {}`: nenhuma
+#    taxa governa contagem nenhuma hoje, entao nao existe medicao que sustente a frase.
+#    Escreve-la a mesma seria afirmar uma hipotese eliminada que ninguem eliminou.
+#
+# 2. "demais gateways ... dentro da banda" -- MEDIDO E RECUSADO: os eixos `gateway` e `plan` estao
+#    DECLARADOS INDISPONIVEIS, e o cron de 2026-09-06 11:00:02Z imprimiu "eixos ditos
+#    indisponiveis: 2 (gateway, plan)". **"Indisponivel" e "medido e descartado" sao afirmacoes
+#    OPOSTAS.** O relatorio ja diz os indisponiveis com a frase governada do FR-1316; poe-los
+#    aqui afirmaria ter medido exatamente aquilo que este repositorio declara nao conseguir
+#    medir, e ao leitor isso le-se como cobertura -- o contrario do que a peca 6 existe para dar.
+#    Os dois grupos nunca se juntam na mesma lista nem na mesma frase.
+#
+# Sobra a terceira, e e por isso que ela e a unica escrita: os eixos que a fonte TEM de facto sao
+# `country` e `game` -- que sao, exatamente, os dois eixos cujas palavras ele deu na OD-153.
+#
+# LIMITE CONHECIDO, nomeado em vez de descoberto depois: `none_of` concorda em genero com
+# `pais` e com `jogo`, os dois masculinos. Um eixo feminino que ele venha a nomear precisa da
+# palavra dele, nao de uma regra de concordancia inventada aqui -- e a mesma recusa do S-44.
+discarded_heading: Descartado por medição
+inside_band: dentro da banda
+none_of: nenhum
+concentrated: concentrado
+
+# O NUCLEO: O CALCULO EXISTE, A FRASE ESPERA A PALAVRA DELE -- T1334 peca 5, 2026-09-07.
+#
+# A peca 5 do contrato aprovado e a intersecao (linha 152): "uma celula explicando metade do
+# desvio e causa, nao coincidencia". O exemplo dele, linha 138:
+#
+#     Nucleo (Brasil x PagFacil x Mensal): 6 casos -- 55% do desvio numa so intersecao
+#
+# O CALCULO ESTA CONSTRUIDO E PROVADO: partition_by_pair parte por par de eixos, core_cell_of
+# escolhe a celula que explica a maior fatia, e cells_reconcile afirma que a grelha fecha contra
+# o total. Sete mutacoes, sete vermelhos.
+#
+# O QUE FALTA E A FRASE, E E DELE. Tres coisas que ele le e que nao existem em ficheiro nenhum:
+# o rotulo do nucleo, o separador entre os dois nomes, e a palavra para a contagem de casos. Por
+# isso a chave da celula fica guardada como PAR e nunca junta: junta-la seria este pacote a
+# escolher a forma por ele -- o mesmo defeito que saiu do alerta nesta data.
+#
+# E OS EIXOS NAO SAO OS DO EXEMPLO DELE. O nucleo que ele escreveu cruza pais, gateway e plano, e
+# DOIS desses estao declarados indisponiveis (ver breakdown.yaml). A fonte tem pais e jogo. A
+# ESTRUTURA e dele; os eixos sao os que existem, e a diferenca fica escrita aqui em vez de ser
+# substituida em silencio.
+#
+# ------------------------------------------------------------------------------------------
+# E CINCO RAZOES DIFERENTES COLAPSAM HOJE NUM SO "SEM NUCLEO"
+# ------------------------------------------------------------------------------------------
+#
+# Medido em contribution.py: core_cell_of devolve None por CINCO motivos, e quem le nao os
+# distingue. Cada um e uma frase diferente:
+#
+#   1. nao havia celula nenhuma                        -- nada foi medido
+#   2. o total nao se moveu                            -- nao ha desvio para atribuir
+#   3. nenhuma celula foi vista nos DOIS periodos      -- ha dado, e nao ha movimento observavel
+#   4. duas celulas empataram na maior fatia           -- ha causa candidata, e nao ha UMA
+#   5. a maior fatia e zero                            -- as celulas foram vistas e nao mexeram
+#
+# NAO E CURADO AGORA, DE PROPOSITO: quem consome esta resposta e o render, e o render espera a
+# palavra dele. Uma distincao que ninguem consome hoje e infra-estrutura a espera de utilizador.
+#
+# MAS FICA ESCRITO, e a razao e que no dia em que o render nascer a diferenca entre "nao havia
+# dado" e "havia dado e empatou" e exatamente o que ele vai querer ler. Sem isto escrito, quem
+# escrever o render inventa UMA frase para os cinco casos -- e ela sera falsa em quatro deles.
+
+# ONDE ESTA FRASE VIVE, E A PERGUNTA QUE FICA ABERTA PARA ELE -- 2026-09-07.
+#
+# Ela e o FECHO DO RELATORIO. O contrato aprovado poe-a na seccao 1
+# (docs/exemplos-analise-dimensional.md, linhas 43-44) e diz o que ela pressupoe:
+#
+#     "Num dia quieto, muda so o fecho: AS QUEBRAS CONTINUAM, e o bloco final vira
+#      'Sem desvios relevantes -- nenhuma dimensao fora da banda.'"
+#
+# "As quebras continuam" e a chave: a frase e o que se diz depois de se ter OLHADO.
+#
+# ------------------------------------------------------------------------------------------
+# O QUE SAIU PARA ELE EM 2026-09-07 as 08:01 -03, para tres destinatarios
+# ------------------------------------------------------------------------------------------
+#
+#     Alerta
+#     Ontem 06/09/2026 . Anteontem 05/09/2026
+#     [vermelho] Trial conversion (%)   Variacao: -4,17 pp
+#     [vermelho] Revenue (US$)          Variacao: -36,38 %
+#     [verde]    MAU                    Variacao: +0,31 %
+#     Sem desvios relevantes -- nenhuma dimensao fora da banda.
+#
+# Dos TRES, so Trial conversion (%) tem dimensao declarada (ver `kpis:` no breakdown.yaml).
+# Revenue (US$) e MAU NUNCA tiveram dimensao examinada. A frase afirmou sobre os tres.
+#
+# CURADO NA MESMA DATA, e a cura foi REMOCAO: o alerta deixou de carregar o fecho do relatorio.
+# Nao entrou frase substituta -- "nenhuma dimensao foi examinada" seria vocabulario que ele nao
+# deu, e a cura de uma afirmacao nao sustentada nao pode ser outra afirmacao nossa.
+#
+# ------------------------------------------------------------------------------------------
+# A PERGUNTA E DELE, E AS DUAS SAIDAS ESTAO MEDIDAS. NENHUMA FOI ESCOLHIDA AQUI.
+# ------------------------------------------------------------------------------------------
+#
+# (1) COMO ESTA HOJE: o alerta cala-se sobre o que nao examinou. Nada que ele leia e afirmado
+#     sem medicao por tras. Custo: quem ler o alerta ve um indicador vermelho e nao sabe se as
+#     dimensoes dele foram olhadas ou nao -- a informacao falta, mas nada e afirmado a mais.
+#
+# (2) O ALERTA NOMEIA quem nao tem dimensao declarada, na doutrina do FR-1316 e do `unresolved`
+#     da SC-1303: quem nao foi medido e NOMEADO. E o produto melhor no fim. Custo: exige uma
+#     frase que ele nunca escreveu. O FR-1316 NAO serve de precedente -- a frase governada dele
+#     e sobre EIXOS indisponiveis na fonte, e isto e sobre KPIs que ele nao pediu para
+#     decompor. Sao coisas diferentes, e a segunda nao tem palavra.
+#
+# A (2) precisa de palavra dele. Ate la vale a (1), que nao afirma nada.
+
+quiet_day: Sem desvios relevantes — nenhuma dimensão fora da banda.
+
+# O travessao que separa o valor do que aconteceu com ele. Contrato novo linhas 36 e 38.
+dash: —
+
+# QUANTAS PARTES CADA GRUPO NOMEIA ANTES DA CAUDA -- OD-142, 2026-09-06. Palavra dele sobre a
+# mensagem real: o bloco chegou com TRINTA E SETE linhas, chapado, misturando pais e jogo de dois
+# indicadores, e ordenado por NOME ("Belarus +2" acima de "Poland +11"). Ele disse duas vezes:
+# "nem da pra ler" e "tem que separar os jogos e os paises, pq esta tudo numa coisa so".
+#
+# Uma lista virou QUATRO grupos -- indicador x eixo -- cada um com os TRES maiores e uma cauda
+# contada. O tres e dele.
+#
+# MORA AQUI e nao no pacote pela mesma razao que o top_n do breakdown.yaml: uma literal no codigo
+# e uma segunda copia capaz de divergir da que ele decidiu, e
+# packages/daily_reporting/tests/contract/test_the_loop_enumerates_nothing.py varre o pacote
+# atras de total escrito a mao.
+top_n: 3
+
+# Quanto o residual pode se afastar do desvio total e a conta ainda FECHAR, em fracao do
+# proprio desvio. Um por cento.
+#
+# ESTE NUMERO NAO E PALAVRA DELE: e engenharia, e esta aqui pelo mesmo motivo que top_n
+# esta em breakdown.yaml -- para que mudar a folga seja editar um arquivo datado e nao
+# recompilar uma opiniao dentro do pacote. Acima dela o bloco NAO PUBLICA (SC-1302).
+tolerance: "0.01"
+
+# O QUE FICOU MEDIDO E NAO ENTRA AINDA:
+#  - A BANDEIRA por pais: RESOLVIDA EM 2026-09-04 pelo OD-119, e a recusa que estava aqui
+#    sobreviveu um dia a propria razao. Ela dizia: derivar a bandeira exige o codigo ISO,
+#    a fonte carrega o NOME, e um mapa nome->codigo seria a enumeracao escrita a mao que
+#    o S-4 impede. Certo, enquanto ninguem tivesse escrito o mapa. No dia seguinte ele
+#    escreveu: breakdown.yaml, chave `icons`, uma entrada por valor, palavra dele e
+#    datada. O bloco le o MESMO mapa que a quebra -- nao deriva nada, e valor fora do
+#    mapa continua saindo sem icone. Enquanto a recusa durou, a MESMA mensagem escreveu
+#    a bandeira na quebra e o nome pelado no bloco, quatro linhas abaixo.
+#  - O emoji POR EIXO (docs/contrato-013-exemplos.md linhas 24 e 25, 💳 gateway e 📦 plano,
+#    ausentes no contrato novo). Os eixos desta fatia
+#    sao pais e jogo, e para esses dois ele nao escreveu emoji nenhum. Nao se inventa.
+#  - O limiar de relevancia (D-1305). Sem OD.

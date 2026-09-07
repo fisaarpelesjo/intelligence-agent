@@ -1,0 +1,654 @@
+{
+  "$defs": {
+    "Additivity": {
+      "description": "How a metric may legitimately be combined (FR-003).",
+      "enum": [
+        "additive",
+        "non_additive",
+        "ratio",
+        "point_in_time"
+      ],
+      "title": "Additivity",
+      "type": "string"
+    },
+    "Aggregation": {
+      "enum": [
+        "sum",
+        "count_distinct",
+        "ratio",
+        "snapshot_last"
+      ],
+      "title": "Aggregation",
+      "type": "string"
+    },
+    "AvailabilityStatus": {
+      "enum": [
+        "available",
+        "unavailable"
+      ],
+      "title": "AvailabilityStatus",
+      "type": "string"
+    },
+    "CohortAssignment": {
+      "description": "Fixed. Cohort membership is the user's first eligible activity (FR-046).",
+      "enum": [
+        "first_eligible_activity"
+      ],
+      "title": "CohortAssignment",
+      "type": "string"
+    },
+    "Deprecation": {
+      "additionalProperties": false,
+      "description": "Adds a boundary; never mutates or deletes a historical definition (FR-061).",
+      "properties": {
+        "content": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PtBrContent"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "deprecated_from": {
+          "format": "date",
+          "title": "Deprecated From",
+          "type": "string"
+        },
+        "replacement_metric_id": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "pattern": "^[a-z][a-z0-9_]*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Replacement Metric Id"
+        },
+        "successor": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "pattern": "^[a-z][a-z0-9_]*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Successor"
+        }
+      },
+      "required": [
+        "deprecated_from"
+      ],
+      "title": "Deprecation",
+      "type": "object"
+    },
+    "GrainFamily": {
+      "description": "Day-grained (event date) or cohort-grained (cohort formation date).\n\nMixing the two without declared weighting is refused by Gate 5 (FR-050, A-14).",
+      "enum": [
+        "day",
+        "cohort"
+      ],
+      "title": "GrainFamily",
+      "type": "string"
+    },
+    "MetricContent": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "label": {
+          "minLength": 1,
+          "title": "Label",
+          "type": "string"
+        },
+        "lang": {
+          "const": "pt-BR",
+          "description": "Explicit language declaration; never inferred.",
+          "title": "Lang",
+          "type": "string"
+        },
+        "limitations": {
+          "default": [],
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Limitations",
+          "type": "array"
+        }
+      },
+      "required": [
+        "lang",
+        "label",
+        "description"
+      ],
+      "title": "MetricContent",
+      "type": "object"
+    },
+    "MetricVersion": {
+      "additionalProperties": false,
+      "description": "One immutable definition of a metric over an effective date range.",
+      "properties": {
+        "additivity": {
+          "$ref": "#/$defs/Additivity"
+        },
+        "aggregation": {
+          "$ref": "#/$defs/Aggregation"
+        },
+        "allowed_dimensions": {
+          "default": [],
+          "description": "Deny-by-default: anything absent is forbidden (FR-008).",
+          "items": {
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9_]*$",
+            "type": "string"
+          },
+          "title": "Allowed Dimensions",
+          "type": "array"
+        },
+        "calculation_basis": {
+          "minLength": 1,
+          "title": "Calculation Basis",
+          "type": "string"
+        },
+        "content": {
+          "$ref": "#/$defs/MetricContent"
+        },
+        "denominator": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Denominator"
+        },
+        "effective_from": {
+          "format": "date",
+          "title": "Effective From",
+          "type": "string"
+        },
+        "effective_to": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "None means current. A closed version accepts Descriptive edits only.",
+          "title": "Effective To"
+        },
+        "exclusions": {
+          "default": [],
+          "description": "What the number explicitly does not cover (FR-004).",
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Exclusions",
+          "type": "array"
+        },
+        "grain": {
+          "minLength": 1,
+          "title": "Grain",
+          "type": "string"
+        },
+        "kpi_name": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Kpi Name"
+        },
+        "lower_is_better": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "True when a fall is good. None means the direction is not declared.",
+          "title": "Lower Is Better"
+        },
+        "numerator": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Numerator"
+        },
+        "source_view": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "pattern": "^[a-z][a-z0-9_]*$",
+              "type": "string"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "description": "Reference to a semantic.* object owned elsewhere; never dereferenced.",
+          "title": "Source View"
+        },
+        "time_dimension": {
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "title": "Time Dimension",
+          "type": "string"
+        },
+        "unit": {
+          "$ref": "#/$defs/Unit"
+        },
+        "value_column": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ValueColumn"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "version",
+        "effective_from",
+        "source_view",
+        "grain",
+        "aggregation",
+        "additivity",
+        "unit",
+        "time_dimension",
+        "calculation_basis",
+        "content"
+      ],
+      "title": "MetricVersion",
+      "type": "object"
+    },
+    "PtBrContent": {
+      "additionalProperties": false,
+      "description": "A human-facing content block, declared pt-BR (FR-054, FR-056).\n\nThe marker is required and fixed. Automated validation checks presence and\nthe declaration; whether the Portuguese is *correct* is a reviewer duty\n(D-10) and is deliberately not claimed here.",
+      "properties": {
+        "lang": {
+          "const": "pt-BR",
+          "description": "Explicit language declaration; never inferred.",
+          "title": "Lang",
+          "type": "string"
+        }
+      },
+      "required": [
+        "lang"
+      ],
+      "title": "PtBrContent",
+      "type": "object"
+    },
+    "RetentionContract": {
+      "additionalProperties": false,
+      "description": "Required when ``grain_family == cohort``.",
+      "properties": {
+        "cohort_assignment": {
+          "$ref": "#/$defs/CohortAssignment"
+        },
+        "cohort_timezone": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "REQUIRED, authored externally (D-9). Never defaulted to the canonical zone.",
+          "title": "Cohort Timezone"
+        },
+        "denominator": {
+          "minLength": 1,
+          "title": "Denominator",
+          "type": "string"
+        },
+        "eligible_event": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "REQUIRED, authored externally (D-8). Never inferred (FR-048).",
+          "title": "Eligible Event"
+        },
+        "identity_rule": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "REQUIRED, authored externally (D-8). Never inferred (FR-048).",
+          "title": "Identity Rule"
+        },
+        "min_maturity_days": {
+          "description": "Defaults to window_days when authored (A-15); a longer value may be declared.",
+          "minimum": 1,
+          "title": "Min Maturity Days",
+          "type": "integer"
+        },
+        "numerator": {
+          "minLength": 1,
+          "title": "Numerator",
+          "type": "string"
+        },
+        "retention_style": {
+          "$ref": "#/$defs/RetentionStyle"
+        },
+        "window_days": {
+          "description": "One metric per window (FR-044, A-16); not a parameter of a shared metric.",
+          "enum": [
+            1,
+            7,
+            30
+          ],
+          "title": "Window Days",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "window_days",
+        "retention_style",
+        "cohort_assignment",
+        "numerator",
+        "denominator",
+        "min_maturity_days"
+      ],
+      "title": "RetentionContract",
+      "type": "object"
+    },
+    "RetentionStyle": {
+      "description": "Fixed. Rolling retention is forbidden (FR-045).",
+      "enum": [
+        "exact_day"
+      ],
+      "title": "RetentionStyle",
+      "type": "string"
+    },
+    "SourceAvailability": {
+      "additionalProperties": false,
+      "description": "Where a metric may be answered — a dated decision, not a version bump (FR-052).",
+      "properties": {
+        "available_from": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Available From"
+        },
+        "effective_from": {
+          "format": "date",
+          "title": "Effective From",
+          "type": "string"
+        },
+        "reason_code": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reason Code"
+        },
+        "reversible": {
+          "default": false,
+          "title": "Reversible",
+          "type": "boolean"
+        },
+        "review_trigger": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Review Trigger"
+        },
+        "sliding": {
+          "default": false,
+          "title": "Sliding",
+          "type": "boolean"
+        },
+        "source": {
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "title": "Source",
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/AvailabilityStatus"
+        }
+      },
+      "required": [
+        "source",
+        "status",
+        "effective_from"
+      ],
+      "title": "SourceAvailability",
+      "type": "object"
+    },
+    "Synonym": {
+      "additionalProperties": false,
+      "description": "A pt-BR term that resolves to an English canonical identifier (FR-057).",
+      "properties": {
+        "kind": {
+          "enum": [
+            "formal",
+            "informal",
+            "abbreviation"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "text": {
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "text",
+        "kind"
+      ],
+      "title": "Synonym",
+      "type": "object"
+    },
+    "Unit": {
+      "description": "What one of the metric's numbers counts.\n\n**The five money and count members were added on 2026-08-30**, when the nineteen KPIs\nof `semantic.subscription_daily_metrics` entered the catalog. Declaring `users` for a\nfigure in reais would have been false, and the enum existing in a shape that forces a\nfalse answer is not a reason to give one.\n\n``COUNT`` is deliberately vague and that vagueness is measured: for `Sales (qty)`,\n`Cancellations (qty)`, `Not renewed (qty)` and `Chargeback (qty)` the view declares a\ncount and **does not declare what is counted**. The thing counted is a named gap in\neach contract, not a guess here.",
+      "enum": [
+        "users",
+        "sessions",
+        "events",
+        "rate",
+        "stars",
+        "count",
+        "subscriptions",
+        "months",
+        "currency_brl",
+        "currency_usd"
+      ],
+      "title": "Unit",
+      "type": "string"
+    },
+    "ValueColumn": {
+      "description": "Which column of the source view carries this metric's number — `FR-806`.\n\n**This exists because of a published error.** MRR and Revenue were reported as having\nno value, from reading only `value`; they do have values and they live in `value_usd`.\nSo the column is DECLARED per metric and read from the declaration, and above all it is\n**never defaulted to `value`** — that default is precisely what produced the error.\n\nThe rule an author follows is ``usd_*`` -> ``value_usd``, ``brl`` -> ``value_brl``,\neverything else -> ``value``. **That rule governs the author, not this enum**: written\ninto code it would be a second copy of a fact the contracts already carry, and two\ncopies of one fact disagree the day one of them moves.",
+      "enum": [
+        "value",
+        "value_usd",
+        "value_brl"
+      ],
+      "title": "ValueColumn",
+      "type": "string"
+    }
+  },
+  "$id": "https://intelligence-agent/semantic-catalog/metric.schema.json",
+  "additionalProperties": false,
+  "description": "``semantic/metrics/{name}.yaml``.",
+  "properties": {
+    "access": {
+      "description": "Access tag; gates published metrics and pending stubs.",
+      "minLength": 1,
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "title": "Access",
+      "type": "string"
+    },
+    "catalog_schema_version": {
+      "title": "Catalog Schema Version",
+      "type": "integer"
+    },
+    "deprecation": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Deprecation"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "grain_family": {
+      "$ref": "#/$defs/GrainFamily"
+    },
+    "kind": {
+      "const": "metric",
+      "title": "Kind",
+      "type": "string"
+    },
+    "name": {
+      "minLength": 1,
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "title": "Name",
+      "type": "string"
+    },
+    "owner": {
+      "minLength": 1,
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "title": "Owner",
+      "type": "string"
+    },
+    "retention": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/RetentionContract"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "source_availability": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/SourceAvailability"
+      },
+      "title": "Source Availability",
+      "type": "array"
+    },
+    "synonyms": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/Synonym"
+      },
+      "title": "Synonyms",
+      "type": "array"
+    },
+    "versions": {
+      "items": {
+        "$ref": "#/$defs/MetricVersion"
+      },
+      "minItems": 1,
+      "title": "Versions",
+      "type": "array"
+    }
+  },
+  "required": [
+    "catalog_schema_version",
+    "kind",
+    "name",
+    "owner",
+    "access",
+    "grain_family",
+    "versions"
+  ],
+  "title": "Metric",
+  "type": "object",
+  "x-catalog-schema-version": 3,
+  "x-do-not-edit": "Generated from the Pydantic models. Edit the models, then regenerate. This file is never a source of truth.",
+  "x-generated-by": "semantic_catalog.contracts.export",
+  "x-supported-schema-versions": [
+    3,
+    2,
+    1
+  ]
+}

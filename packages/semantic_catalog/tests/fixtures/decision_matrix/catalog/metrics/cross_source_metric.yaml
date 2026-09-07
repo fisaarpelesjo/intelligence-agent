@@ -1,0 +1,36 @@
+# T058 decision-matrix fixture — NOT production data.
+#
+# Available on BOTH fixture sources, which is what makes a genuine cross-source
+# request possible: the scoping rules and the answerable-subset disclosure only
+# mean anything when one required source can be stale while another is healthy.
+
+catalog_schema_version: 1
+kind: metric
+name: cross_source_metric
+owner: fixture_owner
+access: standard
+grain_family: day
+versions:
+  - version: 1
+    effective_from: 2026-01-01
+    source_view: semantic.fixture_cross
+    grain: date x product
+    aggregation: sum
+    additivity: additive
+    unit: events
+    time_dimension: date
+    calculation_basis: Métrica do fixture disponível nas duas fontes.
+    allowed_dimensions: [country]
+    content:
+      lang: pt-BR
+      label: Métrica multi-fonte
+      description: Métrica do fixture disponível nas duas fontes.
+source_availability:
+  - source: app_a
+    status: available
+    available_from: 2026-01-01
+    effective_from: 2026-01-01
+  - source: store_a
+    status: available
+    available_from: 2026-01-01
+    effective_from: 2026-01-01

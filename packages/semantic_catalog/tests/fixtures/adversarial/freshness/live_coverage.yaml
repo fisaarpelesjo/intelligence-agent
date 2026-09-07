@@ -1,0 +1,21 @@
+# T099 adversarial freshness fixture — UNIT FIXTURE ONLY.
+#
+# Healthy and covering days that have not happened yet, so the refusal cannot be
+# about coverage. What is left is the period itself: it runs up to the
+# evaluation date and has not ended, and a figure for it is partial. The attack
+# is presenting that partial figure as a complete one.
+
+observed_at: 2026-08-11T06:00:00Z
+snapshot_id: adversarial_live_coverage
+records:
+  - source: app_a
+    status: complete
+    observed_at: 2026-08-11T06:00:00Z
+    last_successful_update: 2026-08-11T05:00:00Z
+    completeness_ratio: 1.0
+coverage:
+  - metric: app_sessions
+    source: app_a
+    min_date: 2026-01-01
+    max_date: 2026-08-31
+    observed_at: 2026-08-11T06:00:00Z

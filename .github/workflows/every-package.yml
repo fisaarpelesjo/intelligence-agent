@@ -1,0 +1,410 @@
+name: every-package
+
+# =============================================================================
+# THIS HEADER USED TO ASSERT A STATE OF GITHUB, AND THE ASSERTION ROTTED.
+#
+# What stood here until 2026-09-06 read: "WRITTEN AND NOT EXERCISED ON GITHUB.
+# The Actions budget has been exhausted since 2026-08-25, so no run of this file
+# exists and none can be started. Do not read a green badge into it: there is no
+# badge." Every clause of that is contradicted by measurement. A READING taken on
+# 2026-09-06 — a reading, not a state — reports:
+#
+#     gh workflow list --all                    -> every-package  active
+#     gh run list --workflow=every-package.yml  -> 68 runs, the earliest created
+#                                                  2026-08-28T01:01:54Z
+#
+# The earliest run is dated the day AFTER the sentence claiming none could be
+# started was committed alongside this file. The sentence was therefore never
+# true for long, and nothing ever told it so: it stopped being true while going
+# on being read as evidence.
+#
+# THE DEFECT IS THE SHAPE, NOT THE NUMBER. A comment that asserts the current
+# state of a remote system cannot notice that state changing, and it is believed
+# for exactly as long as it is wrong. Correcting it to "it runs now, and it is
+# red" would rebuild the same trap facing the other way. So this header asserts
+# no colour, no count and no budget. **ASK THE SERVER**, at the moment the answer
+# is needed:
+#
+#     gh run list --workflow=every-package.yml --limit 10
+#     gh workflow list --all
+#
+# One claim from the old header survives, and it survives because it is a
+# property of THIS REPOSITORY rather than of GitHub: `tools/local-ci/run_local_ci.py`
+# DERIVES its commands from this file instead of carrying a copy, so the steps
+# below are executable content in a second door that needs no budget and no
+# network. That is checkable from a clone, on any day, by reading the executor —
+# which is what makes it safe to write down here at all.
+# =============================================================================
+#
+# WHY THIS FILE EXISTS.
+#
+# Measured on 2026-08-27, across the seven workflows in this directory: they
+# name `semantic_catalog`, `analytics_query`, `analytics_interaction`,
+# `channel_integration` and `anomaly_investigation`. **`insights_prioritisation`
+# and `proactive_distribution` appear in none of them** — two features that are
+# on `main`, and that neither automatic door measures.
+#
+# The push hook covers every one BY DERIVATION and has since cycle 367. But
+# `run_local_ci.py` reads THIS directory, so both doors that run without a human
+# inherit the same blindness. The sentence is `371`'s and it applies here: **a
+# package outside every instrument is not a package that passes, it is a package
+# nobody measured** — and here it is outside one door of two, the one that runs
+# by itself.
+#
+# THIS FILE IS THE LAST ONE THAT SHOULD EVER NEED WRITING FOR THIS REASON.
+#
+# Every step below DERIVES the packages it acts on: the criterion is "a
+# directory under `packages/` whose `pyproject.toml` declares the tool", and
+# nothing here names a package. The six existing workflows each carry a fixed
+# list, and a fixed list is what let two features be born unseen — twice, since
+# `anomaly-investigation.yml` exists because the same thing happened in cycle
+# 302. **A ninth package is covered here without anybody remembering.**
+#
+# WHY A SHELL LOOP AND NOT A MATRIX.
+#
+# A `strategy.matrix` is the idiomatic way to do this on GitHub, and it was
+# rejected after measuring the cost: `run_local_ci.py` reads `jobs.*.steps`
+# flatly and expands no matrix, so a matrix job would leave `${{ matrix.* }}`
+# unexpanded in the one door this file exists to fix. The derivation therefore
+# lives INSIDE the `run:` block, which that executor runs verbatim.
+#
+# WHY NO SWEEP CARRIES `|| exit 1` ANY MORE.
+#
+# The half of `F140` that stands: a loop whose body fails silently reports the
+# exit code of the LAST iteration, so a failure in the first package swept is
+# invisible. The fix chosen here was `|| exit 1` -- exit on the spot, naming the
+# package -- and on 2026-09-03 THAT FIX PRODUCED THE DEFECT IT WAS WRITTEN TO
+# PREVENT, one level up.
+#
+# MEASURED. `channel_integration` is fourth of nine alphabetically. Its suite went
+# red on 2026-09-03, so `conversation_context`, `daily_reporting`,
+# `insights_prioritisation`, `proactive_distribution` and `semantic_catalog` have
+# not run on a GitHub runner since. **2,250 collected nodes**, counted with
+# `pytest --collect-only` on 2026-09-06 on the developer machine -- the runner's
+# figure will differ, because collection moves with optional dependencies and with
+# a credential, which is precisely why the number is stamped with the machine and
+# the day rather than written as a universal. And FOUR of those five packages are
+# covered by NO OTHER WORKFLOW: `harness.yml` names four of them, but only to
+# `pip install -e` them as the bot's dependencies; it runs none of their suites.
+# Worse, the `scope evidence:` line printed AFTER the loop, so on exactly the runs
+# where the scope collapsed it never printed at all. The UI shows one red step, and
+# the loss is invisible.
+#
+# THE PUSH HOOK ALREADY HAD THE RIGHT SHAPE AND SAYS WHY. `tools/git-hooks/pre-push`
+# runs all forty of its jobs, writes each exit code to its own file, and reads them
+# afterwards; its `read_results` loop never breaks -- a red job sets `failed=1` and
+# the loop CONTINUES. Its stated rule is *"A MISSING EXIT-CODE FILE IS A FAILURE,
+# NOT AN ABSENCE OF ONE. 'It did not run' must never read as 'it passed' -- that is
+# the same defect as a skip counted green"*, and the sentence that proves the shape
+# earns its keep is `OD-137`'s: *"Thirty-nine of the forty gates were green, and the
+# fortieth was the launcher, not the code."* NO GATE THAT STOPS AT THE FIRST RED CAN
+# WRITE THAT SENTENCE. It is the same argument, one instrument over.
+#
+# So every sweep below RUNS ALL, RECORDS, AND THEN BLOCKS:
+#
+#   * the package is COUNTED BEFORE its checker runs, so the evidence line reports
+#     the scope that was actually swept -- including on a red run, which is the only
+#     kind of run where that number was ever in doubt;
+#   * the exit code is captured into `rc` with NO PIPE between the command and `$?`.
+#     That is the other half of `F140`, and it is the rule pre-push states as *"NO
+#     PIPE on the command whose exit code matters ... `$?` is read immediately,
+#     before anything else can overwrite it"*;
+#   * EVERY failing package is named as it fails and named again in the verdict, so
+#     the reader gets all of them rather than the alphabetically first;
+#   * the step still exits non-zero. Nothing here warns instead of failing, and no
+#     `continue-on-error` appears -- running on is a property of the LOOP, never of
+#     the step.
+#
+# The install loop keeps `|| exit 1` and that is deliberate: its order is DERIVED
+# from the dependency graph, so a package that fails to install poisons every
+# install after it. There, a second failure is a consequence and not a measurement.
+#
+# WHAT THIS FILE DELIBERATELY DOES NOT DO.
+#
+# It touches **no existing workflow and no existing job**. It adds coverage and
+# removes none. There is no path filter, no `continue-on-error`, and no step that
+# warns instead of failing.
+#
+# EMENDA, 2026-09-07 -- decisao do reviewer, revendo a dele propria. Este paragrafo
+# dizia tambem "no `if: always()`", e a proibicao juntava duas coisas diferentes:
+#
+#   * `continue-on-error` transforma uma FALHA em NAO-FALHA. Continua proibido, e ha
+#     dois nos noutros pacotes a exigi-lo dos workflows deles.
+#   * uma condicao de passo NAO transforma nada: cada varrimento continua a falhar e o
+#     job continua vermelho. O que muda e deixarem de se esconder uns atras dos outros.
+#
+# O GitHub para o JOB no primeiro PASSO vermelho. Sem isto, um unico achado do `ruff
+# format` impedia as NOVE suites de correr -- e "nao chegou la" lia-se como "nada a
+# relatar", que e a mesma familia de defeitos que este ficheiro passou tres ciclos a
+# fechar DENTRO de cada varrimento. Exigi-la no laco e nao entre os passos era uma
+# inconsistencia.
+#
+# A razao para adiar era nao mexer na estrutura com vermelhos escondidos uns atras dos
+# outros. Essa razao acabou com o 8/8 de hoje: existe linha de base para provar a
+# mudanca, e a mutacao que a prova esta descrita no no que a vigia.
+#
+# `!cancelled()` e nao `always()`: um job cancelado a mao nao deve continuar a gastar
+# runner, e os dois nos irmaos vetam literalmente `always()`.
+#
+# It reaches no warehouse, no model provider and no channel provider. There is
+# no `secrets` reference and no service container: the packages that read a
+# warehouse skip loudly without a credential, naming what was not measured.
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: every-package-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  every-package:
+    runs-on: ubuntu-latest
+    steps:
+      # Full history: the boundary nodes of `005` and `006` measure their own
+      # commits out of git, and in a `--depth 1` clone the base commit is simply
+      # absent, so they skip. Fetching everything is what makes those gates run.
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # UM AMBIENTE SO, E CRIADO ANTES DE QUALQUER INSTALACAO.
+      #
+      # `tools/git-hooks/pre-push` procura `${ROOT}/.venv/bin/python`. O CI nunca criou essa
+      # pasta, entao TODA pergunta ao portao respondia "pre-push SKIPPED" e SETE nos de
+      # `insights_prioritisation` reprovavam por nao conseguirem medir -- medido no run
+      # 34082535518.
+      #
+      # A PRIMEIRA TENTATIVA CRIOU O VENV DEPOIS DA INSTALACAO, com --system-site-packages, e
+      # PARTIU O PYRIGHT EM SETE DOS OITO PACOTES (run 34083...): o pyright AUTO-DESCOBRE um
+      # `.venv` na raiz, e passou a resolver imports contra um ambiente onde as instalacoes
+      # editaveis nao estavam -- o `.pth` fica no site-packages do sistema, nao no do venv.
+      # Curei sete falhas e criei sete noutro sitio. **Medi os testes e nao medi os tipos.**
+      #
+      # A cura de raiz nao e um venv A MAIS: e nao haver DOIS ambientes. O venv nasce aqui,
+      # antes de tudo, e entra na PATH -- entao o `pip install -e` do passo seguinte instala
+      # DENTRO dele, e o ruff, o pytest, o pyright e o portao passam a ver exactamente o mesmo
+      # interpretador. Nada e duplicado e nada precisa de concordar por acaso.
+      - name: One interpreter, where every gate looks for it
+        run: |
+          python -m venv .venv
+          echo "$PWD/.venv/bin" >> "$GITHUB_PATH"
+          .venv/bin/python -m pip install --upgrade pip --quiet
+          echo "scope evidence: $(.venv/bin/python -V) em .venv, e daqui em diante e este"
+
+      - name: Install every package, in an order derived from what they declare
+        run: |
+          python -m pip install --upgrade pip
+          # The ORDER is derived and not written. A hand-kept order is the same
+          # defect as a hand-kept package list, one field over: it ages the day
+          # somebody adds a dependency between two packages.
+          python - <<'PY' > .install-order
+          import pathlib, tomllib
+          manifests = sorted(pathlib.Path("packages").glob("*/pyproject.toml"))
+          declared, needs = {}, {}
+          for manifest in manifests:
+              with manifest.open("rb") as handle:
+                  project = tomllib.load(handle).get("project", {})
+              name = project.get("name")
+              if not name:
+                  continue
+              declared[name] = manifest.parent
+              needs[name] = {
+                  requirement.split("==")[0].strip()
+                  for requirement in project.get("dependencies", [])
+              }
+          ordered, remaining = [], dict(needs)
+          while remaining:
+              free = sorted(n for n, deps in remaining.items() if not (deps & set(remaining)))
+              if not free:
+                  raise SystemExit(f"dependency cycle among packages: {sorted(remaining)}")
+              for name in free:
+                  ordered.append(str(declared[name]))
+                  del remaining[name]
+          print("\n".join(ordered))
+          PY
+          cat .install-order
+          while read -r package; do
+            [ -n "$package" ] || continue
+            pip install -e "$package[dev]" || exit 1
+          done < .install-order
+          # O PORTAO ENCONTRA O INTERPRETADOR -- e esta linha MEDE isso, ao contrario da que
+          # estava aqui.
+          #
+          # Ate 2026-09-07 este probe era `--concurrency`, com o comentario "o portao responde de
+          # facto, em vez de assumirmos que a pasta chegou". NAO MEDIA ISSO. O reviewer copiou o
+          # hook para um repositorio vazio, SEM .venv nenhum, e a linha deu
+          # `limit=3 cpus=16 ...` e rc=0. Reproduzi por mim, mesmo resultado.
+          #
+          # A causa esta escrita no proprio hook, e fui EU que a escrevi: `--concurrency` esta em
+          # `needs_no_interpreter=1`, de proposito, porque perguntar pelo PLANO nao precisa de
+          # interpretador -- e essa decisao continua certa. O que estava errado era o comentario:
+          # a linha e verde com ou sem a pasta, entao nao pode ser prova de que a pasta chegou.
+          # A minha propria correccao tornou a minha propria evidencia sem sentido.
+          #
+          # `--format-check` PRECISA do interpretador (corre `ruff` por ele) e por isso mede o
+          # que aqui se afirma: medido no mesmo repositorio vazio, rc=2 sem `.venv` e rc=0 com
+          # uma suite formatada. E o oposto de um probe que passa por nao medir.
+          bash tools/git-hooks/pre-push --format-check packages/semantic_catalog
+
+      - name: Format check, every package
+        if: ${{ !cancelled() }}
+        run: |
+          checked=0
+          failures=0
+          failed_packages=""
+          for package in packages/*/; do
+            [ -f "$package/pyproject.toml" ] || continue
+            checked=$((checked + 1))
+            python -m ruff format --check "$package" && rc=0 || rc=$?
+            [ "$rc" -eq 0 ] || {
+              echo "::error::ruff format --check FAILED in ${package} (exit ${rc})"
+              failures=$((failures + 1))
+              failed_packages="${failed_packages} ${package}"
+            }
+          done
+          echo "scope evidence: ruff format ran in $checked package(s)"
+          [ "$checked" -gt 0 ] || { echo "gate failed: no package was format-checked"; exit 1; }
+          [ "$failures" -eq 0 ] || {
+            echo "gate failed: ruff format failed in ${failures} of ${checked} package(s):${failed_packages}"
+            exit 1
+          }
+
+      - name: Lint, every package
+        if: ${{ !cancelled() }}
+        run: |
+          checked=0
+          failures=0
+          failed_packages=""
+          for package in packages/*/; do
+            [ -f "$package/pyproject.toml" ] || continue
+            checked=$((checked + 1))
+            python -m ruff check "$package" && rc=0 || rc=$?
+            [ "$rc" -eq 0 ] || {
+              echo "::error::ruff check FAILED in ${package} (exit ${rc})"
+              failures=$((failures + 1))
+              failed_packages="${failed_packages} ${package}"
+            }
+          done
+          echo "scope evidence: ruff check ran in $checked package(s)"
+          [ "$checked" -gt 0 ] || { echo "gate failed: no package was linted"; exit 1; }
+          [ "$failures" -eq 0 ] || {
+            echo "gate failed: ruff check failed in ${failures} of ${checked} package(s):${failed_packages}"
+            exit 1
+          }
+
+      # The criterion is the package's OWN declaration. A package that declares
+      # no checker is not given one, and that gap is named rather than filled by
+      # invention -- the same rule the push hook states for the same reason.
+      - name: Strict type check, every package that declares one
+        if: ${{ !cancelled() }}
+        run: |
+          checked=0
+          failures=0
+          failed_packages=""
+          for package in packages/*/; do
+            grep -q '^\[tool\.pyright\]' "$package/pyproject.toml" 2>/dev/null || continue
+            # COUNTED BEFORE THE CHECKER RUNS. It used to increment after, which
+            # meant a red package was not in the number -- and the number never
+            # printed on a red run anyway, because `|| exit 1` left before the echo.
+            checked=$((checked + 1))
+            ( cd "$package" && python -m pyright ) && rc=0 || rc=$?
+            [ "$rc" -eq 0 ] || {
+              echo "::error::pyright FAILED in ${package} (exit ${rc})"
+              failures=$((failures + 1))
+              failed_packages="${failed_packages} ${package}"
+            }
+          done
+          echo "scope evidence: pyright ran in $checked package(s)"
+          # A sweep that type-checked nothing would report success by doing
+          # nothing. `F115`.
+          [ "$checked" -gt 0 ] || { echo "gate failed: no package was type-checked"; exit 1; }
+          [ "$failures" -eq 0 ] || {
+            echo "gate failed: pyright failed in ${failures} of ${checked} package(s):${failed_packages}"
+            exit 1
+          }
+
+      # THIS IS THE STEP THE 2026-09-03 MEASUREMENT WAS TAKEN ON. See the
+      # `WHY NO SWEEP CARRIES || exit 1 ANY MORE` paragraph at the top of the file.
+      - name: Tests, every package, run from inside its own directory
+        if: ${{ !cancelled() }}
+        run: |
+          tested=0
+          failures=0
+          failed_packages=""
+          for package in packages/*/; do
+            [ -d "$package/tests" ] || continue
+            tested=$((tested + 1))
+            ( cd "$package" && python -m pytest -q ) && rc=0 || rc=$?
+            [ "$rc" -eq 0 ] || {
+              echo "::error::pytest FAILED in ${package} (exit ${rc})"
+              failures=$((failures + 1))
+              failed_packages="${failed_packages} ${package}"
+            }
+          done
+          echo "scope evidence: pytest ran in $tested package(s)"
+          [ "$tested" -gt 0 ] || { echo "gate failed: no package was tested"; exit 1; }
+          [ "$failures" -eq 0 ] || {
+            echo "gate failed: pytest failed in ${failures} of ${tested} package(s):${failed_packages}"
+            echo "             every package above was measured; this names all of them,"
+            echo "             not the alphabetically first."
+            exit 1
+          }
+
+      # --- what the derivation itself claims, asserted rather than assumed ----
+      #
+      # The steps above are only as good as the sweep that feeds them. This one
+      # fails if the sweep stops seeing a package that exists -- which is the
+      # exact failure this whole file was written for, in a new place.
+      # AND THIS STEP WAS WRITTEN WRONG THE FIRST TIME, WHICH IS WORTH KEEPING.
+      #
+      # It read `-ge 8`. The number came from memory in the one file whose entire
+      # purpose is to stop numbers coming from memory -- `F136` committed inside
+      # its own correction. The local executor caught it on the first run, which is
+      # the only reason it is a comment and not a green step asserting a count
+      # nobody has.
+      #
+      # AND THEN THE CORRECTION COMMITTED THE SAME DEFECT ONE CLAUSE LATER. It went
+      # on to say "and there are SEVEN packages" -- a second number, from a second
+      # moment, written as a standing fact with no date on it. It has since been
+      # false for longer than it was ever true. A READING taken on 2026-09-06, with
+      # the two commands this very step runs, answered NINE and NINE:
+      #
+      #     find packages -mindepth 1 -maxdepth 1 -type d | wc -l              -> 9
+      #     find packages -mindepth 2 -maxdepth 2 -name pyproject.toml | wc -l -> 9
+      #
+      # analytics_interaction, analytics_query, anomaly_investigation,
+      # channel_integration, conversation_context, daily_reporting,
+      # insights_prioritisation, proactive_distribution, semantic_catalog. That
+      # paragraph carries its date because it is a READING and not a property: the
+      # answer was seven once, it was nine on the date named, and it is wrong again
+      # the next time a package is born. **Run the two commands rather than
+      # believing the paragraph** -- which is precisely what the step below does, on
+      # every push, instead of comparing either sweep against a literal.
+      #
+      # So no count is written. **Two independent sweeps are compared**: every
+      # directory under `packages/`, and every directory there that declares a
+      # `pyproject.toml`. A package added without a manifest is invisible to every
+      # loop above and visible to the first sweep, which is exactly the failure
+      # this file exists to prevent, one level down.
+      - name: Every directory under packages declares a manifest, so no loop skips one
+        if: ${{ !cancelled() }}
+        run: |
+          directories=$(find packages -mindepth 1 -maxdepth 1 -type d | wc -l)
+          manifests=$(find packages -mindepth 2 -maxdepth 2 -name pyproject.toml | wc -l)
+          echo "scope evidence: $directories directory(ies), $manifests manifest(s)"
+          [ "$manifests" -gt 0 ] || { echo "gate failed: no package was swept"; exit 1; }
+          [ "$directories" -eq "$manifests" ] || {
+            echo "gate failed: $directories directories under packages/ and $manifests manifests"
+            echo "             a directory with no manifest is a package every loop above skips"
+            exit 1
+          }

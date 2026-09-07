@@ -1,0 +1,9 @@
+# T048 unit-test fixture — NOT production data, NOT a production approval.
+# The governed production seed is `semantic/governance/pending-visibility-approvals.yaml`
+# (T039) and is validated separately. Nothing here grants anything in the real
+# catalog.
+
+# No approval at all. Every exposable field must be omitted.
+catalog_schema_version: 1
+kind: pending_visibility_approvals
+approvals: []

@@ -1,0 +1,60 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+dist/
+build/
+
+# Tooling caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.hypothesis/
+.pyright/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+*.tmp
+
+# The demonstration harness appends its local audit trail beside itself, one JSON object
+# per line. It is a run artifact, not source: it carries pseudonymised identity
+# references and stage records from whatever question was asked, and a commit offering it
+# would be a commit offering somebody's message history. Nothing ignored it until
+# 2026-08-20, so any run left it staged and waiting to be added by mistake.
+apps/telegram-bot/demo-audit.jsonl
+apps/telegram-bot/*.jsonl
+# The same argument for a redirected console. `run.py` prints the question, the stage counts and
+# the operator's own lines; until 2026-08-21 it printed the credential **path** as well. A
+# redirection inside the tree left that file waiting to be added by mistake, exactly as the audit
+# trail was before it was ignored.
+apps/telegram-bot/*.log
+
+# O diario de corridas: registro do que rodou NESTA maquina, nao fato sobre o codigo.
+apps/telegram-bot/runs/
+
+# A chave da service account do BigQuery: mora aqui, NUNCA no git -- igual ao .env.
+apps/telegram-bot/bigquery-service-account.json
+
+# operational audit archive of the steward CLI (T110/D-13) — runs/ of any cwd
+runs/
+docs/estado-das-nove-frentes.txt
+docs/progresso-do-projeto.md
+docs/analise-dimensional-013.md
+
+# uv.lock de qualquer diretorio: byproduto de `uv run`, nunca conteudo do repo.
+# MEDIDO em 2026-09-04: zero uv.lock rastreado (`git ls-files | grep uv.lock` vazio), e o
+# `packages/semantic_catalog/uv.lock` deixado por um agente ja barrou um push hoje -- ele CAI
+# sob os prefixos vigiados das duas travessias, e o de `apps/telegram-bot/` NAO cai sob nenhum.
+# A regra e a mesma para os dois porque a diferenca e acidente de onde o comando rodou.
+uv.lock

@@ -1,0 +1,18 @@
+# T063 freshness fixture — UNIT FIXTURE ONLY.
+#
+# Never production data, never an observation of a real warehouse, and never a
+# claim that EXT-A (D-12) is ready. `load_snapshot` forces `is_fixture: true`
+# regardless of what this file says, so a fixture cannot present itself as a
+# production reading.
+
+# The source reports healthy and the availability table says nothing about the
+# metric. Silence is not coverage.
+observed_at: 2026-08-11T06:00:00Z
+snapshot_id: fixture_no_coverage_row
+records:
+  - source: app_a
+    status: complete
+    observed_at: 2026-08-11T06:00:00Z
+    last_successful_update: 2026-08-11T05:00:00Z
+    completeness_ratio: 1.0
+coverage: []

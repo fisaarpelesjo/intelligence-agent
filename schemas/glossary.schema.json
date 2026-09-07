@@ -1,0 +1,112 @@
+{
+  "$defs": {
+    "GlossaryContent": {
+      "additionalProperties": false,
+      "properties": {
+        "definition": {
+          "minLength": 1,
+          "title": "Definition",
+          "type": "string"
+        },
+        "lang": {
+          "const": "pt-BR",
+          "description": "Explicit language declaration; never inferred.",
+          "title": "Lang",
+          "type": "string"
+        },
+        "term": {
+          "minLength": 1,
+          "title": "Term",
+          "type": "string"
+        }
+      },
+      "required": [
+        "lang",
+        "term",
+        "definition"
+      ],
+      "title": "GlossaryContent",
+      "type": "object"
+    },
+    "Synonym": {
+      "additionalProperties": false,
+      "description": "A pt-BR term that resolves to an English canonical identifier (FR-057).",
+      "properties": {
+        "kind": {
+          "enum": [
+            "formal",
+            "informal",
+            "abbreviation"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "text": {
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "text",
+        "kind"
+      ],
+      "title": "Synonym",
+      "type": "object"
+    }
+  },
+  "$id": "https://intelligence-agent/semantic-catalog/glossary.schema.json",
+  "additionalProperties": false,
+  "description": "``semantic/glossary/{id}.yaml``.",
+  "properties": {
+    "catalog_schema_version": {
+      "title": "Catalog Schema Version",
+      "type": "integer"
+    },
+    "content": {
+      "$ref": "#/$defs/GlossaryContent"
+    },
+    "id": {
+      "minLength": 1,
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "title": "Id",
+      "type": "string"
+    },
+    "kind": {
+      "const": "glossary",
+      "title": "Kind",
+      "type": "string"
+    },
+    "owner": {
+      "minLength": 1,
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "title": "Owner",
+      "type": "string"
+    },
+    "synonyms": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/Synonym"
+      },
+      "title": "Synonyms",
+      "type": "array"
+    }
+  },
+  "required": [
+    "catalog_schema_version",
+    "kind",
+    "id",
+    "owner",
+    "content"
+  ],
+  "title": "GlossaryTerm",
+  "type": "object",
+  "x-catalog-schema-version": 3,
+  "x-do-not-edit": "Generated from the Pydantic models. Edit the models, then regenerate. This file is never a source of truth.",
+  "x-generated-by": "semantic_catalog.contracts.export",
+  "x-supported-schema-versions": [
+    3,
+    2,
+    1
+  ]
+}

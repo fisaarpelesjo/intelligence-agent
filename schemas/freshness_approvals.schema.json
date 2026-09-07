@@ -1,0 +1,214 @@
+{
+  "$defs": {
+    "FreshnessApproval": {
+      "additionalProperties": false,
+      "description": "One D-1 sign-off, for one source's decision-bearing inventory.",
+      "properties": {
+        "approval_status": {
+          "$ref": "#/$defs/FreshnessApprovalStatus"
+        },
+        "approved_at": {
+          "format": "date",
+          "title": "Approved At",
+          "type": "string"
+        },
+        "approved_by_role": {
+          "description": "A role from the ownership registry. Never an individual.",
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "title": "Approved By Role",
+          "type": "string"
+        },
+        "delay_tolerance": {
+          "format": "duration",
+          "title": "Delay Tolerance",
+          "type": "string"
+        },
+        "earliest_available_date": {
+          "format": "date",
+          "title": "Earliest Available Date",
+          "type": "string"
+        },
+        "expected_refresh_interval": {
+          "format": "duration",
+          "title": "Expected Refresh Interval",
+          "type": "string"
+        },
+        "expires_at": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expires At"
+        },
+        "known_outages": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Outage"
+          },
+          "title": "Known Outages",
+          "type": "array"
+        },
+        "known_restatements": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Restatement"
+          },
+          "title": "Known Restatements",
+          "type": "array"
+        },
+        "limitations": {
+          "default": [],
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Limitations",
+          "type": "array"
+        },
+        "reporting_time_zone": {
+          "title": "Reporting Time Zone",
+          "type": "string"
+        },
+        "source_commit": {
+          "description": "Binds the approval to approved content.",
+          "minLength": 7,
+          "title": "Source Commit",
+          "type": "string"
+        },
+        "source_id": {
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "title": "Source Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_id",
+        "approval_status",
+        "expected_refresh_interval",
+        "delay_tolerance",
+        "reporting_time_zone",
+        "earliest_available_date",
+        "approved_by_role",
+        "approved_at",
+        "source_commit"
+      ],
+      "title": "FreshnessApproval",
+      "type": "object"
+    },
+    "FreshnessApprovalStatus": {
+      "description": "Machine-readable. ``rejected`` is a decision, not an absence.",
+      "enum": [
+        "approved",
+        "rejected"
+      ],
+      "title": "FreshnessApprovalStatus",
+      "type": "string"
+    },
+    "Outage": {
+      "additionalProperties": false,
+      "description": "A window in which the source produced no usable data.",
+      "properties": {
+        "from": {
+          "format": "date",
+          "title": "From",
+          "type": "string"
+        },
+        "reason": {
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        },
+        "to": {
+          "format": "date",
+          "title": "To",
+          "type": "string"
+        }
+      },
+      "required": [
+        "from",
+        "to",
+        "reason"
+      ],
+      "title": "Outage",
+      "type": "object"
+    },
+    "Restatement": {
+      "additionalProperties": false,
+      "description": "The source republished figures for a past window (FR-028).\n\nDistinct from a definition change: the meaning did not move, the numbers did.",
+      "properties": {
+        "affects_from": {
+          "format": "date",
+          "title": "Affects From",
+          "type": "string"
+        },
+        "affects_to": {
+          "format": "date",
+          "title": "Affects To",
+          "type": "string"
+        },
+        "reason": {
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        },
+        "restated_at": {
+          "format": "date",
+          "title": "Restated At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "restated_at",
+        "affects_from",
+        "affects_to",
+        "reason"
+      ],
+      "title": "Restatement",
+      "type": "object"
+    }
+  },
+  "$id": "https://intelligence-agent/semantic-catalog/freshness_approvals.schema.json",
+  "additionalProperties": false,
+  "description": "``semantic/governance/freshness-approvals.yaml`` — deny-by-default.\n\nSeeded **empty**, which is the correct initial state while D-1 is open: with\nno approvals, every source is unpublishable and no candidate tolerance can\nreach a decision or a user-facing refusal.",
+  "properties": {
+    "approvals": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/FreshnessApproval"
+      },
+      "title": "Approvals",
+      "type": "array"
+    },
+    "catalog_schema_version": {
+      "title": "Catalog Schema Version",
+      "type": "integer"
+    },
+    "kind": {
+      "const": "freshness_approvals",
+      "title": "Kind",
+      "type": "string"
+    }
+  },
+  "required": [
+    "catalog_schema_version",
+    "kind"
+  ],
+  "title": "FreshnessApprovalRegistry",
+  "type": "object",
+  "x-catalog-schema-version": 3,
+  "x-do-not-edit": "Generated from the Pydantic models. Edit the models, then regenerate. This file is never a source of truth.",
+  "x-generated-by": "semantic_catalog.contracts.export",
+  "x-supported-schema-versions": [
+    3,
+    2,
+    1
+  ]
+}

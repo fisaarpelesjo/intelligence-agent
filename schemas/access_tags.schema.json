@@ -1,0 +1,159 @@
+{
+  "$defs": {
+    "AccessTag": {
+      "additionalProperties": false,
+      "description": "One authorisation tag.",
+      "properties": {
+        "allowed_authorization_scopes": {
+          "items": {
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9_]*$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Allowed Authorization Scopes",
+          "type": "array"
+        },
+        "allowed_principal_types": {
+          "items": {
+            "$ref": "#/$defs/PrincipalType"
+          },
+          "minItems": 1,
+          "title": "Allowed Principal Types",
+          "type": "array"
+        },
+        "content": {
+          "$ref": "#/$defs/AccessTagContent"
+        },
+        "deprecated_from": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Deprecated From"
+        },
+        "effective_from": {
+          "format": "date",
+          "title": "Effective From",
+          "type": "string"
+        },
+        "id": {
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "owner_role": {
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "title": "Owner Role",
+          "type": "string"
+        },
+        "replacement_tag": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "pattern": "^[a-z][a-z0-9_]*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Replacement Tag"
+        }
+      },
+      "required": [
+        "id",
+        "owner_role",
+        "effective_from",
+        "allowed_principal_types",
+        "allowed_authorization_scopes",
+        "content"
+      ],
+      "title": "AccessTag",
+      "type": "object"
+    },
+    "AccessTagContent": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "label": {
+          "minLength": 1,
+          "title": "Label",
+          "type": "string"
+        },
+        "lang": {
+          "const": "pt-BR",
+          "description": "Explicit language declaration; never inferred.",
+          "title": "Lang",
+          "type": "string"
+        }
+      },
+      "required": [
+        "lang",
+        "label",
+        "description"
+      ],
+      "title": "AccessTagContent",
+      "type": "object"
+    },
+    "PrincipalType": {
+      "description": "Humans and service principals warrant different treatment.",
+      "enum": [
+        "user",
+        "service_principal"
+      ],
+      "title": "PrincipalType",
+      "type": "string"
+    }
+  },
+  "$id": "https://intelligence-agent/semantic-catalog/access_tags.schema.json",
+  "additionalProperties": false,
+  "description": "``semantic/governance/access-tags.yaml`` — deny-by-default.",
+  "properties": {
+    "catalog_schema_version": {
+      "title": "Catalog Schema Version",
+      "type": "integer"
+    },
+    "kind": {
+      "const": "access_tags",
+      "title": "Kind",
+      "type": "string"
+    },
+    "tags": {
+      "items": {
+        "$ref": "#/$defs/AccessTag"
+      },
+      "minItems": 1,
+      "title": "Tags",
+      "type": "array"
+    }
+  },
+  "required": [
+    "catalog_schema_version",
+    "kind",
+    "tags"
+  ],
+  "title": "AccessTagRegistry",
+  "type": "object",
+  "x-catalog-schema-version": 3,
+  "x-do-not-edit": "Generated from the Pydantic models. Edit the models, then regenerate. This file is never a source of truth.",
+  "x-generated-by": "semantic_catalog.contracts.export",
+  "x-supported-schema-versions": [
+    3,
+    2,
+    1
+  ]
+}

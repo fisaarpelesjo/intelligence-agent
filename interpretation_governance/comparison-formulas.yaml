@@ -1,0 +1,78 @@
+# Governed comparison formulas — D-18.
+#
+# EMPTY AND UNAPPROVED BY DESIGN. The closed formula set, each formula's unit
+# rule, its behaviour at a zero or absent baseline, and any presentation
+# quantisation are governed content. This feature applies no rounding of its
+# own: inventing one here would silently decide how every percentage in the
+# product reads.
+#
+# While this file declares no formula, every comparison refuses.
+#
+# DO NOT AUTHOR A FORMULA, UNIT RULE, ROUNDING OR ZERO-BASELINE BEHAVIOUR.
+#
+# THAT LINE WAS LIFTED ONCE, ON 2026-08-26, AND ONLY FOR `percentage_change`.
+# The owner's literal words, recorded in the governed loop channel at
+# 2026-08-26T17:17:40Z: "Autorizar as duas (Recomendado)" — this formula and the
+# D-1 freshness approval of `subscription_daily`, and nothing else.
+#
+# WHY THIS FORMULA AND NOT THE OTHER TWO. It is the one `005`'s detection needs:
+# a threshold rule asks "how much did this move, in per cent". `absolute_difference`
+# and `ratio` are equally declarable and are NOT declared here, because nothing
+# asked for them and a formula authored ahead of a need is a governed decision
+# nobody made. The set stays closed; it now holds one member instead of none.
+#
+# WHAT WAS ABSENT AND WHY IT MATTERED, measured on 2026-08-26 before authoring:
+# `instances: []` meant `resolve_formula` refused EVERY id, so every comparison in
+# the product answered `INTERPRETATION_VOCABULARY_UNRESOLVABLE`. That was the
+# designed state and it was correct while nobody had decided; it stopped being the
+# state the moment he decided.
+#
+# THE THREE DECLARED PROPERTIES ARE HIS DECISION, NOT DERIVED FROM THE CODE:
+#
+#   * `unit_rule: percent` — the formula's definition already multiplies by one
+#     hundred, so the figure it produces is in per cent. The rule states what the
+#     number IS; it is carried verbatim and never converted;
+#   * `zero_baseline: refuse_comparison` — a percentage change divides by the
+#     baseline, so a zero baseline has no answer. Refusing is the only rule this
+#     feature can execute today: `DerivedFigure.value` is a required decimal, so
+#     "produce no number but still return a comparison" is not representable.
+#     Declaring any other rule would make every such comparison refuse anyway, with
+#     a worse message;
+#   * NO `quantisation`. Deliberate, and the file's own warning is why: a rounding
+#     declared here silently decides how every percentage in the product reads. No
+#     governed rounding is itself a governed decision, and it is the one taken.
+#
+# WHAT THIS DOES NOT DO. It does not make any metric publishable, does not declare
+# readiness, does not enable a channel. It removes ONE of the two things standing
+# between `005` and a candidate.
+
+schema_version: 1
+kind: comparison_formulas
+
+# A list of versioned instances, each with version, effective_from, an optional
+# effective_to, an `approval` mapping and its `formulas`. Each formula declares
+# id, surface_forms (pt-BR), unit_rule, zero_baseline and an optional
+# quantisation.
+instances:
+  - version: "1"
+    effective_from: 2026-08-26
+    effective_to: null
+    approval:
+      approver_role: data_governance
+      # Not a repository path, deliberately: the decision lives in the governed
+      # loop channel and citing a file that does not hold it would be worse than
+      # naming where it actually is.
+      evidence_ref: >-
+        owner decision recorded in the governed loop channel at
+        2026-08-26T17:17:40Z, literal words "Autorizar as duas (Recomendado)"
+      approved_on: 2026-08-26
+    formulas:
+      - id: percentage_change
+        surface_forms:
+          - variação percentual
+          - variacao percentual
+          - mudança percentual
+          - quanto variou em porcentagem
+        unit_rule: percent
+        zero_baseline: refuse_comparison
+        quantisation: null

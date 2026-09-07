@@ -1,0 +1,31 @@
+# Governed channel rendering capability matrix — D-28. Owned by data governance,
+# with the D-10 pt-BR reviewer's sign-off on every disclosure wording.
+#
+# EMPTY AND UNAPPROVED BY DESIGN.
+#
+# Per channel: maximum_body_characters, expressible_structures,
+# permitted_degradations, continuation_mechanism, ordering_guarantee and
+# disclosure_wording. All six together or the entry does not resolve.
+#
+# PERMITTED DEGRADATIONS ARE STRUCTURAL ONLY. A table rendered as a list is a
+# degradation. Shortening, summarising, rewording, rounding, omitting or
+# truncating are content changes and are forbidden outright — there is no field in
+# which one could be declared, because there is no permitted one (ADR 0022).
+#
+# ORDERING_GUARANTEE IS LOAD-BEARING. A channel that does not declare one cannot
+# carry a continuation: an answer split across fragments that may arrive out of
+# order is an answer whose caveats may arrive before the number they qualify, or
+# not at all. Without a guarantee, the response is withheld.
+#
+# While this file declares no instance, nothing renders: every response withholds
+# with CHANNEL_RENDERING_CAPABILITY_UNRESOLVABLE.
+#
+# DO NOT INVENT A CAPABILITY, A LIMIT, A DEGRADATION OR A DISCLOSURE WORDING.
+
+schema_version: 1
+kind: channel_capability_matrix
+
+# A list of versioned instances, each with version, effective_from, an optional
+# effective_to, an `approval` mapping, and a `channels` mapping keyed by channel
+# id carrying all six per-channel fields.
+instances: []

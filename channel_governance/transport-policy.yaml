@@ -1,0 +1,28 @@
+# Governed channel transport policy — D-26. Owned by the platform owner, with
+# security sign-off on the replay tolerance.
+#
+# EMPTY AND UNAPPROVED BY DESIGN.
+#
+# Seven values are required together, per channel: replay_tolerance_seconds,
+# maximum_inbound_bytes, timeout_seconds, retry_bounds, rate_limit,
+# idempotency_window_seconds and continuation_mechanism. A policy carrying a rate
+# limit but no replay tolerance does not resolve — it is not partially usable.
+# That single failure mode is deliberate: it removes any configuration in which
+# the system enforces delivery bounds but accepts a replayed webhook, or the
+# reverse.
+#
+# While this file declares no instance, every dependent operation refuses with
+# CHANNEL_TRANSPORT_POLICY_UNRESOLVABLE: replay-tolerance evaluation, the governed
+# size bound, idempotency, retries, rate limiting and continuation.
+#
+# DO NOT INVENT A TOLERANCE, SIZE, TIMEOUT, RETRY BOUND, RATE LIMIT, WINDOW OR
+# CONTINUATION MECHANISM. A plausible default is the most dangerous kind: it would
+# look reviewed.
+
+schema_version: 1
+kind: channel_transport_policy
+
+# A list of versioned instances, each with version, effective_from, an optional
+# effective_to, an `approval` mapping, and a `channels` mapping keyed by channel
+# id (WHATSAPP, SLACK, TELEGRAM, GENERIC_WEBHOOK) carrying all seven values.
+instances: []

@@ -1,0 +1,26 @@
+# T058 decision-matrix fixture — NOT production data, NOT a production approval.
+
+catalog_schema_version: 1
+kind: catalog_policy
+policy_id: fixture_policy
+policy_version: 1
+effective_from: 2026-01-01
+owner_role: fixture_governance
+approval_roles: [fixture_governance, fixture_owner]
+authorization:
+  default: deny
+  require_access_tag: true
+  unknown_tag_behaviour: fail_closed
+  self_approval_allowed: false
+publication:
+  require_complete_contract: true
+  require_owner: true
+  require_pt_br_content: true
+  require_reason_message_for_publishable_codes: true
+pending_visibility:
+  exposable_fields: [public_name, expected_available_from]
+  require_visibility_approval: true
+  approval_expiry_behaviour: omit_field
+refusal:
+  disclose_answerable_subset: true
+  disclose_replacement_metric_id: true

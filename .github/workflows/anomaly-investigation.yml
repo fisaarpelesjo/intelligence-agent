@@ -1,0 +1,245 @@
+name: anomaly-investigation
+
+# =============================================================================
+# THIS HEADER ONCE SAID "NEVER RUN", AND IT WAS ALREADY FALSE WHEN IT WAS SAVED.
+#
+# What stood here until 2026-09-06 read: "WRITTEN AND NOT EXERCISED. This
+# workflow has NEVER RUN on GitHub. The Actions budget was exhausted when it was
+# added (2026-08-25), so no run of it exists and none can be started" — and, at
+# the end, "the gate is a green run of EVERY workflow in this directory, and this
+# one has produced zero."
+#
+# A READING taken on 2026-09-06 — a reading of the server at a moment, not a
+# state of the world — contradicts all of it:
+#
+#     gh workflow list --all                            -> anomaly-investigation
+#                                                          active
+#     gh run list --workflow=anomaly-investigation.yml  -> 153 runs; earliest
+#                                                          created
+#                                                          2026-08-25T20:16:55Z
+#
+# THE EARLIEST RUN IS SIX SECONDS AFTER THE COMMIT THAT ADDED THIS FILE. That
+# commit is `d4aa09a` ("ci(005): extend coverage to the new package -- written,
+# and NOT exercised"), committed 2026-08-25T20:16:49Z; the run it triggered was
+# created at 20:16:55Z and carries `d4aa09a` as its head SHA. So the sentence
+# "this workflow has NEVER RUN" was written into a file whose push started a run
+# of that same file before anyone could have read the sentence. It was never
+# checked, and for twelve days it was the standing justification for not looking.
+#
+# THE DEFECT IS THE SHAPE, NOT THE COUNT. The old header already knew this about
+# numbers — it deleted "six green runs" rather than bumping it to seven, because
+# "a stale number reads as confirmed". It then wrote a stale STATE in the same
+# breath and did not notice, because a state feels like a fact in a way a count
+# does not. Both age. Neither belongs in a comment.
+#
+# So nothing here asserts a colour, a count, a budget, or whether the file has
+# run. **ASK THE SERVER**, at the moment the answer matters:
+#
+#     gh run list --workflow=anomaly-investigation.yml --limit 10
+#     gh workflow list --all
+#
+# What survives is what does not depend on GitHub: `tools/local-ci/run_local_ci.py`
+# DERIVES its commands from this file rather than carrying a copy, so the steps
+# below are executable content in a second door, one that needs neither budget
+# nor network. That is checkable from any clone by reading the executor. The
+# line further down, about the six workflows that did not notice a new package,
+# is a measurement of the PAST — it names what was true on a stated date and
+# cannot be falsified by anything that happens next — and it stays as it is.
+# =============================================================================
+#
+# WHY THIS FILE EXISTS.
+#
+# `packages/anomaly_investigation` was created in cycle 302 and the six existing
+# workflows did not notice. Measured: they name **four** packages by fixed list,
+# with no glob and no discovery, so 64 tests passed locally and **zero** ran on
+# the server. The local runner reported 80 executed steps before the package
+# existed and 80 after — the gate did not observe that new code was born.
+#
+# The node that matters most was the one least guarded: `test_originates_nothing`
+# is this feature's strongest guarantee — no scheduler, no timer, no send — and
+# it was guarding nothing on the server.
+#
+# WHAT THIS FILE DELIBERATELY DOES NOT DO.
+#
+# It touches **no existing workflow and no existing job**. It adds coverage; it
+# removes none. There is no path filter, no `continue-on-error`, no
+# `if: always()`, and no step that warns instead of failing — a gate that warns
+# is a gate that gets ignored. Extending coverage is the opposite act from
+# weakening a gate, and only the first is authorized.
+#
+# It reaches no warehouse, no model provider and no channel provider. There is
+# no `secrets` reference below and no service container. Every result here is
+# structural or fixture-backed.
+#
+# WHAT THIS FILE GATES BY SWEEP AND WHAT IT GATES BY NAME, SAID PLAINLY.
+#
+# THE PARAGRAPH THAT STOOD HERE UNTIL 2026-09-06 WAS THE MOST DANGEROUS LINE IN
+# THIS DIRECTORY, AND IT IS QUOTED SO IT CANNOT COME BACK BY ACCIDENT: "Phase 1
+# of this feature is contracts only. `freshness/`, `detect/`, `investigate/` and
+# `ports/` are named by the plan and do not exist, so no gate here mentions them:
+# a gate over an absent module passes because there is nothing to break, which
+# reports a guarantee nobody is holding."
+#
+# The reasoning was sound and the premise was false. Those four directories are
+# on disk with real code in them, and three of the four were born on the SAME DAY
+# the paragraph was written — the first of them twenty-six minutes later:
+#
+#   freshness/    996cc54  2026-08-25 17:42 -03  "Phase 2 -- freshness and
+#                                                 completeness"
+#   detect/       44c64eb  2026-08-25 19:29 -03  "Phase 3"
+#   ports/        44c64eb  2026-08-25 19:29 -03  (extended by 783e6d3, 2026-08-26)
+#   investigate/  c44c140  2026-08-25 20:45 -03  "Phase 4 -- which segment carried
+#                                                 the movement"
+#
+# WHAT THEY ACTUALLY CONTAIN, read on 2026-09-06 (1451 lines of source against
+# 768 in `contracts/`, so the majority of this package is in the four trees the
+# paragraph called absent):
+#
+#   freshness/    398 lines  assess_freshness, FreshnessVerdict, EvidenceClass,
+#                            evidence_class — the withholding decision
+#   detect/       222 lines  assess_threshold, ThresholdOutcome, ThresholdVerdict,
+#                            GOVERNED_METHODS, method_or_refusal
+#   investigate/  205 lines  investigate, InvestigationOutcome, reconcile,
+#                            Reconciliation — the dimensional split
+#   ports/        626 lines  resolve_metric, MetricResolution, CatalogEvaluator,
+#                            resolve_movement, MovementResolution, SideFigure,
+#                            FigureExecutor — the two upstream boundaries
+#
+# ARE THEY GATED? MEASURED, NOT ASSUMED — AND THE ANSWER IS TWO DIFFERENT
+# ANSWERS.
+#
+# BY SWEEP: YES, AND ALWAYS WERE. Every whole-directory step in this file names
+# the package and not a module, so each of them reaches all four the moment the
+# files exist — `ruff format --check packages/anomaly_investigation`, `ruff check
+# packages/anomaly_investigation`, `pyright` run from the package root, and
+# `pytest -q` run from the package root. That last one collected 463 nodes on
+# 2026-09-06, of which 107 live in the eleven test files that import one of the
+# four trees (`tests/unit/test_withholds_on_stale_or_incomplete.py`,
+# `tests/unit/test_threshold_crossing.py`,
+# `tests/unit/test_a_rule_that_can_never_fire_is_reported.py`,
+# `tests/unit/test_wrong_aggregation_class_is_refused.py`,
+# `tests/unit/test_absent_dimensions_are_reported.py`,
+# `tests/unit/test_contributions_reconcile.py`,
+# `tests/contract/test_governed_methods_match_the_baseline.py`,
+# `tests/integration/test_withholding_is_readable_in_the_run.py`,
+# `tests/integration/test_an_upstream_refusal_reaches_the_caller.py`,
+# `tests/integration/test_the_catalog_refusal_travels.py`,
+# `tests/integration/test_candidate_against_the_real_warehouse.py`). The push
+# hook agrees: `bash tools/git-hooks/pre-push --list-jobs` lists `format:`,
+# `lint:`, `strict types:` and the suite itself for `packages/anomaly_investigation`,
+# all four derived from the directory rather than from a list. `every-package.yml`
+# sweeps the same package a third time by the same derivation. **Deriving instead
+# of listing is what saved this**: no human had to remember the four trees for
+# them to be measured, which is the property the paragraph above was written to
+# defend and then quietly undermined in prose.
+#
+# BY NAME: NO, AND THAT IS THE REAL RESIDUE. The named steps further down —
+# "Originates nothing", "Fifth reason-code namespace is disjoint", "Contracts
+# refuse incomplete evidence" — are all Phase-1 contract nodes. Not one names a
+# guarantee of `freshness/`, `detect/`, `investigate/` or `ports/`. Those steps
+# exist so a failure reports the GUARANTEE that broke instead of "some test
+# failed"; a break in the withholding decision or in the upstream boundary is
+# still caught, but it is reported as a red "Tests" step and nothing more. That
+# is a legible-failure gap, not a coverage hole, and it is written here as the
+# smaller thing it is rather than as the larger thing the old paragraph implied.
+#
+# AND THE RULE THE OLD PARAGRAPH BROKE: **a comment may not stand as the written
+# justification for what a gate does not do.** A gate that omits something says
+# so by what it runs, and that can be measured; a comment saying "there is
+# nothing there" is unfalsifiable from inside the file and outlives the fact by
+# however long nobody checks. If a module tree here is ever genuinely absent, the
+# way to say so is a step that fails when it appears — not a sentence.
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: anomaly-investigation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  anomaly-investigation:
+    runs-on: ubuntu-latest
+    steps:
+      # Full history, because one node measures instead of asserting.
+      # T033 proves no upstream file was edited by reading this feature's own
+      # commits out of git. The default checkout is `fetch-depth: 1`, and measured
+      # in a `--depth 1` clone the base commit is simply absent -- so the node
+      # skips, every time, and the step that claims to prove the boundary proves
+      # nothing. This is the opposite of relaxing a gate: it is what makes the
+      # gate run at all.
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install all five packages
+        run: |
+          python -m pip install --upgrade pip
+          # Upstream first: the dependency direction is
+          # semantic_catalog <- analytics_query <- analytics_interaction <- anomaly_investigation,
+          # and the install order is what supplies each path dependency.
+          # `channel_integration` is installed because the reason-code disjointness
+          # check compares against all four existing namespaces, and one of them is
+          # its own. This feature imports nothing else from it.
+          pip install -e "packages/semantic_catalog[dev]"
+          pip install -e "packages/analytics_query[dev]"
+          pip install -e "packages/analytics_interaction[dev]"
+          pip install -e "packages/channel_integration[dev]"
+          pip install -e "packages/anomaly_investigation[dev]"
+
+      # --- formatting, linting, strict typing -------------------------------
+      - name: Format check
+        run: python -m ruff format --check packages/anomaly_investigation
+
+      - name: Lint
+        run: python -m ruff check packages/anomaly_investigation
+
+      - name: Strict type check
+        run: python -m pyright
+        working-directory: packages/anomaly_investigation
+
+      # --- tests -------------------------------------------------------------
+      - name: Tests
+        run: python -m pytest -q
+        working-directory: packages/anomaly_investigation
+
+      # --- the guarantees, named one by one ----------------------------------
+      # Named explicitly rather than folded into the suite above, so a failure names
+      # the guarantee that broke instead of "some test failed". This is the pattern
+      # `004`'s workflow already uses.
+
+      - name: Originates nothing -- no scheduler, timer, thread, loop or send
+        run: python -m pytest tests/security/test_originates_nothing.py -q
+        working-directory: packages/anomaly_investigation
+
+      - name: Fifth reason-code namespace is disjoint from all four
+        run: python -m pytest tests/contract/test_namespace_is_disjoint.py -q
+        working-directory: packages/anomaly_investigation
+
+      - name: Contracts refuse incomplete evidence
+        run: python -m pytest tests/unit/test_contracts_refuse_incomplete_evidence.py -q
+        working-directory: packages/anomaly_investigation
+
+      # --- upstream preservation ---------------------------------------------
+      # This feature edits nothing upstream. Running the four suites is how that
+      # claim is measured rather than asserted: if anything here reached back into
+      # `001`–`004`, one of these would say so.
+      - name: Upstream suites must stay whole
+        run: |
+          python -m pytest -q packages/semantic_catalog
+          python -m pytest -q packages/analytics_query
+          python -m pytest -q packages/analytics_interaction
+          python -m pytest -q packages/channel_integration
+
+      - name: Repository-wide artifact guards
+        run: python -m pytest tests/contract/test_cross_artifact_links.py -q
+        working-directory: packages/semantic_catalog

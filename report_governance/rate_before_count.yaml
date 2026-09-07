@@ -1,0 +1,118 @@
+# QUAL TAXA GOVERNA QUAL CONTAGEM -- SC-1303 / FR-1320, fatia F8, T1333.
+#
+# Palavra dele, regra 3 do contrato aprovado (docs/exemplos-analise-dimensional.md, linha 348):
+#
+#     Taxa antes de contagem -- desvio de contagem so vira alerta se a TAXA tambem saiu da
+#     banda; volume subindo com taxa estavel e crescimento, e crescimento nao alarma.
+#
+# E o alerta de exemplo dele mostra a peca funcionando num caso concreto
+# (docs/exemplos-analise-dimensional.md, linha 132):
+#
+#     Taxa: 10,7% das vendas (banda 4,1-7,2%) -- a TAXA subiu, nao e so volume
+#
+# O MECANISMO EXISTE E ESTA LIGADO. daily_reporting/alert/rate_before_count.py aplica a regra
+# sobre o conjunto de cruzamentos do dia, e apps/telegram-bot/deliver_daily_report.py chama esse
+# passo antes de montar o alerta. O que NAO existe e o CONTEUDO deste arquivo.
+#
+# ------------------------------------------------------------------------------------------
+# A DECISAO E DELE, E ESTA EM ABERTO. NENHUM PAR FOI INVENTADO AQUI.
+# ------------------------------------------------------------------------------------------
+#
+# Medido em 2026-09-06 varrendo report_governance/, semantic/metrics/, schemas/ e o codigo:
+# NENHUM arquivo do repositorio declara que uma contagem e governada por uma taxa. O
+# schemas/metric.schema.json fecha additionalProperties, entao o contrato de metrica nao tem
+# onde carregar isso; semantic/comparability/ tem `metric_pair`, mas o enum de `relation` e
+# fechado em combinable | comparable_with_caveat | not_comparable e nenhum valor significa
+# "governa". Por isso o par nasce aqui, na arvore governada do relatorio, como os outros.
+#
+# ENQUANTO `pairs` ESTIVER VAZIO o produto NAO MUDA e NADA E SUPRIMIDO: toda contagem que
+# cruzar sai no alerta e volta NOMEADA em `unresolved` -- "a regra nao pode ser aplicada a
+# esta". E o fail-closed escolhido: uma serie de taxa quebrada nao ganha o poder de calar o
+# alerta inteiro, e uma contagem nunca some em silencio.
+#
+# ------------------------------------------------------------------------------------------
+# OPCOES, COM UMA RECOMENDADA. A EVIDENCIA DE CADA UMA E MEDIDA; A ESCOLHA NAO E MINHA.
+# ------------------------------------------------------------------------------------------
+#
+# A evidencia vem de apps/telegram-bot/metrics.py linhas 549-637, que registra numerador e
+# denominador de cada razao COM CONFERENCIA CONTRA A VIEW (ex.: linha 566, "11330 e exatamente
+# o New trials da mesma janela"). Aquele modulo se declara "MVP scope. NOT approved governed
+# content" (metrics.py, linha 99), entao ele serve como MEDICAO, nunca como declaracao.
+#
+# Repare que os dois sentidos aparecem, e e por isso que isto nao pode ser derivado por regra:
+#   - Chargeback (qty) e o NUMERADOR de Chargeback (%);
+#   - New trials e o DENOMINADOR de Trial conversion (%).
+# Nos dois casos a taxa "governa" a contagem no sentido dele, mas nenhuma regra mecanica sobre
+# nome ou sobre numerador/denominador acerta os dois.
+#
+# OPCAO 1 (RECOMENDADA) -- os quatro pares que a medicao fecha, e mais nenhum:
+#   New trials:          Trial conversion (%)    # metrics.py:554-566, denominador conferido
+#   Chargeback (qty):    Chargeback (%)          # metrics.py:620-635, numerador conferido;
+#                                                # e o caso do exemplo dele, linha 132
+#   Cancellations (qty): Cancellations (%)       # metrics.py:578-590, numerador conferido
+#   Not renewed (qty):   Not renewed (%)         # metrics.py:602-612, numerador conferido
+#   Sales (qty) fica de fora: a unica taxa que o toca e Chargeback (%), onde ele e o
+#   DENOMINADOR -- chargeback estavel nao diz nada sobre venda subir. Sales (qty) seguiria
+#   `unresolved`, saindo no alerta e nomeado.
+#   Custo: o alerta de New trials de 05/09 (688, +18,83 %) deixa de sair nos dias em que a
+#   conversao ficar dentro da banda -- que e exatamente o que a SC-1303 pede.
+#
+# OPCAO 2 -- so o par do exemplo dele (Chargeback (qty): Chargeback (%)).
+#   Nada alem do que ele escreveu literalmente. Custo: a SC-1303 quase nunca dispara, porque
+#   Chargeback (qty) e o KPI que menos cruza; New trials continua alarmando por volume.
+#
+# OPCAO 3 -- os quatro da opcao 1 mais Sales (qty): Chargeback (%).
+#   Custo: suprime venda subindo porque o chargeback ficou estavel. E a relacao errada, e foi
+#   escrita aqui so para que a opcao apareca antes de alguem a propor sem medir.
+#
+# AS CONTAGENS SAO SEIS, E ESTE ARQUIVO SO DISCUTIA QUATRO -- medido em 2026-09-07.
+#
+# SELECT DISTINCT kpi_name, aggregation_class da view: seis KPIs sao COUNT --
+# Cancellations (qty), Chargeback (qty), New trials, Not renewed (qty), Sales (qty) e
+# REVENUE (US$). As opcoes acima nomeiam quatro pares e discutem Sales (qty); a sexta faltava,
+# e uma escolha feita contra uma lista incompleta e uma escolha mal informada.
+#
+# REVENUE (US$) NAO TEM PAR NOMEADO, e a distincao entre isto e "nao tem par" e do proprietario.
+#
+# MEDIDO: nenhuma taxa deste catalogo NOMEIA Revenue (US$), e nao existe "Revenue (%)". Uma busca
+# por nome nao acha nenhuma.
+#
+# NAO MEDIDO, E POR ISSO NAO AFIRMADO: se alguma taxa governa receita no SENTIDO dele. O catalogo
+# tem duas taxas em dinheiro, e a pergunta e sobre o que elas medem no armazem e nao sobre como se
+# chamam. LTV (US$) divide, pela sua propria definicao operacional, "dolares somados pela fonte"
+# por "clientes contados pela fonte" -- se esses dolares sao os do Revenue (US$) e uma pergunta
+# sobre as colunas de origem, que este repositorio nao possui. CAC (R$) e a outra. Escrever aqui
+# que "nao existe do que a governar" fechava, por um argumento de nome, uma porta que e dele.
+#
+# E A MESMA REGRA DAS DUAS ORACOES DA PECA 6, uma camada acima: nomeia-se a pergunta em aberto em
+# vez de se afirmar a resposta que ninguem mediu.
+#
+# O QUE ISSO SIGNIFICA NA PRATICA, e isto nao muda: com este arquivo como esta, Revenue (US$) segue
+# SEMPRE em `unresolved`, saindo no alerta e NOMEADA, qualquer que seja a opcao escolhida. E o
+# fail-closed a funcionar: uma contagem em dinheiro nao e calada por uma taxa que ninguem mediu.
+#
+# Um nome que nenhum contrato ativo carregue e RECUSA no carregamento, dos dois lados do par:
+# um nome errado nao pode sumir em silencio (mesma regra do daily_scope.yaml).
+#
+# Este arquivo e conteudo governado: muda com decisao dele, datada.
+schema_version: 1
+kind: report_rate_before_count
+
+# Contagem -> a taxa que a governa.
+#
+# ELE DECIDIU EM 2026-09-07, OD-156: os QUATRO que a medicao fecha, que era a opcao 1 acima.
+# Recusou explicitamente as outras tres que lhe foram postas: so o par do exemplo dele; os
+# quatro mais Sales (qty) -> Chargeback (%); e nenhum.
+#
+# O QUE ISTO DESTRAVA: a entrega visivel da T1333 -- MENOS ALERTAS FALSOS -- que ate agora nao
+# existia, porque com a lista vazia toda contagem caia em `unresolved` e continuava a alertar.
+#
+# Sales (qty) fica de fora pela razao ja escrita acima: a unica taxa que o toca e Chargeback (%),
+# onde ele e o DENOMINADOR, e chargeback estavel nao diz nada sobre venda subir.
+# Revenue (US$) fica de fora por nao haver par NOMEADO -- ver a seccao das seis contagens.
+# As duas seguem em `unresolved`, saindo no alerta e nomeadas.
+pairs:
+  New trials: Trial conversion (%)
+  Chargeback (qty): Chargeback (%)
+  Cancellations (qty): Cancellations (%)
+  Not renewed (qty): Not renewed (%)

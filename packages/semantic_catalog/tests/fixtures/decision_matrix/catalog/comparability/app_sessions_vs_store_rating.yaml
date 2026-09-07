@@ -1,0 +1,22 @@
+# T082 decision-matrix fixture — NOT production data.
+#
+# Comparability is deny-by-default: a pair with no rule here is refused, and the
+# absence of a rule is never read as permission.
+
+# Comparable, and not identical. Permitted, and labelled.
+catalog_schema_version: 1
+kind: comparability
+
+id: app_sessions_vs_store_rating
+subject: metric_pair
+left: app_sessions
+right: store_rating
+relation: comparable_with_caveat
+content:
+  lang: pt-BR
+  reason: >-
+    Uma métrica conta eventos do produto e a outra é uma nota acumulada exibida
+    pela loja.
+  caveat: >-
+    Compare direção e ordem de grandeza, nunca níveis: a nota é um valor pontual
+    acumulado e as sessões são uma contagem do dia.

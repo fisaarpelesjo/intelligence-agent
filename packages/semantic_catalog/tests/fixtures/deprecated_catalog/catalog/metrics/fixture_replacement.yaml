@@ -1,0 +1,35 @@
+# T090 fixture — NOT production data, NOT a production approval.
+#
+# A self-contained miniature catalog whose source IS approved, so the gate
+# pipeline is reachable at all. The production catalog is deliberately
+# unpublishable while D-1 and D-8 are open; faking an approval there would be
+# inventing governance history.
+
+# The authored replacement. It is a live metric in its own right, and nothing
+# in the catalog answers a request for fixture_metric with this metric.
+
+catalog_schema_version: 1
+kind: metric
+name: fixture_replacement
+owner: fixture_owner
+access: standard
+grain_family: day
+versions:
+  - version: 1
+    effective_from: 2026-06-01
+    source_view: semantic.fixture_daily
+    grain: date x product
+    aggregation: sum
+    additivity: additive
+    unit: sessions
+    time_dimension: date
+    calculation_basis: Sessoes iniciadas no dia, definicao sucessora.
+    content:
+      lang: pt-BR
+      label: Sessoes do aplicativo, definicao sucessora
+      description: Sessoes iniciadas no dia sob a definicao sucessora.
+source_availability:
+  - source: fixture_source
+    status: available
+    available_from: 2026-06-01
+    effective_from: 2026-06-01

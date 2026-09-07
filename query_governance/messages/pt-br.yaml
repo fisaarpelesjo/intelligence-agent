@@ -1,0 +1,130 @@
+# Governed pt-BR reason messages — T015 (FR-058; SC-021).
+#
+# Stored wording selected by reason code. Never generated, never translated at
+# answer time, and never produced by a language model. The same
+# (code, policy_version) returns byte-identical text on every lookup.
+#
+# Automation asserts presence, coverage and byte-stability ONLY. Linguistic
+# correctness remains the reviewer duty carried by inherited record 001:T117
+# (D-10) and is never claimed by a test.
+#
+# DISCLOSURE RULE. These sentences are fixed text and interpolate nothing.
+# Authorisation and existence refusals in particular must not reveal a metric's
+# shape, a source observation, a governed relationship or a policy limit — so
+# their wording says only that the request was refused and who to ask. Figures
+# that a caller is entitled to (a cost estimate, a row count) travel in the
+# decision payload, never in this registry.
+
+schema_version: 1
+kind: reason_message_registry
+lang: pt-BR
+policy_version: "unversioned"
+
+messages:
+  # --- malformação da requisição ------------------------------------------
+  - code: REQUEST_MALFORMED
+    text: >-
+      A requisição não é válida. Verifique os campos enviados e envie apenas os
+      campos previstos no contrato.
+  - code: OPERATOR_NOT_GOVERNED
+    text: >-
+      O operador informado não faz parte do vocabulário governado.
+  - code: FILTER_VALUE_SET_EMPTY
+    text: >-
+      A lista de valores do filtro está vazia. Informe ao menos um valor ou
+      remova o filtro.
+  - code: FILTER_VALUE_NOT_GOVERNED
+    text: >-
+      O valor informado não pertence ao conjunto governado desta dimensão.
+  - code: FILTER_VALUE_NULL
+    text: >-
+      Filtros não aceitam valor nulo. Ausência de valor não é uma condição
+      expressável neste contrato.
+  - code: DATE_DIMENSION_NOT_FILTERABLE
+    text: >-
+      A dimensão de data não é filtrável. O período é definido exclusivamente
+      pelo intervalo de datas da requisição.
+  - code: FILTER_RANGE_INVALID
+    text: >-
+      O limite superior do intervalo é anterior ao limite inferior. O intervalo
+      não é reordenado automaticamente.
+  - code: OPERATOR_NOT_APPLICABLE
+    text: >-
+      O operador não é permitido para o tipo desta dimensão.
+  - code: DIMENSION_TYPE_UNDECLARED
+    text: >-
+      A dimensão não possui tipo declarado no vocabulário governado e por isso
+      não pode ser usada em filtros.
+  - code: DATE_RANGE_INVALID
+    text: >-
+      A data final é anterior à data inicial. O intervalo não é reordenado
+      automaticamente.
+  - code: DATE_RANGE_TOO_LONG
+    text: >-
+      O intervalo solicitado excede o limite governado de dias.
+
+  # --- política -------------------------------------------------------------
+  - code: QUERY_POLICY_UNRESOLVABLE
+    text: >-
+      Não há política de consulta vigente e aprovada. Nenhuma consulta é
+      executada sem ela. Procure a pessoa responsável pela governança.
+
+  # --- custo e limites ------------------------------------------------------
+  - code: QUERY_COST_LIMIT_EXCEEDED
+    text: >-
+      A consulta excede o limite de custo aprovado e não foi executada. Reduza
+      o período ou as dimensões solicitadas.
+  - code: QUERY_ROW_LIMIT_EXCEEDED
+    text: >-
+      O resultado excede o limite de linhas aprovado. A consulta é recusada e
+      nenhum resultado parcial é devolvido.
+  - code: QUERY_TIMEOUT
+    text: >-
+      A execução excedeu o tempo limite e foi cancelada. Nenhum resultado
+      parcial é devolvido.
+
+  # --- integridade da execução ---------------------------------------------
+  - code: DRY_RUN_FAILED
+    text: >-
+      A validação prévia da consulta não foi concluída. A execução não é
+      iniciada sem ela.
+  - code: RESULT_SHAPE_MISMATCH
+    text: >-
+      O formato do resultado difere do formato validado. O resultado é retido.
+  - code: CATALOG_CHANGED_DURING_EXECUTION
+    text: >-
+      O catálogo mudou durante a execução. O resultado é descartado para não
+      responder sob uma definição que não foi validada.
+  - code: WAREHOUSE_UNAVAILABLE
+    text: >-
+      A fonte de dados está indisponível no momento. Nenhum valor aproximado ou
+      armazenado é devolvido.
+  - code: LEDGER_UNAVAILABLE
+    text: >-
+      O registro de execuções está indisponível. Nenhuma consulta é executada
+      sem registro.
+  - code: AUDIT_EMISSION_FAILED
+    text: >-
+      O evento de auditoria não pôde ser registrado. Nenhum resultado é
+      liberado sem registro de auditoria.
+
+  # --- observações ----------------------------------------------------------
+  - code: OBSERVATIONS_UNAVAILABLE
+    text: >-
+      Não foi possível obter o estado governado das fontes. Sem essa leitura a
+      resposta não é emitida.
+
+  # --- privacidade ----------------------------------------------------------
+  - code: RESULT_CELL_SUPPRESSED
+    text: >-
+      Parte dos valores foi omitida para proteger grupos pequenos. As células
+      omitidas estão explicitamente marcadas.
+  - code: RESULT_FULLY_SUPPRESSED
+    text: >-
+      O resultado foi integralmente omitido para proteger grupos pequenos.
+      Amplie o recorte solicitado.
+
+  # --- permitido ------------------------------------------------------------
+  - code: QUERY_EXECUTED
+    text: >-
+      Consulta executada e verificada, com proveniência completa.

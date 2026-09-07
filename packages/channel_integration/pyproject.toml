@@ -1,0 +1,106 @@
+[build-system]
+requires = ["hatchling==1.27.0"]
+build-backend = "hatchling.build"
+
+# T001: the fourth additive sibling package. `packages/semantic_catalog`,
+# `packages/analytics_query` and `packages/analytics_interaction` are upstream
+# dependencies and are never edited by this feature. The single authorized
+# exception — ADR 0017's composed entry point — belongs to Phase D0 and is a new
+# module inside `analytics_interaction`, not a change here.
+[project]
+name = "channel-integration"
+version = "0.1.0"
+description = "Governed multichannel integration: authenticity, identity, normalisation, preservation and transport."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "Proprietary" }
+
+# Pinned exactly, and byte-matched to `001`'s, `002`'s and `003`'s — Constitution
+# § Reproducibility requires pinned, reproducible dependencies, and four packages
+# in one repository resolving the same library to different versions is a
+# reproducibility defect.
+#
+# `analytics-interaction` is a **path dependency** within this monorepo, and it
+# transitively supplies `analytics-query` and `semantic-catalog`. All three are
+# installed editable before this package; declaring bare names rather than
+# `file://` URLs keeps the file portable across checkouts.
+#
+# **No new runtime dependency** (`research.md` `R-20`). Verification uses `hmac`,
+# `hashlib` and `secrets` from the standard library. No HTTP client, no HTTP
+# server, no provider SDK and no cryptography library is declared: a provider SDK
+# would live behind an adapter port (`FR-071`), and every channel is fail-closed
+# while `D-22` – `D-25` are undeclared, so there is nothing for one to talk to.
+dependencies = [
+  "analytics-interaction==0.1.0",
+  "analytics-query==0.1.0",
+  "semantic-catalog==0.1.0",
+  "pydantic==2.11.9",
+  "PyYAML==6.0.2",
+  # Canonical business time zone is America/Sao_Paulo, resolved through the IANA
+  # database rather than a fixed offset. Windows ships no system tz database.
+  "tzdata==2026.3",
+]
+
+# The dev extra exists from the first commit, matching `002` and `003`. No new dev
+# dependency: `hypothesis` is already `003`'s pin and the property layer (Phase E)
+# reuses it.
+[project.optional-dependencies]
+dev = [
+  "pytest==8.4.2",
+  "ruff==0.14.0",
+  "pyright==1.1.406",
+  "hypothesis==6.140.3",
+]
+
+# The steward CLI arrives in Phase E (T150 – T151). `python -m channel_integration.cli`
+# stays the invocation, and no console script is declared until the entry point exists.
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/channel_integration"]
+
+# --- T003: linting, type checking, tests -------------------------------------
+# Mirrors `packages/analytics_interaction/pyproject.toml`, which mirrors `002`'s,
+# which mirrors `001`'s. Divergence between the four packages' gates would let a
+# defect pass in one that the others would catch.
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "A", "C4", "SIM", "RUF"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["channel_integration"]
+
+[tool.pyright]
+include = ["src", "tests"]
+pythonVersion = "3.12"
+typeCheckingMode = "strict"
+reportMissingTypeStubs = false
+# The three upstream packages are monorepo path dependencies installed editable.
+# Pyright cannot follow the editable finder, so their source roots are named
+# directly — otherwise every upstream type resolves as Unknown and strict mode
+# reports hundreds of false errors that hide the real ones.
+extraPaths = [
+  "src",
+  "../analytics_interaction/src",
+  "../analytics_query/src",
+  "../semantic_catalog/src",
+]
+venvPath = "../.."
+venv = ".venv"
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+addopts = "-ra --strict-markers --strict-config"
+markers = [
+  "contract: validates an authored artifact or boundary against its contract",
+  "unit: isolated deterministic unit test",
+  "integration: exercises the ordered inbound or outbound sequence",
+  "adversarial: asserts a governed refusal against a hostile input",
+  "security: measures a boundary rather than asserting it",
+  "property: asserts an invariant over generated inputs",
+]

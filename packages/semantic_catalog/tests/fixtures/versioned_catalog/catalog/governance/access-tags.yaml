@@ -1,0 +1,29 @@
+# T090 fixture — NOT production data, NOT a production approval.
+#
+# A self-contained miniature catalog whose source IS approved, so the gate
+# pipeline is reachable at all. The production catalog is deliberately
+# unpublishable while D-1 and D-8 are open; faking an approval there would be
+# inventing governance history.
+
+catalog_schema_version: 1
+kind: access_tags
+tags:
+  - id: standard
+    owner_role: fixture_governance
+    effective_from: 2025-01-01
+    allowed_principal_types: [user, service_principal]
+    allowed_authorization_scopes: [default]
+    content:
+      lang: pt-BR
+      label: Padrao
+      description: Metricas de teste sem restricao adicional.
+
+  - id: restricted
+    owner_role: fixture_governance
+    effective_from: 2025-01-01
+    allowed_principal_types: [user]
+    allowed_authorization_scopes: [finance]
+    content:
+      lang: pt-BR
+      label: Restrito
+      description: Metricas de teste com restricao de escopo.

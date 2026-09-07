@@ -1,0 +1,18 @@
+# Governed QueryPolicy — no approved instance exists.
+#
+# THIS EMPTY STATE IS THE DESIGNED STATE, NOT A GAP.
+#
+# A policy carries five jointly required limits: maximum_bytes_billed,
+# maximum_rows, execution_timeout_seconds, maximum_range_days (all D-14) and
+# minimum_aggregation_threshold (D-16). A policy missing any one of them is
+# UNRESOLVABLE, not partially usable — so no configuration can run with cost
+# limits but no privacy floor.
+#
+# While this list is empty, policy resolution refuses every request with
+# QUERY_POLICY_UNRESOLVABLE. Populating it requires approved external evidence
+# recorded against D-14 and D-16; it is NOT an implementation task, and no
+# fixture policy may be copied here.
+
+schema_version: 1
+kind: query_policy_set
+policies: []   # requires D-14 and D-16 evidence; see tasks.md T123 and T125

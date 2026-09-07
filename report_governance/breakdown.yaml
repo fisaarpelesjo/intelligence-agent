@@ -1,0 +1,280 @@
+# A quebra por dimensao no relatorio diario — D-1302 (OD-111, 2026-09-03) e o contrato
+# aprovado por ele.
+#
+# ESTE ARQUIVO GOVERNA DUAS COISAS, e as duas sao dele:
+#
+# 1. O CORTE de renderizacao (top_n) — quantas linhas uma quebra mostra antes da cauda.
+#    Palavra dele no contrato: "top 5 + resto"; e a regra global SC-1304 poe o TETO em dez
+#    linhas. O cinco mora aqui e nao no pacote por medicao, nao por gosto:
+#    packages/daily_reporting/tests/contract/test_the_loop_enumerates_nothing.py:41 carrega
+#    ENUMERATED_TOTALS = (20, 5, 19) e reprova um literal 5 escrito no codigo. O precedente de
+#    corte-como-dado e o section_order.yaml ao lado, do OD-70.
+#
+# 2. OS ROTULOS da quebra e da cauda. NENHUM foi autorado aqui: as tres palavras estao
+#    LITERALMENTE no contrato de exemplos que ele aprovou ("por pais", "por jogo",
+#    "demais 7 paises: 49"). Elas chegam ao pacote como DADO pelo mesmo caminho do
+#    section_order — o pacote nao escreve rotulo nenhum de proprio punho.
+#
+#    Se ele quiser outra palavra em qualquer um destes campos, e palavra dele e muda aqui,
+#    datada, como as emendas do FR-804. O pacote nao precisa mudar.
+#
+# O QUE ESTE ARQUIVO NAO DECIDE: quais dimensoes cada metrica suporta. Isso e contrato do
+# catalogo (MetricVersion.allowed_dimensions), que e a OUTRA metade do D-1302 — quanto uma
+# metrica PODE expor e uma pergunta diferente de quanto CABE numa mensagem.
+schema_version: 1
+kind: report_breakdown
+decided_by: OD-111
+decided_on: 2026-09-03
+
+# Quantos valores uma quebra mostra antes da cauda. O teto do SC-1304 e dez.
+top_n: 5
+
+# O rotulo de cada eixo, na ordem em que as quebras aparecem sob o indicador.
+# A CHAVE e o nome da coluna na fonte; o VALOR e a palavra dele.
+axis_labels:
+  country: por país
+  game: por jogo
+
+# O MARCADOR DE CADA NIVEL DA QUEBRA -- OD-119, palavra dele em 2026-09-04:
+# "em vez de colocar espaco antes da linha, coloca -", e depois "- pais / --brazil".
+# UM traco no eixo, DOIS no valor. A hierarquia e contagem de traco, nao recuo de espaco.
+#
+# ATE 04/09 O RECUO ERA DE ESPACOS, e o comentario do pacote dizia que um traco seria
+# "caractere que ninguem decidiu". Agora ele decidiu, entao o traco deixa de ser enfeite e
+# passa a ser palavra dele -- e por isso mora aqui, nao no pacote.
+#
+# MEDIDO em 04/09 contra _words_in: o traco NAO vira token do verificador (nao tem letra),
+# desde que venha SEPARADO POR ESPACO. Colado no valor -- "-Brazil" -- ele forma o token
+# literal "-Brazil", que nao casa com "Brazil" do vocabulario e a mensagem seria RECUSADA por
+# origination_wording_not_his. O espaco depois do marcador nao e estetica.
+axis_marker: "-"
+value_marker: "--"
+
+# A cauda: o que sobra depois do corte, nomeada com a contagem do que sobrou.
+# O texto final e montado pelo pacote com a contagem e o total; as PALAVRAS sao estas.
+# Forma exigida pela FR-1303 e pela SC-1304: "demais N valores: X".
+tail_label: demais
+tail_noun: valores
+
+# A CAUDA DE UMA TAXA SE PARTE EM DUAS -- OD-144, 2026-09-06, palavra dele sobre a mensagem real.
+#
+# O DEFEITO, medido na mensagem das 08:00: UMA linha somava DUAS populacoes -- as partes que nao
+# couberam no top-N e as partes RETIDAS pelo piso de amostra (sample_floor, D-1304). O leitor via
+# "Australia 0,00 %" ranqueada ACIMA de uma cauda lendo "4,47 %", que e absurdo na cara, e a
+# explicacao ("a cauda tem gente que nao entrou no ranking porque a taxa nao e afirmavel") nao
+# estava escrita em lugar nenhum da tela.
+#
+# A FORMA QUE ELE ESCOLHEU:
+#
+#     -- demais 31 países com amostra: 1,74 %
+#     -- 43 países sem amostra para afirmar: não classificados
+#
+# AS RETIDAS CONTINUAM NA RECONCILIACAO. Ele RECUSOU remove-las: some-las com as cortadas era o
+# defeito, apaga-las contradiz a reconciliacao que ele aprovou. Elas ficam CONTADAS e a taxa
+# delas nao e AFIRMADA -- que e exatamente o que o piso decide. len(linhas) + demais + retidas
+# continua sendo o numero de particoes do eixo, e um no mede isso.
+#
+# SO VALE ONDE HA RETIDAS. Uma quebra de contagem (New trials, Sales) nao tem piso -- contagem de
+# cinco e contagem de cinco -- entao ela renderiza a cauda de UMA linha que sempre teve, sem
+# qualificador. Um qualificador que distingue de nada e ruido.
+#
+# NENHUMA PALAVRA E DO PACOTE. O eixo empresta a palavra declarada em `axis_plural` /
+# `axis_singular` abaixo; sem palavra declarada, cai em `tail_noun`, que ja e palavra governada
+# -- a mesma regra que o contribution.yaml usa para o mesmo problema.
+sampled_qualifier: com amostra
+withheld_label: sem amostra para afirmar
+withheld_value: não classificados
+
+# O PLURAL E O SINGULAR POR EIXO -- OD-153, 2026-09-06. PALAVRA DELE, literal, as tres que
+# faltavam: "jogos", "país", "jogo".
+#
+# "paises" ja era dele desde antes: contrato de exemplos, docs/contrato-013-exemplos.md linha 28
+# ("Os demais paises/gateways"), e ja governado no report_governance/contribution.yaml pela
+# mesma razao.
+#
+# POR QUE AS TRES FALTAVAM, E POR QUE ISSO NAO ERA O MESMO DEFEITO NOS DOIS CASOS:
+#
+#   1. "jogos" nao aparecia em contrato nenhum, entao o eixo jogo caia em `tail_noun` e a
+#      mensagem real dizia "-- demais 2 valores". ISSO ERA A RECUSA FUNCIONANDO, nao defeito:
+#      o D-28 proibe inventar palavra dele, e cair numa palavra governada e o comportamento
+#      certo para uma palavra que nao existe. O que mudou em 06/09 foi o VOCABULARIO, nao a
+#      regra -- ele deu a palavra, entao ela pode ser dita.
+#
+#   2. "-- demais 1 países" -- plural para UM -- ERA defeito de verdade, e e defeito de ACORDO,
+#      nao de invencao: o arquivo carregava UMA palavra por eixo, entao uma cauda de uma
+#      particao so tinha a palavra de muitas para usar. Com o singular declarado, a cauda passa
+#      a concordar com a CONTAGEM: exatamente um -> singular, qualquer outro numero -> plural.
+#
+# OS DOIS MAPAS NOMEIAM OS MESMOS EIXOS e o carregador RECUSA quando nao nomeiam. Um eixo com
+# plural e sem singular renderia a palavra errada para a contagem 1 sem ninguem ver -- que e
+# exatamente o defeito que este bloco fecha, e silencio nao e valor (S-41).
+#
+# O `tail_noun` generico continua sem singular, porque ele nao deu um. Entao o eixo que nao
+# estiver nomeado aqui cai nele para QUALQUER contagem. E ausencia declarada, nao escolha do
+# pacote; o dia em que ele der a palavra, ela entra aqui datada como estas tres.
+axis_plural:
+  country: países
+  game: jogos
+
+axis_singular:
+  country: país
+  game: jogo
+
+# A palavra do TOTAL de uma quebra. **Escolhida por ele no OD-122 (2026-09-04)**, num menu de
+# tres, e a alternativa POR EIXO -- 'Todos os paises', 'Todos os jogos' -- foi RECUSADA por
+# ele: uma palavra so, para todo eixo.
+#
+# Ela existe porque o contrato de exemplos dele abre a quebra com o total (melhoria numero 1:
+# 'a quebra sem o total nao deixa conferir a soma') e a resposta do bot nao tinha onde
+# escreve-lo: `AnalyticsResult` recusa misturar linha rotulada com linha sem rotulo
+# (RESULT_SHAPE_MISMATCH, medido), entao o total precisa de um ROTULO -- e rotulo e palavra,
+# e palavra e dele.
+#
+# Aqui e nao no pacote pelo mesmo motivo que `top_n` e `tail_label` estao aqui: uma literal
+# no codigo seria uma segunda copia capaz de divergir da que ele decidiu.
+total_label: Total
+
+# Valores que NAO sao um valor do eixo e por isso nunca entram numa quebra.
+#
+# `(Total)` e um MARCADOR DA FONTE, nao uma palavra dele: semantic/dimensions/game.yaml mediu
+# 70.532 linhas que o carregam, todas de um unico KPI da origem (`CAC (R$)`). O eixo `game`
+# declara `permitted_values: open`, que NAO filtra nada -- entao quem quebra por jogo tem de
+# excluir o marcador, senao a quebra soma o agregado junto com as partes e conta tudo duas
+# vezes. Mora aqui, e nao no pacote, pela mesma razao que os rotulos: o pacote nao escreve
+# valor de fonte de proprio punho.
+excluded_values:
+  game:
+    - (Total)
+
+# O piso de amostra do SC-1301 — D-1304 (OD-113, 2026-09-03): 30 casos, UM numero para todas
+# as metricas, que e o numero do contrato de exemplos dele. Piso por metrica fica disponivel
+# no dia em que uma provar que precisa do proprio.
+#
+# ABAIXO DO PISO A TAXA NAO E AFIRMADA: a particao nao e ranqueada e cai na cauda, onde ainda
+# conta para um numero honesto porque a cauda e AGREGADA e nao somada. So se aplica onde existe
+# denominador -- contagem de cinco e contagem de cinco.
+#
+# MEDIDO em 2026-09-04, e e por isso que este piso entrou junto com a F1: sem ele o ranking de
+# Trial conversion por pais abria com um pais de meia duzia de casos no topo.
+sample_floor: 30
+
+# QUAIS indicadores mostram quebra nesta fatia. Palavra dele no escopo da F1: "os 3
+# indicadores do diario passam a mostrar as quebras que cada um suporta".
+#
+# E ha um TETO que torna isso obrigatorio e nao estetico: o Telegram corta em 4096 caracteres
+# (apps/telegram-bot/telegram_client.py) e MEDIDO em 2026-09-04 o relatorio com quebra em
+# quinze KPIs deu 4.259 bytes -- passaria PARTIDO em varias mensagens, que muda o produto que
+# ele aprovou. Com os tres, cabe. O split do diario e a F7 (FR-1319); ate la a lista e esta.
+#
+# Os NOMES sao os da view, como no section_order.yaml. Um KPI fora desta lista nao perde nada
+# do que ja tinha: ele so nao ganha quebra.
+kpis:
+  - New trials
+  - Sales (qty)
+  - Trial conversion (%)
+
+# O ICONE DE CADA VALOR DO EIXO -- OD-119: "e nao esqueca dos icones dos paises".
+#
+# A CHAVE e o nome do eixo; dentro dela, o nome do valor COMO A FONTE ESCREVE, e o icone.
+#
+# NAO SE DERIVA A BANDEIRA DO NOME NEM DE CODIGO ISO. Derivar seria o pacote inventando
+# simbolo para um valor que veio da fonte -- mesma classe do S-44. Valor sem entrada aqui
+# renderiza SEM icone, nunca com marcador de ausencia: ausencia e fato, invencao nao.
+#
+# QUAIS VALORES: medido em 04/09 sobre os 30 dias fechados ate 2026-09-03. A uniao dos
+# top-5 dos tres KPIs nessa janela tem VINTE E UM nomes distintos, nao mais -- a view carrega
+# 178 paises na janela e so 21 chegam a um top-5. Brazil e United States aparecem nos 90
+# slots (30 dias x 3 KPIs); Iran, Spain e Poland aparecem UMA vez cada.
+#
+# ISSO ENVELHECE. O vigesimo primeiro de hoje sai amanha, e um pais novo entra sem icone --
+# que e o comportamento certo, e nao um defeito a consertar com derivacao.
+#
+# So o eixo pais. Ele falou de paises; o eixo jogo nao ganha icone ate ele dizer.
+icons:
+  country:
+    Brazil: 🇧🇷
+    "United States": 🇺🇸
+    Russia: 🇷🇺
+    Algeria: 🇩🇿
+    Peru: 🇵🇪
+    "Saudi Arabia": 🇸🇦
+    Argentina: 🇦🇷
+    Turkey: 🇹🇷
+    Pakistan: 🇵🇰
+    Portugal: 🇵🇹
+    Colombia: 🇨🇴
+    Indonesia: 🇮🇩
+    Australia: 🇦🇺
+    Mexico: 🇲🇽
+    India: 🇮🇳
+    Canada: 🇨🇦
+    Iraq: 🇮🇶
+    Kuwait: 🇰🇼
+    Iran: 🇮🇷
+    Spain: 🇪🇸
+    Poland: 🇵🇱
+
+# EIXOS QUE ELE PEDIU E A FONTE NAO CARREGA -- spec 013 F5 (FR-1314, FR-1316), OD-127 de
+# 2026-09-05: "a fatia comeca pela RECUSA NOMEADA".
+#
+# MEDIDO em 2026-09-04 (T1322) e remedido em 2026-09-05 ~11:05 -03: a view do diario
+# (semantic.subscription_daily_metrics, 17 colunas) e a tbl_summary por tras dela (14 colunas)
+# NAO tem coluna de plano; o plano vive em example_dataset.tbl_sales_breakdown.plan_name (9 valores
+# distintos, zero nulos em 30 dias), que nao alimenta a view e nao e fonte governada. Enquanto a
+# view de join da T1326 nao existir, a quebra por plano e DITA como indisponivel, com o motivo,
+# sob os indicadores que o contrato dele manda carregar plano -- e nada mais muda na mensagem.
+#
+# Isto NAO e a FR-1304 (dimensao que o contrato da metrica nao permite -> silencio no diario):
+# `plan` e um eixo GOVERNADO que ele pediu por escrito e que a fonte nao tem. E a forma da
+# FR-1316 ("diz que esta indisponivel e por que"), que a F6 repetira com gateway.
+#
+# NENHUMA PALAVRA DESTA SECAO E DO PACOTE, e a origem de cada uma esta aqui:
+#   - o rotulo "por plano": contrato de exemplos aprovado por ele, hoje dentro da arvore em
+#     docs/exemplos-analise-dimensional.md, linhas 26 ("por plano: Mensal 122 · Anual 61 ·
+#     Trimestral 31"), 32 e 377 ('"por pais", "por jogo", "por plano", "por gateway" como
+#     quebras governadas no bot'). O cabecalho "Por plano:" continua citando o contrato
+#     ANTIGO, docs/contrato-013-exemplos.md linha 91, e a razao esta medida: aquela linha
+#     NAO EXISTE no contrato novo (conferido em 06/09 sem acento e sem caixa; o novo so tem o
+#     rotulo minusculo inline). Apontar para uma linha que nao contem a frase seria pior que a
+#     citacao velha, que ao menos e verdadeira contra o arquivo dela -- OD-133.
+#   - a FRASE DO MOTIVO nao esta escrita aqui: e a mensagem governada
+#     DIMENSION_NOT_APPLICABLE_TO_SOURCE de semantic/content/reason-messages.pt-BR.yaml (001,
+#     FR-055, versao 1 de 2026-08-11), interpolada com dimension_id=plan e
+#     source_id=subscription_daily pelo entregador; o pacote so posiciona a frase;
+#   - os DOIS indicadores: docs/exemplos-analise-dimensional.md linha 13 -- "New trials: pais e jogo (trial
+#     nao tem plano nem gateway); Sales e Conversion: pais, jogo, plano e gateway". Os nomes sao
+#     os da view, como em `kpis` acima.
+#
+# A CHAVE de cada eixo e o id da dimensao no catalogo (semantic/dimensions/plan.yaml). O dia em
+# que a view carregar plano, este bloco sai e `plan: por plano` entra em `axis_labels` -- a
+# quebra aparece no lugar onde a recusa estava (T1323/T1327, "no other line changed").
+unavailable_axes:
+  plan:
+    label: por plano
+    reason_code: DIMENSION_NOT_APPLICABLE_TO_SOURCE
+    source: subscription_daily
+    kpis:
+      - Sales (qty)
+      - Trial conversion (%)
+  # gateway (F6, T1325, FR-1316, OD-128 de 2026-09-05) -- a MESMA recusa nomeada, enquanto a
+  # view de join da FR-1315 nao existir (remedido 13:02 -03: o dataset semantic nao a tem).
+  # NENHUMA PALAVRA E DO PACOTE:
+  #   - o rotulo "por gateway": docs/exemplos-analise-dimensional.md, linhas 27 ("por gateway:
+  #     Stripe 141 · PagFacil 55 · PayPal 18"), 33 e 377 ('"por pais", "por jogo", "por plano",
+  #     "por gateway" como quebras governadas no bot'). O cabecalho "Por gateway:" continua no
+  #     contrato ANTIGO, docs/contrato-013-exemplos.md linha 88, pela mesma razao do "Por
+  #     plano:" acima: a linha nao existe no novo;
+  #   - a FRASE DO MOTIVO e o mesmo CODIGO do registry do 001, interpolado com
+  #     dimension_id=gateway e source_id=subscription_daily pelo entregador;
+  #   - os DOIS indicadores: linha 13 do contrato novo -- "Sales e Conversion: pais, jogo,
+  #     plano e gateway";
+  #     "trial nao tem plano nem gateway", logo New trials NAO esta aqui.
+  # A chave e o id da dimensao (semantic/dimensions/gateway.yaml). Quando a view existir, este
+  # bloco sai e `gateway: por gateway` entra em `axis_labels` (T1327, "no other line changed").
+  gateway:
+    label: por gateway
+    reason_code: DIMENSION_NOT_APPLICABLE_TO_SOURCE
+    source: subscription_daily
+    kpis:
+      - Sales (qty)
+      - Trial conversion (%)

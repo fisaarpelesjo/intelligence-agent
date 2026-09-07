@@ -1,0 +1,221 @@
+{
+  "$defs": {
+    "ApprovalExpiryBehaviour": {
+      "enum": [
+        "omit_field"
+      ],
+      "title": "ApprovalExpiryBehaviour",
+      "type": "string"
+    },
+    "AuthorizationRules": {
+      "additionalProperties": false,
+      "properties": {
+        "default": {
+          "const": "deny",
+          "description": "Deny-by-default is not configurable; only its scope is.",
+          "title": "Default",
+          "type": "string"
+        },
+        "require_access_tag": {
+          "title": "Require Access Tag",
+          "type": "boolean"
+        },
+        "self_approval_allowed": {
+          "default": false,
+          "description": "Refused unless a policy grants it explicitly (ADR 0003 §3).",
+          "title": "Self Approval Allowed",
+          "type": "boolean"
+        },
+        "unknown_tag_behaviour": {
+          "$ref": "#/$defs/UnknownTagBehaviour"
+        }
+      },
+      "required": [
+        "default",
+        "require_access_tag",
+        "unknown_tag_behaviour"
+      ],
+      "title": "AuthorizationRules",
+      "type": "object"
+    },
+    "PendingVisibilityRules": {
+      "additionalProperties": false,
+      "properties": {
+        "approval_expiry_behaviour": {
+          "$ref": "#/$defs/ApprovalExpiryBehaviour"
+        },
+        "exposable_fields": {
+          "description": "The only fields a pending metric may ever expose (FR-058).",
+          "items": {
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9_]*$",
+            "type": "string"
+          },
+          "title": "Exposable Fields",
+          "type": "array"
+        },
+        "require_visibility_approval": {
+          "title": "Require Visibility Approval",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "exposable_fields",
+        "require_visibility_approval",
+        "approval_expiry_behaviour"
+      ],
+      "title": "PendingVisibilityRules",
+      "type": "object"
+    },
+    "PublicationRules": {
+      "additionalProperties": false,
+      "properties": {
+        "require_complete_contract": {
+          "title": "Require Complete Contract",
+          "type": "boolean"
+        },
+        "require_owner": {
+          "title": "Require Owner",
+          "type": "boolean"
+        },
+        "require_pt_br_content": {
+          "title": "Require Pt Br Content",
+          "type": "boolean"
+        },
+        "require_reason_message_for_publishable_codes": {
+          "title": "Require Reason Message For Publishable Codes",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "require_complete_contract",
+        "require_owner",
+        "require_pt_br_content",
+        "require_reason_message_for_publishable_codes"
+      ],
+      "title": "PublicationRules",
+      "type": "object"
+    },
+    "RefusalRules": {
+      "additionalProperties": false,
+      "properties": {
+        "disclose_answerable_subset": {
+          "description": "Disclosure on a denial; never a substitute payload (FR-022).",
+          "title": "Disclose Answerable Subset",
+          "type": "boolean"
+        },
+        "disclose_replacement_metric_id": {
+          "description": "Guidance only; never automatically substituted (FR-064).",
+          "title": "Disclose Replacement Metric Id",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "disclose_answerable_subset",
+        "disclose_replacement_metric_id"
+      ],
+      "title": "RefusalRules",
+      "type": "object"
+    },
+    "UnknownTagBehaviour": {
+      "enum": [
+        "fail_closed"
+      ],
+      "title": "UnknownTagBehaviour",
+      "type": "string"
+    }
+  },
+  "$id": "https://intelligence-agent/semantic-catalog/catalog_policy.schema.json",
+  "additionalProperties": false,
+  "description": "``semantic/policies/catalog-policy.yaml``.",
+  "properties": {
+    "approval_roles": {
+      "items": {
+        "minLength": 1,
+        "pattern": "^[a-z][a-z0-9_]*$",
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Approval Roles",
+      "type": "array"
+    },
+    "authorization": {
+      "$ref": "#/$defs/AuthorizationRules"
+    },
+    "catalog_schema_version": {
+      "title": "Catalog Schema Version",
+      "type": "integer"
+    },
+    "effective_from": {
+      "format": "date",
+      "title": "Effective From",
+      "type": "string"
+    },
+    "kind": {
+      "const": "catalog_policy",
+      "title": "Kind",
+      "type": "string"
+    },
+    "owner_role": {
+      "minLength": 1,
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "title": "Owner Role",
+      "type": "string"
+    },
+    "pending_visibility": {
+      "$ref": "#/$defs/PendingVisibilityRules"
+    },
+    "policy_id": {
+      "minLength": 1,
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "title": "Policy Id",
+      "type": "string"
+    },
+    "policy_version": {
+      "minimum": 1,
+      "title": "Policy Version",
+      "type": "integer"
+    },
+    "publication": {
+      "$ref": "#/$defs/PublicationRules"
+    },
+    "refusal": {
+      "$ref": "#/$defs/RefusalRules"
+    },
+    "supersedes_version": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Supersedes Version"
+    }
+  },
+  "required": [
+    "catalog_schema_version",
+    "kind",
+    "policy_id",
+    "policy_version",
+    "effective_from",
+    "owner_role",
+    "approval_roles",
+    "authorization",
+    "publication",
+    "pending_visibility",
+    "refusal"
+  ],
+  "title": "CatalogPolicy",
+  "type": "object",
+  "x-catalog-schema-version": 3,
+  "x-do-not-edit": "Generated from the Pydantic models. Edit the models, then regenerate. This file is never a source of truth.",
+  "x-generated-by": "semantic_catalog.contracts.export",
+  "x-supported-schema-versions": [
+    3,
+    2,
+    1
+  ]
+}

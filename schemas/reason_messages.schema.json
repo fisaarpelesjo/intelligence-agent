@@ -1,0 +1,151 @@
+{
+  "$defs": {
+    "ReasonCode": {
+      "description": "Stable enum. Renaming or repurposing a member is a breaking change.",
+      "enum": [
+        "REQUEST_ALLOWED",
+        "METRIC_NOT_GOVERNED",
+        "DIMENSION_NOT_GOVERNED",
+        "SOURCE_NOT_GOVERNED",
+        "METRIC_PENDING",
+        "METRIC_AMBIGUOUS",
+        "ACCESS_DENIED",
+        "METRIC_NOT_AVAILABLE_FOR_SOURCE",
+        "DIMENSION_NOT_APPLICABLE_TO_SOURCE",
+        "DIMENSION_NOT_ALLOWED_FOR_METRIC",
+        "GRAIN_FAMILY_MISMATCH",
+        "AGGREGATION_INVALID_FOR_ADDITIVITY",
+        "METRICS_NOT_COMPARABLE",
+        "COMPARABILITY_RULE_MISSING",
+        "COMPARABLE_WITH_CAVEAT",
+        "RANGE_OUTSIDE_COVERAGE",
+        "SOURCE_BEYOND_TOLERANCE",
+        "SOURCE_STATE_FAILED",
+        "SOURCE_STATE_UNKNOWN",
+        "SOURCE_STATE_PARTIAL",
+        "SOURCE_LAGGING_WITHIN_TOLERANCE",
+        "COVERAGE_ENDS_BEFORE_PERIOD",
+        "PARTIAL_VS_COMPLETE_COMPARISON",
+        "EQUIVALENT_PARTIAL_COMPARISON",
+        "PERIOD_INCOMPLETE",
+        "TIMEZONE_OFFSET_MATERIAL",
+        "COHORT_NOT_MATURED",
+        "RETENTION_SOURCE_UNAVAILABLE",
+        "RETENTION_NOT_SUMMABLE",
+        "SPANS_DEFINITION_CHANGE",
+        "DEPRECATED_METRIC",
+        "METRIC_DEPRECATED_FOR_PERIOD",
+        "SPANS_DEPRECATION_BOUNDARY",
+        "COMPARISON_REQUIRES_DEPRECATED_PERIOD",
+        "PERIOD_RESTATED",
+        "REPRODUCIBILITY_LIMITED",
+        "POLICY_UNRESOLVABLE",
+        "ACCESS_TAG_UNKNOWN",
+        "ACCESS_TAG_DEPRECATED",
+        "ACCESS_TAG_SCOPE_MISMATCH",
+        "RELEASE_WITHDRAWN"
+      ],
+      "title": "ReasonCode",
+      "type": "string"
+    },
+    "ReasonMessage": {
+      "additionalProperties": false,
+      "description": "One canonical pt-BR message.",
+      "properties": {
+        "effective_from": {
+          "format": "date",
+          "title": "Effective From",
+          "type": "string"
+        },
+        "interpolation_fields": {
+          "default": [],
+          "items": {
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9_]*$",
+            "type": "string"
+          },
+          "title": "Interpolation Fields",
+          "type": "array"
+        },
+        "message": {
+          "minLength": 1,
+          "title": "Message",
+          "type": "string"
+        },
+        "owner_role": {
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "title": "Owner Role",
+          "type": "string"
+        },
+        "reason_code": {
+          "$ref": "#/$defs/ReasonCode"
+        },
+        "reviewed_by_role": {
+          "description": "Who signed off the Portuguese. Automation checks presence, not correctness.",
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "title": "Reviewed By Role",
+          "type": "string"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "reason_code",
+        "version",
+        "effective_from",
+        "owner_role",
+        "reviewed_by_role",
+        "message"
+      ],
+      "title": "ReasonMessage",
+      "type": "object"
+    }
+  },
+  "$id": "https://intelligence-agent/semantic-catalog/reason_messages.schema.json",
+  "additionalProperties": false,
+  "description": "``semantic/content/reason-messages.pt-BR.yaml``.",
+  "properties": {
+    "catalog_schema_version": {
+      "title": "Catalog Schema Version",
+      "type": "integer"
+    },
+    "kind": {
+      "const": "reason_messages",
+      "title": "Kind",
+      "type": "string"
+    },
+    "lang": {
+      "const": "pt-BR",
+      "title": "Lang",
+      "type": "string"
+    },
+    "messages": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/ReasonMessage"
+      },
+      "title": "Messages",
+      "type": "array"
+    }
+  },
+  "required": [
+    "catalog_schema_version",
+    "kind",
+    "lang"
+  ],
+  "title": "ReasonMessageRegistry",
+  "type": "object",
+  "x-catalog-schema-version": 3,
+  "x-do-not-edit": "Generated from the Pydantic models. Edit the models, then regenerate. This file is never a source of truth.",
+  "x-generated-by": "semantic_catalog.contracts.export",
+  "x-supported-schema-versions": [
+    3,
+    2,
+    1
+  ]
+}

@@ -1,0 +1,294 @@
+# T058 decision-matrix fixture — NOT production content.
+#
+# Only the codes this matrix reaches. The production registry (T038) covers all
+# forty and is validated separately; duplicating it here would create a second
+# place for wording to drift.
+
+catalog_schema_version: 1
+kind: reason_messages
+lang: pt-BR
+
+messages:
+  - reason_code: REQUEST_ALLOWED
+    version: 1
+    effective_from: 2026-01-01
+    owner_role: fixture_governance
+    reviewed_by_role: fixture_owner
+    message: Solicitação autorizada pelas políticas vigentes.
+
+  - reason_code: DEPRECATED_METRIC
+    version: 1
+    effective_from: 2026-01-01
+    owner_role: fixture_governance
+    reviewed_by_role: fixture_owner
+    interpolation_fields: [metric_id]
+    message: >-
+      A métrica {metric_id} está descontinuada e nenhuma substituta é usada
+      automaticamente.
+
+  # Dated deprecation (T089). The plain DEPRECATED_METRIC caveat above says a
+  # boundary exists; these three say where the requested period sits relative
+  # to it.
+  - reason_code: METRIC_DEPRECATED_FOR_PERIOD
+    version: 1
+    effective_from: 2026-01-01
+    owner_role: fixture_governance
+    reviewed_by_role: fixture_owner
+    interpolation_fields: [metric_id, period_end]
+    message: >-
+      {metric_id} ja estava descontinuada em {period_end}; nao ha definicao
+      vigente para esse periodo.
+
+  - reason_code: SPANS_DEPRECATION_BOUNDARY
+    version: 1
+    effective_from: 2026-01-01
+    owner_role: fixture_governance
+    reviewed_by_role: fixture_owner
+    interpolation_fields: [metric_id]
+    message: >-
+      O periodo pedido atravessa a descontinuacao de {metric_id}: parte dele
+      esta sob a definicao antiga e parte nao tem definicao vigente.
+
+  - reason_code: COMPARISON_REQUIRES_DEPRECATED_PERIOD
+    version: 1
+    effective_from: 2026-01-01
+    owner_role: fixture_governance
+    reviewed_by_role: fixture_owner
+    interpolation_fields: [metric_id]
+    message: >-
+      A comparacao exigiria um periodo em que {metric_id} ja estava
+      descontinuada.
+
+  - reason_code: SPANS_DEFINITION_CHANGE
+    version: 1
+    effective_from: 2026-01-01
+    owner_role: fixture_governance
+    reviewed_by_role: fixture_owner
+    interpolation_fields: [metric_id, metric_version_id]
+    message: >-
+      O periodo pedido atravessa uma mudanca de definicao de {metric_id}. A
+      partir de {metric_version_id} a metrica passou a ser calculada de outra
+      forma.
+
+  - reason_code: METRIC_NOT_GOVERNED
+    version: 1
+    effective_from: 2026-01-01
+    owner_role: fixture_governance
+    reviewed_by_role: fixture_owner
+    interpolation_fields: [metric_id]
+    message: Não existe métrica governada chamada {metric_id}.
+
+  - reason_code: DIMENSION_NOT_GOVERNED
+    version: 1
+    effective_from: 2026-01-01
+    owner_role: fixture_governance
+    reviewed_by_role: fixture_owner
+    interpolation_fields: [dimension_id]
+    message: Não existe dimensão governada chamada {dimension_id}.
+
+  - reason_code: SOURCE_NOT_GOVERNED
+    version: 1
+    effective_from: 2026-01-01
+    owner_role: fixture_governance
+    reviewed_by_role: fixture_owner
+    interpolation_fields: [source_id]
+    message: Não existe fonte governada chamada {source_id}.
+
+  - reason_code: METRIC_PENDING
+    version: 1
+    effective_from: 2026-01-01
+    owner_role: fixture_governance
+    reviewed_by_role: fixture_owner
+    interpolation_fields: [metric_id, owner]
+    message: A métrica {metric_id} está pendente. Procure {owner}.
+
+  - reason_code: ACCESS_DENIED
+    version: 1
+    effective_from: 2026-01-01
+    owner_role: fixture_governance
+    reviewed_by_role: fixture_owner
+    interpolation_fields: [metric_id]
+    message: Você não tem autorização para consultar {metric_id}.
+
+  - reason_code: ACCESS_TAG_UNKNOWN
+    version: 1
+    effective_from: 2026-01-01
+    owner_role: fixture_governance
+    reviewed_by_role: fixture_owner
+    interpolation_fields: [access_tag]
+    message: A etiqueta de acesso {access_tag} não está no registro.
+
+  - reason_code: ACCESS_TAG_DEPRECATED
+    version: 1
+    effective_from: 2026-01-01
+    owner_role: fixture_governance
+    reviewed_by_role: fixture_owner
+    interpolation_fields: [access_tag]
+    message: A etiqueta {access_tag} foi descontinuada; a substituta não é herdada.
+
+  - reason_code: ACCESS_TAG_SCOPE_MISMATCH
+    version: 1
+    effective_from: 2026-01-01
+    owner_role: fixture_governance
+    reviewed_by_role: fixture_owner
+    interpolation_fields: [access_tag]
+    message: A etiqueta {access_tag} não cobre o escopo apresentado.
+
+  - reason_code: METRIC_NOT_AVAILABLE_FOR_SOURCE
+    version: 1
+    effective_from: 2026-01-01
+    owner_role: fixture_governance
+    reviewed_by_role: fixture_owner
+    interpolation_fields: [metric_id, source_id]
+    message: A métrica {metric_id} não está disponível para a fonte {source_id}.
+
+  - reason_code: DIMENSION_NOT_APPLICABLE_TO_SOURCE
+    version: 1
+    effective_from: 2026-01-01
+    owner_role: fixture_governance
+    reviewed_by_role: fixture_owner
+    interpolation_fields: [dimension_id, source_id]
+    message: A dimensão {dimension_id} não se aplica à fonte {source_id}.
+
+  - reason_code: DIMENSION_NOT_ALLOWED_FOR_METRIC
+    version: 1
+    effective_from: 2026-01-01
+    owner_role: fixture_governance
+    reviewed_by_role: fixture_owner
+    interpolation_fields: [dimension_id, metric_id]
+    message: A métrica {metric_id} não pode ser aberta por {dimension_id}.
+
+  - reason_code: GRAIN_FAMILY_MISMATCH
+    version: 1
+    effective_from: 2026-01-01
+    owner_role: fixture_governance
+    reviewed_by_role: fixture_owner
+    message: As métricas pedidas usam granularidades diferentes.
+
+  - reason_code: AGGREGATION_INVALID_FOR_ADDITIVITY
+    version: 1
+    effective_from: 2026-01-01
+    owner_role: fixture_governance
+    reviewed_by_role: fixture_owner
+    interpolation_fields: [metric_id]
+    message: A agregação pedida não é válida para a aditividade de {metric_id}.
+
+  - reason_code: METRICS_NOT_COMPARABLE
+    version: 1
+    effective_from: 2026-01-01
+    owner_role: fixture_governance
+    reviewed_by_role: fixture_owner
+    message: >-
+      As métricas pedidas foram declaradas não comparáveis: medem eventos
+      diferentes, em sistemas diferentes.
+
+  - reason_code: COMPARABILITY_RULE_MISSING
+    version: 1
+    effective_from: 2026-01-01
+    owner_role: fixture_governance
+    reviewed_by_role: fixture_owner
+    message: >-
+      Não existe regra de comparabilidade aprovada para esse par. A ausência de
+      regra é recusa, não permissão.
+
+  - reason_code: COMPARABLE_WITH_CAVEAT
+    version: 1
+    effective_from: 2026-01-01
+    owner_role: fixture_governance
+    reviewed_by_role: fixture_owner
+    message: >-
+      A comparação é permitida com ressalva: as definições não são idênticas.
+
+  - reason_code: RANGE_OUTSIDE_COVERAGE
+    version: 1
+    effective_from: 2026-01-01
+    owner_role: fixture_governance
+    reviewed_by_role: fixture_owner
+    interpolation_fields: [metric_id]
+    message: O período pedido está fora da cobertura de {metric_id}.
+
+  - reason_code: COVERAGE_ENDS_BEFORE_PERIOD
+    version: 1
+    effective_from: 2026-01-01
+    owner_role: fixture_governance
+    reviewed_by_role: fixture_owner
+    interpolation_fields: [source_id]
+    message: A cobertura de {source_id} termina antes do fim do período pedido.
+
+  - reason_code: SOURCE_BEYOND_TOLERANCE
+    version: 1
+    effective_from: 2026-01-01
+    owner_role: fixture_governance
+    reviewed_by_role: fixture_owner
+    interpolation_fields: [source_id, last_successful_update, delay_tolerance]
+    message: >-
+      A fonte {source_id} foi atualizada em {last_successful_update}, acima da
+      tolerância de {delay_tolerance}.
+
+  - reason_code: SOURCE_STATE_PARTIAL
+    version: 1
+    effective_from: 2026-01-01
+    owner_role: fixture_governance
+    reviewed_by_role: fixture_owner
+    interpolation_fields: [source_id, completeness_ratio]
+    message: A fonte {source_id} carregou apenas {completeness_ratio} do esperado.
+
+  - reason_code: SOURCE_STATE_FAILED
+    version: 1
+    effective_from: 2026-01-01
+    owner_role: fixture_governance
+    reviewed_by_role: fixture_owner
+    interpolation_fields: [source_id]
+    message: A última carga da fonte {source_id} falhou.
+
+  - reason_code: SOURCE_STATE_UNKNOWN
+    version: 1
+    effective_from: 2026-01-01
+    owner_role: fixture_governance
+    reviewed_by_role: fixture_owner
+    message: O estado de atualização de uma fonte exigida é desconhecido.
+
+  - reason_code: SOURCE_LAGGING_WITHIN_TOLERANCE
+    version: 1
+    effective_from: 2026-01-01
+    owner_role: fixture_governance
+    reviewed_by_role: fixture_owner
+    interpolation_fields: [source_id, last_successful_update]
+    message: A fonte {source_id} está atrasada, mas dentro da tolerância; última atualização em {last_successful_update}.
+
+  - reason_code: TIMEZONE_OFFSET_MATERIAL
+    version: 1
+    effective_from: 2026-01-01
+    owner_role: fixture_governance
+    reviewed_by_role: fixture_owner
+    interpolation_fields: [source_id]
+    message: A fonte {source_id} fecha o dia em outro fuso horário.
+
+  - reason_code: PERIOD_INCOMPLETE
+    version: 1
+    effective_from: 2026-01-01
+    owner_role: fixture_governance
+    reviewed_by_role: fixture_owner
+    message: O período pedido ainda não terminou.
+
+  - reason_code: PARTIAL_VS_COMPLETE_COMPARISON
+    version: 1
+    effective_from: 2026-01-01
+    owner_role: fixture_governance
+    reviewed_by_role: fixture_owner
+    message: Um dos períodos está incompleto e o outro não.
+
+  - reason_code: EQUIVALENT_PARTIAL_COMPARISON
+    version: 1
+    effective_from: 2026-01-01
+    owner_role: fixture_governance
+    reviewed_by_role: fixture_owner
+    interpolation_fields: [cutoff]
+    message: Os dois períodos foram cortados em {cutoff}.
+
+  - reason_code: POLICY_UNRESOLVABLE
+    version: 1
+    effective_from: 2026-01-01
+    owner_role: fixture_governance
+    reviewed_by_role: fixture_owner
+    message: Não foi possível determinar qual política de catálogo está vigente.

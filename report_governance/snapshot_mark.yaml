@@ -1,0 +1,32 @@
+# A MARCA do indicador que e um nivel, e nao um acumulado — SC-1306 / FR-1318, fatia F7.
+#
+# Palavra dele, do contrato de exemplos aprovado (docs/exemplos-analise-dimensional.md:68):
+#
+#     MRR: US$ 52,1k ▲ +2,3% · R$ 74,6k (snapshot do último dia)
+#
+# POR QUE A MARCA EXISTE: MRR, MAU e Paid subscribers sao NIVEIS. O numero de um periodo e o
+# ULTIMO DIA dele, nunca a soma dos dias — somar sete dias de MAU conta as mesmas pessoas sete
+# vezes. A aritmetica passou a fazer isso na T1330; esta frase e a outra metade da SC-1306,
+# que pede que a mensagem MARQUE onde isso aparece. Sem a marca, dois numeros da mesma mensagem
+# respondem a perguntas diferentes e nada na tela diz qual e qual.
+#
+# POR QUE A PALAVRA MORA AQUI E NAO NO PACOTE: a mesma razao do D-7 e dos rotulos da quebra.
+# _every_word_is_his recusa todo token com letra que nao venha de um vocabulario nomeado, e
+# estas quatro palavras tem letra. Crescer AUTHORED_WORDS seria errado — esse orcamento conta
+# o que o PACOTE guarda, e a marca nao e uma escolha do pacote. Ela chega como DADO.
+#
+# Se ele quiser outra frase, muda aqui, datado, e nenhuma linha de codigo se mexe.
+schema_version: 1
+kind: report_snapshot_mark
+decided_by: OD-129
+decided_on: 2026-09-05
+
+# Como a linha diz que aquele numero e um nivel do ultimo dia.
+#
+# INICIAL ALTA DESDE 2026-09-06, OD-151. A marca deixou de ser uma anotacao entre parenteses no
+# fim da linha do indicador e passou a ser uma LINHA PROPRIA, sob os numeros dela -- ele recusou
+# fundir a marca numa unica linha de fecho junto com o limiar. Palavra abrindo linha comeca com
+# maiuscula, e mudar a CAIXA de uma palavra dele nao e uma palavra nova: e o OD-32, literal
+# ("aqui o ontem e anteontem nao pode ter inicial alto?"), aplicado a mesma frase. O verificador
+# de palavras compara sem caixa desde entao, pelo mesmo motivo.
+mark: Snapshot do último dia

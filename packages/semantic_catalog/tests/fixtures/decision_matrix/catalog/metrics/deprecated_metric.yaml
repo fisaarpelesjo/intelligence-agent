@@ -1,0 +1,36 @@
+# T058 decision-matrix fixture — NOT production data.
+#
+# Carries a deprecation block. Gate 2 must attach DEPRECATED_METRIC as a caveat
+# and let evaluation continue; a later denial must still win. The DATED half of
+# deprecation — boundary segmentation, METRIC_DEPRECATED_FOR_PERIOD,
+# SPANS_DEPRECATION_BOUNDARY, replacement disclosure — is T089 and is not
+# exercised here.
+
+catalog_schema_version: 1
+kind: metric
+name: deprecated_metric
+owner: fixture_owner
+access: standard
+grain_family: day
+versions:
+  - version: 1
+    effective_from: 2026-01-01
+    source_view: semantic.fixture_daily
+    grain: date x product
+    aggregation: sum
+    additivity: additive
+    unit: events
+    time_dimension: date
+    calculation_basis: Métrica descontinuada do fixture.
+    allowed_dimensions: [country]
+    content:
+      lang: pt-BR
+      label: Métrica descontinuada
+      description: Métrica descontinuada do fixture.
+deprecation:
+  deprecated_from: 2026-07-15
+source_availability:
+  - source: app_a
+    status: available
+    available_from: 2026-01-01
+    effective_from: 2026-01-01

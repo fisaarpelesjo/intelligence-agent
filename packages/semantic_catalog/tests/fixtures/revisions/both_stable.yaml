@@ -1,0 +1,14 @@
+# T079 data-revision fixture — UNIT FIXTURE ONLY.
+#
+# Never production data and never a claim that EXT-A (D-12) is ready.
+# `load_revisions` forces `is_fixture: true` whatever this file says.
+
+# Both fixture sources, for the cross-source path.
+observed_at: 2026-08-11T06:00:00Z
+revisions:
+  - data_revision_id: app_a@rev3
+    source: app_a
+    revised_at: 2026-08-11T05:00:00Z
+  - data_revision_id: store_a@rev8
+    source: store_a
+    revised_at: 2026-08-11T04:00:00Z

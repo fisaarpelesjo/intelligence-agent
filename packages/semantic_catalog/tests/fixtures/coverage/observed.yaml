@@ -1,0 +1,36 @@
+# T092 observed-coverage fixture — UNIT FIXTURE ONLY.
+#
+# Stands in for `semantic.metric_availability`, which is owned by the
+# transformation feature (D-12 / EXT-A) and is not read by this library.
+# `load_observed_coverage` forces `is_fixture: true` regardless of what this file
+# says, and a fixture-backed reconciliation reports that fact as a warning: it
+# proves the rules work and says nothing about production readiness.
+#
+# REGENERATED 2026-09-03 (OD-106, cycle 542): the catalog's declared pairs moved —
+# the nineteen served metrics gained SLIDING declarations on subscription_daily,
+# the ghost-era pairs were retired to dated history, and this fixture mirrors the
+# new declared world exactly as the old one mirrored the old (one row per declared
+# metric-source pair). The window values are the live read of the regeneration day;
+# they are fixture DATA, not observations. Plus one ungoverned pair (cac_brl, whose
+# own dated decision keeps it undeclared) so the warn path keeps a subject.
+coverage:
+  - {metric: cancellations_qty, source: subscription_daily, min_date: 2025-08-03, max_date: 2026-09-02, observed_at: 2026-09-03T07:00:00Z}
+  - {metric: cancellations_rate, source: subscription_daily, min_date: 2025-08-03, max_date: 2026-09-02, observed_at: 2026-09-03T07:00:00Z}
+  - {metric: chargeback_qty, source: subscription_daily, min_date: 2025-08-03, max_date: 2026-09-02, observed_at: 2026-09-03T07:00:00Z}
+  - {metric: chargeback_rate, source: subscription_daily, min_date: 2025-08-03, max_date: 2026-09-02, observed_at: 2026-09-03T07:00:00Z}
+  - {metric: ltv_months, source: subscription_daily, min_date: 2025-08-03, max_date: 2026-09-02, observed_at: 2026-09-03T07:00:00Z}
+  - {metric: ltv_usd, source: subscription_daily, min_date: 2025-08-03, max_date: 2026-09-02, observed_at: 2026-09-03T07:00:00Z}
+  - {metric: mau, source: subscription_daily, min_date: 2025-08-03, max_date: 2026-09-02, observed_at: 2026-09-03T07:00:00Z}
+  - {metric: mrr_usd, source: subscription_daily, min_date: 2025-08-03, max_date: 2026-09-02, observed_at: 2026-09-03T07:00:00Z}
+  - {metric: new_trials, source: subscription_daily, min_date: 2025-08-03, max_date: 2026-09-02, observed_at: 2026-09-03T07:00:00Z}
+  - {metric: not_renewed_qty, source: subscription_daily, min_date: 2025-08-03, max_date: 2026-09-02, observed_at: 2026-09-03T07:00:00Z}
+  - {metric: not_renewed_rate, source: subscription_daily, min_date: 2025-08-03, max_date: 2026-09-02, observed_at: 2026-09-03T07:00:00Z}
+  - {metric: paid_subscribers, source: subscription_daily, min_date: 2025-08-03, max_date: 2026-09-02, observed_at: 2026-09-03T07:00:00Z}
+  - {metric: plan_share_annual, source: subscription_daily, min_date: 2025-08-03, max_date: 2026-09-02, observed_at: 2026-09-03T07:00:00Z}
+  - {metric: plan_share_monthly, source: subscription_daily, min_date: 2025-08-03, max_date: 2026-09-02, observed_at: 2026-09-03T07:00:00Z}
+  - {metric: plan_share_quarterly, source: subscription_daily, min_date: 2025-08-03, max_date: 2026-09-02, observed_at: 2026-09-03T07:00:00Z}
+  - {metric: plan_share_semiannual, source: subscription_daily, min_date: 2025-08-03, max_date: 2026-09-02, observed_at: 2026-09-03T07:00:00Z}
+  - {metric: revenue_usd, source: subscription_daily, min_date: 2025-08-03, max_date: 2026-09-02, observed_at: 2026-09-03T07:00:00Z}
+  - {metric: sales_qty, source: subscription_daily, min_date: 2025-08-03, max_date: 2026-09-02, observed_at: 2026-09-03T07:00:00Z}
+  - {metric: trial_conversion_rate, source: subscription_daily, min_date: 2025-08-03, max_date: 2026-09-02, observed_at: 2026-09-03T07:00:00Z}
+  - {metric: cac_brl, source: subscription_daily, min_date: 2025-08-03, max_date: 2026-09-02, observed_at: 2026-09-03T07:00:00Z}

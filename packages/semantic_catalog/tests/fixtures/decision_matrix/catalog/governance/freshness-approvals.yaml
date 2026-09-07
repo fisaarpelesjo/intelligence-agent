@@ -1,0 +1,25 @@
+# T058 decision-matrix fixture — NOT production data, NOT a production approval.
+
+# Fixture approvals. They exist so gates 4 and 5 are reachable at all, and they
+# grant nothing in the production catalog.
+catalog_schema_version: 1
+kind: freshness_approvals
+approvals:
+  - source_id: app_a
+    approval_status: approved
+    expected_refresh_interval: P1D
+    delay_tolerance: P1D
+    reporting_time_zone: America/Sao_Paulo
+    earliest_available_date: 2026-01-01
+    approved_by_role: fixture_governance
+    approved_at: 2026-01-02
+    source_commit: fixture0
+  - source_id: store_a
+    approval_status: approved
+    expected_refresh_interval: P1D
+    delay_tolerance: P2D
+    reporting_time_zone: America/Los_Angeles
+    earliest_available_date: 2026-01-01
+    approved_by_role: fixture_governance
+    approved_at: 2026-01-02
+    source_commit: fixture0

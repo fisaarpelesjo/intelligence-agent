@@ -1,0 +1,216 @@
+# pt-BR message registry for ChannelReasonCode — 004:T023 (FR-045; SC-060).
+#
+# Keyed by (code, language, content_version). Stored wording selected by code,
+# never generated, paraphrased or translated at delivery time — the same approach
+# 001, 002 and 003 all use, so a recipient cannot tell which of the four layers
+# refused from message style.
+#
+# Coverage is a build gate: 31 codes, 31 messages, no orphan on either side
+# (001's FR-074, inherited).
+#
+# INTERPOLATION IS ALLOWLISTED. Only the fields named in `allowed_arguments` may be
+# inserted. Never a secret, token, header, signature, raw identifier, payload,
+# question, answer, value, filter value or provider error text.
+#
+# THREE DISCLOSURE RULES ARE ENCODED IN THE WORDING ITSELF, not left to callers:
+#
+#   * No message names a governed limit. Unlike 003, this feature never earns the
+#     right to: its sender is unauthenticated at every step, so a D-26 number may
+#     not appear in any refusal (contracts/inbound-conversion.md §3).
+#   * CHANNEL_SIGNATURE_INVALID is worded so that an absent signature, a wrong one,
+#     one over another body, one made with retired material and one valid for
+#     another channel all read identically. The wording is the mechanism.
+#   * CHANNEL_IDENTITY_UNMAPPED is worded so that an unknown identity and a known
+#     but unauthorised one read identically (FR-020). A message saying "your access
+#     was revoked" would defeat it.
+#
+# NO MESSAGE NAMES AN ERROR, AN EXCEPTION, A STACK OR A TRACE. A governed refusal
+# is a state, not a fault (FR-045).
+#
+# AUTOMATION ASSERTS PRESENCE, COVERAGE AND STABILITY ONLY. Whether the Portuguese
+# is correct stays the D-10 / 001:T117 reviewer duty and is never claimed by a test.
+
+schema_version: 1
+kind: channel_messages
+
+# No approved D-26 policy exists, so there is no policy version to key wording on.
+# This sentinel names the wording set; it is not a default standing in for a
+# missing policy — policy resolution refuses independently.
+content_version: unversioned
+
+# The closed set of interpolation field names. A message using anything else fails
+# the build. Note what is absent: no signature, header, token, identity, payload,
+# question, answer, value or limit.
+allowed_arguments:
+  - channel
+  - message_kind
+
+messages:
+  # --- authenticity and integrity ------------------------------------------
+  - code: CHANNEL_PAYLOAD_MALFORMED
+    language: pt-BR
+    text: >-
+      A mensagem recebida não corresponde ao formato esperado pelo canal e não
+      foi processada.
+  - code: CHANNEL_PAYLOAD_EXCEEDS_STRUCTURAL_LIMIT
+    language: pt-BR
+    text: >-
+      A mensagem recebida é maior ou mais complexa do que o contrato de entrada
+      aceita e não foi processada.
+  - code: CHANNEL_SIGNATURE_INVALID
+    language: pt-BR
+    text: >-
+      Não foi possível confirmar a autenticidade da mensagem recebida. Ela não
+      foi processada.
+  - code: CHANNEL_TIMESTAMP_OUTSIDE_TOLERANCE
+    language: pt-BR
+    text: >-
+      A mensagem recebida está fora da janela de tempo aceita e não foi
+      processada.
+  - code: CHANNEL_VERIFICATION_UNAVAILABLE
+    language: pt-BR
+    text: >-
+      A verificação de autenticidade não está disponível para este canal, então
+      nenhuma mensagem é processada.
+
+  # --- envelope and message kind -------------------------------------------
+  - code: CHANNEL_ENVELOPE_INCOMPLETE
+    language: pt-BR
+    text: >-
+      A mensagem recebida não traz todas as informações exigidas pelo contrato de
+      entrada e não foi processada.
+  - code: CHANNEL_ENVELOPE_FIELD_UNKNOWN
+    language: pt-BR
+    text: >-
+      A mensagem recebida traz um campo que o contrato de entrada não declara e
+      não foi processada.
+  - code: CHANNEL_MESSAGE_KIND_UNSUPPORTED
+    language: pt-BR
+    text: >-
+      Este canal aceita apenas perguntas em texto. Mensagens do tipo
+      {message_kind} não são interpretadas, e nada anexo a elas é lido como
+      pergunta.
+    arguments: [message_kind]
+  - code: CHANNEL_TEXT_NOT_USABLE
+    language: pt-BR
+    text: >-
+      A pergunta recebida está vazia ou não contém conteúdo utilizável em texto.
+  - code: CHANNEL_NORMALISATION_AMBIGUOUS
+    language: pt-BR
+    text: >-
+      Não foi possível determinar com segurança qual parte da mensagem é a
+      pergunta. Reescreva a pergunta sem formatação adicional.
+
+  # --- identity, tenant and isolation --------------------------------------
+  - code: CHANNEL_IDENTITY_UNMAPPED
+    language: pt-BR
+    text: >-
+      Não há vínculo governado para este remetente neste canal, então a pergunta
+      não foi encaminhada.
+  - code: CHANNEL_TENANT_MISMATCH
+    language: pt-BR
+    text: >-
+      As informações de origem da mensagem não são consistentes entre si, então a
+      pergunta não foi encaminhada.
+  - code: CHANNEL_SCOPE_MISMATCH
+    language: pt-BR
+    text: >-
+      O identificador informado não pertence a esta conversa, então a pergunta não
+      foi encaminhada.
+
+  # --- configuration and governed policy -----------------------------------
+  - code: CHANNEL_NOT_CONFIGURED
+    language: pt-BR
+    text: >-
+      O canal {channel} não está habilitado, então nenhuma mensagem é processada
+      por ele.
+    arguments: [channel]
+  - code: CHANNEL_CREDENTIAL_UNAVAILABLE
+    language: pt-BR
+    text: >-
+      As credenciais governadas do canal {channel} não estão disponíveis, então
+      nenhuma mensagem é processada por ele.
+    arguments: [channel]
+  - code: CHANNEL_TRANSPORT_POLICY_UNRESOLVABLE
+    language: pt-BR
+    text: >-
+      A política de transporte governada não está aprovada, então as operações que
+      dependem dela são recusadas.
+  - code: CHANNEL_IDENTITY_POLICY_UNRESOLVABLE
+    language: pt-BR
+    text: >-
+      A regra governada de vínculo de identidade não está aprovada, então nenhum
+      remetente é resolvido.
+  - code: CHANNEL_RENDERING_CAPABILITY_UNRESOLVABLE
+    language: pt-BR
+    text: >-
+      A matriz governada de capacidades do canal não está aprovada, então nenhuma
+      resposta é formatada ou entregue.
+  - code: CHANNEL_METADATA_POLICY_UNRESOLVABLE
+    language: pt-BR
+    text: >-
+      A política governada de metadados operacionais não está aprovada, então nada
+      é registrado de forma durável.
+  - code: CHANNEL_AUDIT_UNAVAILABLE
+    language: pt-BR
+    text: >-
+      Não é possível registrar esta operação de forma completa, então a resposta
+      não é entregue.
+  - code: INTERACTION_BOUNDARY_UNAVAILABLE
+    language: pt-BR
+    text: >-
+      A camada de interpretação governada não está disponível, então a pergunta não
+      foi respondida.
+
+  # --- transport flow -------------------------------------------------------
+  - code: CHANNEL_RATE_LIMIT_EXCEEDED
+    language: pt-BR
+    text: >-
+      O limite de envio governado do canal {channel} foi atingido, então a resposta
+      não foi entregue agora.
+    arguments: [channel]
+  - code: CHANNEL_DELIVERY_FAILED
+    language: pt-BR
+    text: A entrega da resposta pelo canal {channel} não foi concluída.
+    arguments: [channel]
+  - code: CHANNEL_DELIVERY_ATTEMPTS_EXHAUSTED
+    language: pt-BR
+    text: >-
+      As tentativas governadas de entrega pelo canal {channel} terminaram sem
+      confirmação.
+    arguments: [channel]
+  - code: CHANNEL_DELIVERY_INDETERMINATE
+    language: pt-BR
+    text: >-
+      Não foi possível confirmar se a resposta chegou ao destino, e ela não é
+      reenviada para evitar entrega duplicada.
+  - code: CHANNEL_MESSAGE_DUPLICATE
+    language: pt-BR
+    text: >-
+      Esta mensagem já havia sido recebida, então nenhuma nova resposta foi
+      produzida.
+
+  # --- rendering and preservation ------------------------------------------
+  - code: CHANNEL_RESPONSE_NOT_REPRESENTABLE
+    language: pt-BR
+    text: >-
+      A resposta governada não pode ser entregue por completo neste canal, e não é
+      entregue de forma parcial.
+  - code: CHANNEL_OUTBOUND_WITHHELD
+    language: pt-BR
+    text: >-
+      A resposta governada foi retida porque não foi possível confirmar que seu
+      conteúdo seria preservado integralmente.
+
+  # --- permitted ------------------------------------------------------------
+  - code: CHANNEL_MESSAGE_ACCEPTED
+    language: pt-BR
+    text: A mensagem foi recebida, verificada e encaminhada para interpretação.
+  - code: CHANNEL_RESPONSE_DELIVERED
+    language: pt-BR
+    text: A resposta governada foi entregue integralmente.
+  - code: CHANNEL_RESPONSE_DELIVERED_WITH_CAVEAT
+    language: pt-BR
+    text: >-
+      A resposta governada foi entregue integralmente, com as ressalvas que a
+      acompanham.
