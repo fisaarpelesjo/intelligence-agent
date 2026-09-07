@@ -1,0 +1,28 @@
+schema_version: 1.0.0
+checkpoint_id: CP-20260907-008
+created_at: '2026-09-07T23:48:34Z'
+workstream: null
+task: null
+branch: docs/003-resolve-adrs
+head: c37e1dda2f2afbd74f664fd45014a962af413fb7
+working_tree:
+  status: dirty
+  modified_paths:
+  - M docs/requirements/project-requirements.md
+  - ?? docs/decisions/0001-canal-real-adiado.md
+  - ?? docs/decisions/0002-conteudo-catalogo-semantico-sintetico.md
+  - ?? docs/decisions/0003-cadencia-relatorio-diaria.md
+  - ?? docs/decisions/0004-observabilidade-adiada-correlation-id.md
+  - ?? docs/decisions/0005-llm-provider-stub.md
+completed_work:
+- Implemented playbook artifacts or recorded current progress.
+commands:
+- engineering-playbook checkpoint
+validation:
+  passed:
+  - engineering-playbook checkpoint
+  failed: []
+  not_run: []
+blockers: []
+next_action: Revisar recorte 002-execucao-query e converger via engineering-playbook
+  delivery prepare/commit/publish

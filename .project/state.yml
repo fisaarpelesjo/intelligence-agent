@@ -1,15 +1,15 @@
 schema_version: 1.0.0
-updated_at: '2026-09-07T23:39:50Z'
+updated_at: '2026-09-07T23:48:34Z'
 active_workstream: null
-current_branch: feat/002-execucao-query
+current_branch: docs/003-resolve-adrs
 current_phase: implement
 status: in_progress
 active_specification: specs/002-execucao-query/spec.md
 active_plan: specs/002-execucao-query/plan.md
 active_tasks: specs/002-execucao-query/tasks.md
 active_task: null
-last_checkpoint: .project/checkpoints/CP-20260907-007.yml
-last_verified_commit: 4022c2cc4852b2f54890c2c0eb98fb18e026756f
+last_checkpoint: .project/checkpoints/CP-20260907-008.yml
+last_verified_commit: c37e1dda2f2afbd74f664fd45014a962af413fb7
 validation:
   passed:
   - engineering-playbook checkpoint
