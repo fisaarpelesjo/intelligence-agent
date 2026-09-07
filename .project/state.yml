@@ -1,15 +1,15 @@
 schema_version: 1.0.0
-updated_at: '2026-09-07T23:48:34Z'
+updated_at: '2026-09-07T23:55:46Z'
 active_workstream: null
-current_branch: docs/003-resolve-adrs
-current_phase: implement
-status: in_progress
-active_specification: specs/002-execucao-query/spec.md
-active_plan: specs/002-execucao-query/plan.md
-active_tasks: specs/002-execucao-query/tasks.md
-active_task: null
-last_checkpoint: .project/checkpoints/CP-20260907-008.yml
-last_verified_commit: c37e1dda2f2afbd74f664fd45014a962af413fb7
+current_branch: feat/003-interacao-conversacional
+current_phase: tasks
+status: planned
+active_specification: specs/003-interacao-conversacional/spec.md
+active_plan: specs/003-interacao-conversacional/plan.md
+active_tasks: specs/003-interacao-conversacional/tasks.md
+active_task: T001
+last_checkpoint: .project/checkpoints/CP-20260907-009.yml
+last_verified_commit: 093afedb89176c579aa3bcb00ee4f8a8772260e2
 validation:
   passed:
   - engineering-playbook checkpoint
@@ -17,5 +17,4 @@ validation:
   not_run: []
 blockers: []
 next_actions:
-- Revisar recorte 002-execucao-query e converger via engineering-playbook delivery
-  prepare/commit/publish
+- 'Implementar T001: criar packages/interacao_conversacional/ conforme specs/003-interacao-conversacional/plan.md'
