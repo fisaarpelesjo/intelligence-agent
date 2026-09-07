@@ -1,7 +1,7 @@
 ---
 document_id: PRD-INTELLIGENCE-AGENT-001
 title: "Project Requirements Document — Intelligence Agent"
-version: "0.2.0"
+version: "0.3.0"
 status: draft
 owners: ["Filipe Sales Araujo"]
 reviewers: []
@@ -40,6 +40,7 @@ Status atual: draft. Nenhuma aprovacao humana ainda ocorreu. `owners` reflete o 
 |---|---|---|---|---|
 | 2026-09-07 | 0.1.0 | Agente (Claude, sessao com Filipe Sales Araujo) | Rascunho inicial do PRD para o projeto Intelligence Agent | Baseline de requisitos para iniciar a reconstrucao seguindo o fluxo canonico do playbook |
 | 2026-09-07 | 0.2.0 | Agente (Claude, sessao com Filipe Sales Araujo) | Reescrita para remover qualquer referencia, citacao ou dado especifico de um produto de terceiros; o documento passa a descrever um produto original com dominio de negocio generico/sintetico | Elimina risco de propriedade intelectual de terceiros no PRD; nao muda a arquitetura pretendida |
+| 2026-09-07 | 0.3.0 | Agente (Claude, sessao com Filipe Sales Araujo) | Resolvidas as decisoes ADR-0001 a ADR-0005 (canal/LLM/observabilidade adiados com fake/stub; cadencia diaria do relatorio; catalogo sintetico) apos decisao explicita do autor | Destrava a spec `003-interacao-conversacional`; recortes `001` e `002` ja implementados e convergidos |
 
 ## Aprovacoes
 
@@ -1044,10 +1045,11 @@ QUESTION: nenhuma alternativa de produto, processo ou solucao tecnica foi formal
 
 | ID | Decisao | Motivo | ADR |
 |---|---|---|---|
-| ADR-0001 | Escolha do primeiro canal de distribuicao real (Telegram, WhatsApp, Slack, outro) | Bloqueia a spec de integracao de canal e distribuicao proativa | QUESTION - a escrever em `docs/decisions/` quando decidido |
-| ADR-0002 | Formato e conteudo inicial (sintetico) do catalogo semantico | Bloqueia a spec de catalogo semantico | QUESTION - a escrever quando decidido |
-| ADR-0003 | Cadencia do relatorio periodico (diaria, semanal, outra) | Afeta o design do pacote de relatorio periodico | QUESTION - a escrever ao planejar esse pacote |
-| ADR-0004 | Stack de observabilidade (coletor, dashboard, alerta operacional) | Exigido por NFR-002, sem escolha registrada ainda | QUESTION - a escrever quando decidido |
+| ADR-0001 | Canal real de distribuicao adiado; usar interface `Channel` abstrata + implementacao fake ate integrar de verdade | Nao bloqueia mais os pacotes 003/004/007 | `docs/decisions/0001-canal-real-adiado.md` |
+| ADR-0002 | Catalogo semantico: YAML sintetico versionado no proprio pacote | Resolvido pela implementacao de `001-catalogo-semantico` | `docs/decisions/0002-conteudo-catalogo-semantico-sintetico.md` |
+| ADR-0003 | Cadencia do relatorio periodico: diaria | Define o escopo do pacote de relatorio periodico | `docs/decisions/0003-cadencia-relatorio-diaria.md` |
+| ADR-0004 | Observabilidade: apenas `correlation_id` por enquanto, OpenTelemetry adiado | Satisfaz NFR-002 sem dependencia externa prematura | `docs/decisions/0004-observabilidade-adiada-correlation-id.md` |
+| ADR-0005 | LLM provider: stub/fake para o MVP, provider real adiado | Destrava a spec de interacao conversacional sem custo/credencial de API | `docs/decisions/0005-llm-provider-stub.md` |
 
 ## Releases e marcos
 
@@ -1066,24 +1068,25 @@ QUESTION: nenhum marco ou data de release foi definido ainda. Proposta inicial: 
 ## Questoes abertas
 
 - QUESTION: quem sao os aprovadores/revisores formais deste PRD, alem do autor?
-- QUESTION: qual sera o primeiro canal de distribuicao real (Telegram, WhatsApp, Slack, outro)? (ADR-0001)
-- QUESTION: qual sera o conteudo inicial (sintetico) do catalogo semantico? (ADR-0002)
 - QUESTION: qual regime de conformidade legal se aplica ao tratamento de identidade de usuario e conteudo de pergunta, quando houver dado real?
-- QUESTION: qual a cadencia correta do relatorio periodico (diaria, semanal, outra)? (ADR-0003)
-- QUESTION: qual stack de observabilidade sera adotada para satisfazer NFR-002? (ADR-0004)
-- QUESTION: quais sao os tetos reais de bytes faturados e linhas retornadas por ambiente (NFR-004)?
+- QUESTION: quais sao os tetos reais de bytes faturados e linhas retornadas por ambiente (NFR-004)? Ja implementado como parametro injetavel em `execucao_query` (`max_bytes`/`max_rows`); falta so o valor concreto por ambiente.
+- QUESTION: quando integrar um canal real (ADR-0001) e um LLM provider real (ADR-0005) — sem prazo definido, depende de quando o autor quiser sair do MVP fake/stub.
 
 ## Decisoes pendentes
 
 - Aprovacao humana deste PRD (status permanece `draft` ate entao).
-- Escolha do primeiro canal de distribuicao real.
-- Ordem de recorte dos pacotes em specs do Spec Kit — proposta natural pela cadeia de dependencia: catalogo semantico -> execucao de query -> interacao conversacional -> integracao de canal -> deteccao de anomalia -> priorizacao de insights -> distribuicao proativa -> relatorio periodico -> memoria de conversa; a confirmar.
+- ~~Escolha do primeiro canal de distribuicao real~~ — adiada por decisao registrada (ADR-0001).
+- Ordem de recorte dos pacotes em specs do Spec Kit — confirmada e em andamento: `001-catalogo-semantico` (feito) -> `002-execucao-query` (feito) -> `003-interacao-conversacional` (proximo) -> integracao de canal -> deteccao de anomalia -> priorizacao de insights -> distribuicao proativa -> relatorio periodico -> memoria de conversa.
 
 ## Waiting room ou requisitos futuros
 
+- Canal real de distribuicao (Telegram, WhatsApp, Slack ou outro) — ver ADR-0001.
+- LLM provider real (Anthropic, OpenAI ou outro) — ver ADR-0005.
+- Integracao com OpenTelemetry (collector, dashboard) — ver ADR-0004.
 - Suporte a canais adicionais alem do primeiro escolhido.
 - Habilitar processamento de mensagens inbound na memoria de conversa.
 - Etapas avancadas de deteccao de anomalia (scoring, rank, narrativa refinada).
+- Cadencia semanal do relatorio periodico, alem da diaria decidida (ADR-0003).
 - Onboarding self-service de novas metricas pelo usuario final (hoje fora de escopo, fluxo permanece governado/manual).
 - API de administracao do catalogo semantico fora de um CLI, caso venha a ser necessaria.
 
