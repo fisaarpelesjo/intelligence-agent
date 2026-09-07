@@ -39,7 +39,7 @@ dependencies = [
 # missing interpreter module rather than on anything it guarded.
 [project.optional-dependencies]
 dev = [
-  "pytest==8.4.2",
+  "pytest==9.0.3",
   "ruff==0.14.0",
   "pyright==1.1.406",
 ]
