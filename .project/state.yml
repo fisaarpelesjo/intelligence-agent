@@ -1,15 +1,15 @@
 schema_version: 1.0.0
-updated_at: '2026-09-07T23:21:10Z'
+updated_at: '2026-09-07T23:35:01Z'
 active_workstream: null
-current_branch: feat/001-catalogo-semantico
-current_phase: implement
-status: in_progress
-active_specification: specs/001-catalogo-semantico/spec.md
-active_plan: specs/001-catalogo-semantico/plan.md
-active_tasks: specs/001-catalogo-semantico/tasks.md
-active_task: null
-last_checkpoint: .project/checkpoints/CP-20260907-005.yml
-last_verified_commit: aeb90f09b4adb6ad823ae48da83f85f1460c45a8
+current_branch: feat/002-execucao-query
+current_phase: tasks
+status: planned
+active_specification: specs/002-execucao-query/spec.md
+active_plan: specs/002-execucao-query/plan.md
+active_tasks: specs/002-execucao-query/tasks.md
+active_task: T001
+last_checkpoint: .project/checkpoints/CP-20260907-006.yml
+last_verified_commit: 7b3a682e7c0bfcef6fe5166b6681ab5ab896c718
 validation:
   passed:
   - engineering-playbook checkpoint
@@ -17,5 +17,4 @@ validation:
   not_run: []
 blockers: []
 next_actions:
-- Revisar recorte 001-catalogo-semantico e converger via engineering-playbook delivery
-  prepare/commit/publish
+- 'Implementar T001: criar packages/execucao_query/ conforme specs/002-execucao-query/plan.md'
