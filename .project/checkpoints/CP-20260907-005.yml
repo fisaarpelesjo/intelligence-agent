@@ -1,0 +1,29 @@
+schema_version: 1.0.0
+checkpoint_id: CP-20260907-005
+created_at: '2026-09-07T23:21:10Z'
+workstream: null
+task: null
+branch: feat/001-catalogo-semantico
+head: aeb90f09b4adb6ad823ae48da83f85f1460c45a8
+working_tree:
+  status: dirty
+  modified_paths:
+  - M .project/state.yml
+  - ' M pyproject.toml'
+  - ' M specs/001-catalogo-semantico/contracts/decidir.md'
+  - ' M specs/001-catalogo-semantico/quickstart.md'
+  - ' M specs/001-catalogo-semantico/tasks.md'
+  - ' M uv.lock'
+  - ?? packages/
+completed_work:
+- Implemented playbook artifacts or recorded current progress.
+commands:
+- engineering-playbook checkpoint
+validation:
+  passed:
+  - engineering-playbook checkpoint
+  failed: []
+  not_run: []
+blockers: []
+next_action: Revisar recorte 001-catalogo-semantico e converger via engineering-playbook
+  delivery prepare/commit/publish

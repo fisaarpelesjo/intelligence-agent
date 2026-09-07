@@ -1,0 +1,7 @@
+dimensions:
+  - id: country
+    type: enumerated
+  - id: plan_type
+    type: enumerated
+  - id: payment_method
+    type: enumerated

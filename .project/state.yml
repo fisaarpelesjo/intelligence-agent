@@ -1,15 +1,15 @@
 schema_version: 1.0.0
-updated_at: '2026-09-07T23:02:03Z'
+updated_at: '2026-09-07T23:21:10Z'
 active_workstream: null
-current_branch: chore/001-adopt-playbook
-current_phase: tasks
-status: planned
+current_branch: feat/001-catalogo-semantico
+current_phase: implement
+status: in_progress
 active_specification: specs/001-catalogo-semantico/spec.md
 active_plan: specs/001-catalogo-semantico/plan.md
 active_tasks: specs/001-catalogo-semantico/tasks.md
-active_task: T001
-last_checkpoint: .project/checkpoints/CP-20260907-004.yml
-last_verified_commit: 9c70b204a38864c43a56a5d916d093b591e267f5
+active_task: null
+last_checkpoint: .project/checkpoints/CP-20260907-005.yml
+last_verified_commit: aeb90f09b4adb6ad823ae48da83f85f1460c45a8
 validation:
   passed:
   - engineering-playbook checkpoint
@@ -17,4 +17,5 @@ validation:
   not_run: []
 blockers: []
 next_actions:
-- 'Implementar T001: criar packages/catalogo_semantico/ conforme specs/001-catalogo-semantico/plan.md'
+- Revisar recorte 001-catalogo-semantico e converger via engineering-playbook delivery
+  prepare/commit/publish

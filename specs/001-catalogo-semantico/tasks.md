@@ -15,9 +15,9 @@ description: "Tasks: catalogo semantico — decisao de autorizacao"
 
 ## Phase 1: Setup
 
-- [ ] T001 Criar `packages/catalogo_semantico/` com `pyproject.toml`, `src/catalogo_semantico/__init__.py`, `tests/unit/__init__.py`, `catalog/` (per `plan.md`)
-- [ ] T002 [P] Adicionar `packages/catalogo_semantico` como membro do workspace `uv` no `pyproject.toml` da raiz (`[tool.uv.workspace] members = ["packages/*"]`)
-- [ ] T003 [P] Configurar `[tool.ruff]`/`[tool.pyright]`/`[tool.pytest.ini_options]` do pacote (herdando os padroes ja usados na raiz do repositorio)
+- [x] T001 Criar `packages/catalogo_semantico/` com `pyproject.toml`, `src/catalogo_semantico/__init__.py`, `tests/unit/__init__.py`, `catalog/` (per `plan.md`)
+- [x] T002 [P] Adicionar `packages/catalogo_semantico` como membro do workspace `uv` no `pyproject.toml` da raiz (`[tool.uv.workspace] members = ["packages/*"]`)
+- [x] T003 [P] Configurar `[tool.ruff]`/`[tool.pyright]`/`[tool.pytest.ini_options]` do pacote (herdando os padroes ja usados na raiz do repositorio)
 
 **Checkpoint**: `uv sync` resolve o workspace com o novo pacote; `uv run pytest packages/catalogo_semantico` roda (ainda sem testes reais).
 
@@ -27,10 +27,10 @@ description: "Tasks: catalogo semantico — decisao de autorizacao"
 
 **Purpose**: infraestrutura que TODAS as user stories dependem.
 
-- [ ] T004 Implementar `MetricDefinition`, `MetricDefinitionVersion`, `DimensionDefinition`, `AccessDecision`, `AuditEvent` em `packages/catalogo_semantico/src/catalogo_semantico/modelos.py` (per `data-model.md`)
-- [ ] T005 [P] Criar catalogo de exemplo sintetico em `packages/catalogo_semantico/catalog/{metrics,dimensions,owners}.yaml` com as metricas `signups`, `monthly_recurring_revenue`, `active_users` (`signups` com 2 versoes para exercitar US2)
-- [ ] T006 Implementar `carregar_catalogo` em `packages/catalogo_semantico/src/catalogo_semantico/carregamento.py`, incluindo a validacao de integridade (IDs duplicados, janelas sobrepostas) — FR-008
-- [ ] T007 [P] Criar catalogo minimo de teste em `packages/catalogo_semantico/tests/fixtures/catalogo_exemplo/` (subset deliberadamente pequeno, usado pelos testes unitarios)
+- [x] T004 Implementar `MetricDefinition`, `MetricDefinitionVersion`, `DimensionDefinition`, `AccessDecision`, `AuditEvent` em `packages/catalogo_semantico/src/catalogo_semantico/modelos.py` (per `data-model.md`)
+- [x] T005 [P] Criar catalogo de exemplo sintetico em `packages/catalogo_semantico/catalog/{metrics,dimensions,owners}.yaml` com as metricas `signups`, `monthly_recurring_revenue`, `active_users` (`signups` com 2 versoes para exercitar US2)
+- [x] T006 Implementar `carregar_catalogo` em `packages/catalogo_semantico/src/catalogo_semantico/carregamento.py`, incluindo a validacao de integridade (IDs duplicados, janelas sobrepostas) — FR-008
+- [x] T007 [P] Criar catalogo minimo de teste em `packages/catalogo_semantico/tests/fixtures/catalogo_exemplo/` (subset deliberadamente pequeno, usado pelos testes unitarios)
 
 **Checkpoint**: fundacao pronta — `carregar_catalogo` funciona contra o fixture de teste; nenhuma user story pode comecar antes disso.
 
@@ -44,13 +44,13 @@ description: "Tasks: catalogo semantico — decisao de autorizacao"
 
 ### Tests for User Story 1 ⚠️
 
-- [ ] T008 [P] [US1] `test_decisao_permite.py`: cenario 1 da spec (metrica+dimensao aprovadas -> permitido com definicao retornada)
-- [ ] T009 [P] [US1] `test_decisao_nega.py`: cenarios 2, 3 e 4 da spec (metrica desconhecida; dimensao nao permitida; catalogo vazio -> sempre negado)
+- [x] T008 [P] [US1] `test_decisao_permite.py`: cenario 1 da spec (metrica+dimensao aprovadas -> permitido com definicao retornada)
+- [x] T009 [P] [US1] `test_decisao_nega.py`: cenarios 2, 3 e 4 da spec (metrica desconhecida; dimensao nao permitida; catalogo vazio -> sempre negado)
 
 ### Implementation for User Story 1
 
-- [ ] T010 [US1] Implementar `decidir()` (autorizacao basica: metrica existe, dimensao permitida) em `packages/catalogo_semantico/src/catalogo_semantico/decisao.py` (depende de T004, T006) — FR-001, FR-002, FR-003, FR-004
-- [ ] T011 [US1] Teste de garantia "zero I/O" (SC-004): interceptar/mockar chamadas de rede e socket durante `decidir()` e falhar se qualquer uma ocorrer
+- [x] T010 [US1] Implementar `decidir()` (autorizacao basica: metrica existe, dimensao permitida) em `packages/catalogo_semantico/src/catalogo_semantico/decisao.py` (depende de T004, T006) — FR-001, FR-002, FR-003, FR-004
+- [x] T011 [US1] Teste de garantia "zero I/O" (SC-004): interceptar/mockar chamadas de rede e socket durante `decidir()` e falhar se qualquer uma ocorrer
 
 **Checkpoint**: User Story 1 funcional e testavel isoladamente — MVP entregavel.
 
@@ -64,13 +64,13 @@ description: "Tasks: catalogo semantico — decisao de autorizacao"
 
 ### Tests for User Story 2 ⚠️
 
-- [ ] T012 [P] [US2] `test_versionamento.py`: cenarios 1-4 da spec (versao antiga, versao nova, periodo cruzando fronteira, versao descontinuada ainda resolvivel)
-- [ ] T013 [P] [US2] `test_catalogo_invalido.py`: catalogo com IDs de metrica duplicados e com janelas de versao sobrepostas falham na carga (`carregar_catalogo`), nao na decisao
+- [x] T012 [P] [US2] `test_versionamento.py`: cenarios 1-4 da spec (versao antiga, versao nova, periodo cruzando fronteira, versao descontinuada ainda resolvivel)
+- [x] T013 [P] [US2] `test_catalogo_invalido.py`: catalogo com IDs de metrica duplicados e com janelas de versao sobrepostas falham na carga (`carregar_catalogo`), nao na decisao
 
 ### Implementation for User Story 2
 
-- [ ] T014 [US2] Implementar resolucao de versao por periodo em `decisao.py` (depende de T010) — FR-005, FR-006, FR-007
-- [ ] T015 [US2] Implementar as duas checagens de integridade em `carregamento.py` (depende de T006) — FR-008
+- [x] T014 [US2] Implementar resolucao de versao por periodo em `decisao.py` (depende de T010) — FR-005, FR-006, FR-007
+- [x] T015 [US2] Implementar as duas checagens de integridade em `carregamento.py` (depende de T006) — FR-008
 
 **Checkpoint**: User Stories 1 e 2 funcionam juntas e isoladamente.
 
@@ -84,12 +84,12 @@ description: "Tasks: catalogo semantico — decisao de autorizacao"
 
 ### Tests for User Story 3 ⚠️
 
-- [ ] T016 [P] [US3] `test_auditoria.py`: cenarios 1-3 da spec (evento em permissao, evento em negacao com motivo, contagem exata apos N chamadas)
+- [x] T016 [P] [US3] `test_auditoria.py`: cenarios 1-3 da spec (evento em permissao, evento em negacao com motivo, contagem exata apos N chamadas)
 
 ### Implementation for User Story 3
 
-- [ ] T017 [US3] Implementar `emitir_evento()` em `packages/catalogo_semantico/src/catalogo_semantico/auditoria.py` — FR-009
-- [ ] T018 [US3] Integrar `emitir_evento()` dentro de `decidir()`, chamado antes do `return` (depende de T010, T017) — FR-010
+- [x] T017 [US3] Implementar `emitir_evento()` em `packages/catalogo_semantico/src/catalogo_semantico/auditoria.py` — FR-009
+- [x] T018 [US3] Integrar `emitir_evento()` dentro de `decidir()`, chamado antes do `return` (depende de T010, T017) — FR-010
 
 **Checkpoint**: todas as 3 user stories funcionais e testadas independentemente.
 
@@ -97,9 +97,9 @@ description: "Tasks: catalogo semantico — decisao de autorizacao"
 
 ## Phase 6: Polish & Cross-Cutting Concerns
 
-- [ ] T019 [P] Escrever `packages/catalogo_semantico/README.md` com o conteudo de `quickstart.md`
-- [ ] T020 Rodar o gate completo: `uv run ruff format --check .`, `uv run ruff check .`, `uv run pyright`, `uv run pytest`, `uv run python scripts/verify.py`
-- [ ] T021 Rodar `engineering-playbook checkpoint` e `engineering-playbook delivery prepare` para converger PRD + spec + plano + tasks + codigo + evidencia (ENGINEERING.md, passo 11-12)
+- [x] T019 [P] Escrever `packages/catalogo_semantico/README.md` com o conteudo de `quickstart.md`
+- [x] T020 Rodar o gate completo: `uv run ruff format --check .`, `uv run ruff check .`, `uv run pyright`, `uv run pytest`, `uv run python scripts/verify.py`
+- [x] T021 Rodar `engineering-playbook checkpoint` e `engineering-playbook delivery prepare` para converger PRD + spec + plano + tasks + codigo + evidencia (ENGINEERING.md, passo 11-12)
 
 ---
 
