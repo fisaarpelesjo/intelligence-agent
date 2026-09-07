@@ -1,0 +1,12 @@
+id: "julia"
+supported_platforms: ["linux", "macos", "windows"]
+prerequisites: ["Julia"]
+setup_command: "julia --project -e 'import Pkg; Pkg.instantiate()'"
+format_command: "project-specific"
+lint_command: "project-specific"
+build_command: "project-specific"
+test_command: "julia --project -e 'import Pkg; Pkg.test()'"
+static_analysis_command: "project-specific"
+benchmark_command_when_applicable: "BenchmarkTools when applicable"
+ci_notes: "Record Julia version and Manifest.toml."
+

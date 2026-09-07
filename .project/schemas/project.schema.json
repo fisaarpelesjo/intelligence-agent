@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["schema_version", "project", "spec_kit", "commands", "sources", "supported_agents"],
+  "properties": {
+    "schema_version": {"type": "string"},
+    "project": {
+      "type": "object",
+      "required": ["name", "language", "default_workflow_profile"],
+      "properties": {
+        "name": {"type": "string"},
+        "language": {"type": "string"},
+        "default_workflow_profile": {"type": "string"}
+      }
+    },
+    "spec_kit": {
+      "type": "object",
+      "required": ["source", "version", "install"],
+      "properties": {
+        "source": {"type": "string"},
+        "version": {"type": "string", "pattern": "^v[0-9]+\\.[0-9]+\\.[0-9]+$"},
+        "install": {"type": "string"}
+      }
+    },
+    "commands": {"type": "object"},
+    "sources": {"type": "array", "items": {"type": "object"}},
+    "supported_agents": {"type": "array", "items": {"type": "string"}, "minItems": 1}
+  }
+}
+

@@ -1,0 +1,21 @@
+id: "strict"
+triggers:
+  - "API publica"
+  - "arquitetura"
+  - "seguranca ou privacidade"
+  - "persistencia ou migracao"
+  - "CUDA, memoria ou performance critica"
+required:
+  - "specification"
+  - "clarification"
+  - "research when uncertain"
+  - "plan"
+  - "MADR"
+  - "tasks"
+  - "tests"
+  - "independent review"
+  - "benchmark when applicable"
+  - "convergence"
+  - "release notes"
+reviewer: "independent_required"
+

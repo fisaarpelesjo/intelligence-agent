@@ -1,0 +1,12 @@
+id: "typescript"
+supported_platforms: ["linux", "macos", "windows"]
+prerequisites: ["Node.js", "project package manager"]
+setup_command: "project-specific install with lockfile"
+format_command: "project-specific"
+lint_command: "project-specific"
+build_command: "project-specific"
+test_command: "project-specific"
+static_analysis_command: "tsc --noEmit"
+benchmark_command_when_applicable: "project-specific"
+ci_notes: "Use the project lockfile."
+

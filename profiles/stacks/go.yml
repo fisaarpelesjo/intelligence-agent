@@ -1,0 +1,12 @@
+id: "go"
+supported_platforms: ["linux", "macos", "windows"]
+prerequisites: ["Go toolchain"]
+setup_command: "go mod download"
+format_command: "gofmt -w ."
+lint_command: "go vet ./..."
+build_command: "go build ./..."
+test_command: "go test ./..."
+static_analysis_command: "go vet ./..."
+benchmark_command_when_applicable: "go test -bench=. ./..."
+ci_notes: "Record Go version."
+

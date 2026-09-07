@@ -1,0 +1,12 @@
+id: "cpp"
+supported_platforms: ["linux", "macos", "windows"]
+prerequisites: ["C++ compiler", "CMake or project build system"]
+setup_command: "project-specific"
+format_command: "clang-format -i <files>"
+lint_command: "clang-tidy <targets>"
+build_command: "cmake --build build"
+test_command: "ctest --test-dir build"
+static_analysis_command: "project-specific"
+benchmark_command_when_applicable: "project-specific"
+ci_notes: "Document compiler and standard library versions."
+

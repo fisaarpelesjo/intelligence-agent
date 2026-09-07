@@ -1,0 +1,12 @@
+id: "cuda"
+supported_platforms: ["linux", "windows"]
+prerequisites: ["NVIDIA GPU", "compatible CUDA Toolkit", "driver matching toolkit"]
+setup_command: "project-specific"
+format_command: "clang-format -i <files>"
+lint_command: "project-specific"
+build_command: "cmake --build build"
+test_command: "ctest --test-dir build"
+static_analysis_command: "compute-sanitizer when applicable"
+benchmark_command_when_applicable: "project-specific benchmark with hardware metadata"
+ci_notes: "GPU CI must state hardware, driver and toolkit."
+

@@ -1,0 +1,12 @@
+id: "swift"
+supported_platforms: ["macos", "linux for server-side Swift"]
+prerequisites: ["Swift toolchain", "macOS for iOS/macOS apps"]
+setup_command: "swift package resolve"
+format_command: "project-specific"
+lint_command: "project-specific"
+build_command: "swift build"
+test_command: "swift test"
+static_analysis_command: "project-specific"
+benchmark_command_when_applicable: "project-specific"
+ci_notes: "iOS and macOS builds require macOS runners."
+

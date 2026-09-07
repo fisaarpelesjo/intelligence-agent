@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["schema_version", "checkpoint_id", "created_at", "workstream", "task", "branch", "head", "working_tree", "completed_work", "commands", "validation", "blockers", "next_action"],
+  "properties": {
+    "schema_version": {"type": "string"},
+    "checkpoint_id": {"type": "string", "pattern": "^CP-[0-9]{8}-[0-9]{3}$"},
+    "created_at": {"type": "string"},
+    "workstream": {"type": ["string", "null"]},
+    "task": {"type": ["string", "null"]},
+    "branch": {"type": "string"},
+    "head": {"type": "string"},
+    "working_tree": {"type": "object"},
+    "completed_work": {"type": "array", "items": {"type": "string"}},
+    "commands": {"type": "array", "items": {"type": "string"}},
+    "validation": {"type": "object"},
+    "blockers": {"type": "array", "items": {"type": "string"}},
+    "next_action": {"type": "string"}
+  }
+}
+

@@ -1,0 +1,12 @@
+id: "dotnet"
+supported_platforms: ["linux", "macos", "windows"]
+prerequisites: [".NET SDK"]
+setup_command: "dotnet restore"
+format_command: "dotnet format"
+lint_command: "dotnet build -warnaserror"
+build_command: "dotnet build"
+test_command: "dotnet test"
+static_analysis_command: "dotnet build -warnaserror"
+benchmark_command_when_applicable: "BenchmarkDotNet when applicable"
+ci_notes: "Record SDK version."
+

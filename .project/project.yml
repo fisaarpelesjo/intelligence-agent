@@ -1,0 +1,30 @@
+schema_version: 1.0.0
+project:
+  name: intelligence-agent
+  language: pt-BR
+  default_workflow_profile: standard
+  stack: python
+spec_kit:
+  source: https://github.com/github/spec-kit
+  version: v1.0.4
+  install: uv tool install specify-cli --from git+https://github.com/github/spec-kit.git@v1.0.4
+commands:
+  init: engineering-playbook init
+  verify: engineering-playbook verify
+  doctor: engineering-playbook doctor
+  checkpoint: engineering-playbook checkpoint
+  delivery: engineering-playbook delivery
+  resume: engineering-playbook resume
+  reconcile_inspect: engineering-playbook reconcile
+  reconcile_apply: engineering-playbook reconcile --apply
+  update: engineering-playbook update
+  tests: uv run pytest
+sources:
+- name: GitHub Spec Kit
+  url: https://github.com/github/spec-kit
+  version: v1.0.4
+- name: MADR
+  url: https://adr.github.io/madr/
+supported_agents:
+- codex
+- claude-code

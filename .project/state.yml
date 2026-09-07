@@ -1,0 +1,20 @@
+schema_version: 1.0.0
+updated_at: '2026-09-07T21:56:47Z'
+active_workstream: null
+current_branch: chore/001-adopt-playbook
+current_phase: requirements
+status: proposed
+active_specification: null
+active_plan: null
+active_tasks: null
+active_task: null
+last_checkpoint: .project/checkpoints/CP-20260907-001.yml
+last_verified_commit: 61d3a9a20eaecaba4d8df9a879eb35a9fb19516c
+validation:
+  passed:
+  - engineering-playbook checkpoint
+  failed: []
+  not_run: []
+blockers: []
+next_actions:
+- Fill docs/requirements/project-requirements.md.

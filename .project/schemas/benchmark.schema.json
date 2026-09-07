@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["benchmark_id", "objective", "hypothesis", "git_commit", "hardware", "operating_system", "runtime_or_compiler_versions", "input_or_dataset", "warmup", "iterations", "metrics", "raw_results_path", "limitations"],
+  "properties": {
+    "benchmark_id": {"type": "string", "pattern": "^BENCH-[0-9]{3}$"},
+    "objective": {"type": "string"},
+    "hypothesis": {"type": "string"},
+    "git_commit": {"type": "string"},
+    "hardware": {"type": "string"},
+    "operating_system": {"type": "string"},
+    "runtime_or_compiler_versions": {"type": "string"},
+    "input_or_dataset": {"type": "string"},
+    "warmup": {"type": "string"},
+    "iterations": {"type": "integer", "minimum": 0},
+    "metrics": {"type": "array"},
+    "raw_results_path": {"type": "string"},
+    "limitations": {"type": "string"}
+  }
+}
+

@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["schema_version", "updated_at", "active_workstream", "current_branch", "current_phase", "status", "active_specification", "active_plan", "active_tasks", "active_task", "validation", "blockers", "next_actions"],
+  "properties": {
+    "schema_version": {"type": "string"},
+    "updated_at": {"type": "string"},
+    "active_workstream": {"type": ["string", "null"], "pattern": "^WS-[0-9]{3}$"},
+    "current_branch": {"type": "string"},
+    "current_phase": {"type": "string"},
+    "status": {"type": "string", "enum": ["proposed", "clarified", "planned", "ready", "in_progress", "review", "changes_requested", "verified", "converged", "done", "archived", "blocked", "paused", "abandoned", "superseded"]},
+    "active_specification": {"type": ["string", "null"]},
+    "active_plan": {"type": ["string", "null"]},
+    "active_tasks": {"type": ["string", "null"]},
+    "active_task": {"type": ["string", "null"], "pattern": "^T[0-9]{3}$"},
+    "last_checkpoint": {"type": ["string", "null"]},
+    "last_verified_commit": {"type": ["string", "null"]},
+    "validation": {
+      "type": "object",
+      "required": ["passed", "failed", "not_run"],
+      "properties": {
+        "passed": {"type": "array", "items": {"type": "string"}},
+        "failed": {"type": "array", "items": {"type": "string"}},
+        "not_run": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "blockers": {"type": "array", "items": {"type": "string"}},
+    "next_actions": {"type": "array", "items": {"type": "string"}, "minItems": 1}
+  }
+}
