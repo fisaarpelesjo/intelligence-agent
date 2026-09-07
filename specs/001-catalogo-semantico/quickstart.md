@@ -5,6 +5,7 @@ from datetime import date
 from catalogo_semantico import carregar_catalogo, decidir
 
 catalogo = carregar_catalogo("packages/catalogo_semantico/catalog")
+eventos_de_auditoria = []
 
 decisao = decidir(
     catalogo,
@@ -12,6 +13,7 @@ decisao = decidir(
     dimension_id="country",
     period_start=date(2026, 3, 1),
     period_end=date(2026, 3, 31),
+    audit_sink=eventos_de_auditoria,
 )
 
 if decisao.allowed:

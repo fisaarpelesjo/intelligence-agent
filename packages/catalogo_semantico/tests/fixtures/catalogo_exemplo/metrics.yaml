@@ -1,0 +1,33 @@
+metrics:
+  - id: signups
+    status: active
+    versions:
+      - effective_from: 2026-01-01
+        effective_until: 2026-07-01
+        label: "Novos cadastros (v1)"
+        source_view: signups_v1
+        grain: day
+        aggregation: count
+        unit: count
+        allowed_dimensions: [country]
+        owner: growth
+      - effective_from: 2026-07-01
+        label: "Novos cadastros (v2)"
+        source_view: signups_v2
+        grain: day
+        aggregation: count
+        unit: count
+        allowed_dimensions: [country, plan_type]
+        owner: growth
+  - id: legacy_metric
+    status: deprecated
+    versions:
+      - effective_from: 2026-01-01
+        effective_until: 2026-04-01
+        label: "Metrica descontinuada"
+        source_view: legacy_view
+        grain: month
+        aggregation: sum
+        unit: count
+        allowed_dimensions: [country]
+        owner: growth

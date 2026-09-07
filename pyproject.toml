@@ -2,7 +2,9 @@
 name = "intelligence-agent"
 version = "0.1.0"
 requires-python = ">=3.11"
-dependencies = []
+dependencies = [
+  "catalogo-semantico",
+]
 
 [dependency-groups]
 dev = [
@@ -14,6 +16,10 @@ dev = [
 
 [tool.uv.sources]
 engineering-playbook = { git = "https://github.com/fisaarpelesjo/engineering-playbook" }
+catalogo-semantico = { workspace = true }
+
+[tool.uv.workspace]
+members = ["packages/*"]
 
 [tool.ruff]
 line-length = 100
@@ -23,10 +29,10 @@ target-version = "py311"
 select = ["E", "F", "I", "UP", "B", "SIM"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["tests", "packages"]
 pythonpath = [".", "src"]
 
 [tool.pyright]
 pythonVersion = "3.11"
-include = ["src", "tests"]
+include = ["src", "tests", "packages"]
 typeCheckingMode = "basic"

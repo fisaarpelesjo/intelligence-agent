@@ -1,0 +1,43 @@
+metrics:
+  - id: signups
+    status: active
+    versions:
+      - effective_from: 2026-01-01
+        effective_until: 2026-07-01
+        label: "Novos cadastros (v1)"
+        source_view: signups_v1
+        grain: day
+        aggregation: count
+        unit: count
+        allowed_dimensions: [country]
+        owner: growth
+      - effective_from: 2026-07-01
+        label: "Novos cadastros (v2)"
+        source_view: signups_v2
+        grain: day
+        aggregation: count
+        unit: count
+        allowed_dimensions: [country, plan_type]
+        owner: growth
+  - id: monthly_recurring_revenue
+    status: active
+    versions:
+      - effective_from: 2026-01-01
+        label: "Receita recorrente mensal"
+        source_view: mrr
+        grain: month
+        aggregation: sum
+        unit: currency_brl
+        allowed_dimensions: [plan_type]
+        owner: finance
+  - id: active_users
+    status: active
+    versions:
+      - effective_from: 2026-01-01
+        label: "Usuarios ativos mensais"
+        source_view: mau
+        grain: month
+        aggregation: last
+        unit: count
+        allowed_dimensions: [country]
+        owner: product

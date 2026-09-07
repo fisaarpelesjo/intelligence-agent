@@ -2,26 +2,27 @@
 
 Interface publica do pacote `catalogo_semantico`, usada por pacotes consumidores (ex.: execucao de query governada, interacao conversacional).
 
-## `decidir(catalogo, metric_id, dimension_id, period_start, period_end) -> AccessDecision`
+## `decidir(catalogo, metric_id, dimension_id, period_start, period_end, audit_sink) -> AccessDecision`
 
-Pura, sincrona, sem I/O de rede ou banco (SC-004). Emite exatamente um `AuditEvent` como efeito colateral obrigatorio antes de retornar (FR-009, FR-010).
+Pura, sincrona, sem I/O de rede ou banco (SC-004). Emite exatamente um `AuditEvent` como efeito colateral obrigatorio antes de retornar (FR-009, FR-010), anexando-o a `audit_sink` (injecao de dependencia — o chamador decide o destino real do evento; esta feature nao persiste nada).
 
 **Entradas**:
 - `catalogo`: instancia de catalogo ja carregado e validado (ver `carregar_catalogo`).
 - `metric_id`: texto.
 - `dimension_id`: texto ou `None`.
 - `period_start`, `period_end`: datas (o periodo pedido).
+- `audit_sink`: lista mutavel de `AuditEvent` a qual o evento desta chamada e anexado.
 
 **Saida**: `AccessDecision` (ver `data-model.md`).
 
 **Regras** (mapeiam para FR-001..FR-007 da spec):
 
 1. Se `metric_id` nao existe no catalogo -> `allowed=false`, `reason_code=unknown_metric`.
-2. Se `dimension_id` fornecida e nao esta em `allowed_dimensions` da versao resolvida (ou nao ha versao resolvida) -> `allowed=false`, `reason_code=dimension_not_allowed`.
-3. Resolver a(s) versao(oes) de `MetricDefinition` cuja janela cobre `[period_start, period_end]`:
+2. Resolver a(s) versao(oes) de `MetricDefinition` cuja janela cobre `[period_start, period_end]`:
    - Nenhuma versao cobre o periodo -> `allowed=false`, `reason_code=no_metric_version_for_period`.
    - O periodo cruza a fronteira de duas versoes (nenhuma versao cobre o intervalo inteiro, mas mais de uma cobre partes dele) -> `allowed=false`, `reason_code=period_spans_version_boundary`.
-   - Exatamente uma versao cobre o periodo inteiro -> prossegue.
+   - Exatamente uma versao cobre o periodo inteiro -> prossegue com essa versao resolvida.
+3. Se `dimension_id` fornecida e nao esta em `allowed_dimensions` da versao resolvida -> `allowed=false`, `reason_code=dimension_not_allowed`.
 4. Se todas as checagens acima passarem -> `allowed=true`, `resolved_metric_version` preenchida.
 
 ## `carregar_catalogo(caminho) -> Catalogo`
