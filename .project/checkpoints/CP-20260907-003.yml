@@ -1,0 +1,23 @@
+schema_version: 1.0.0
+checkpoint_id: CP-20260907-003
+created_at: '2026-09-07T22:52:49Z'
+workstream: null
+task: null
+branch: chore/001-adopt-playbook
+head: 0917b458d8bdc91f130f114f66f69ea41a7aa29c
+working_tree:
+  status: dirty
+  modified_paths:
+  - ?? .claude/
+  - ?? .specify/
+completed_work:
+- Implemented playbook artifacts or recorded current progress.
+commands:
+- engineering-playbook checkpoint
+validation:
+  passed:
+  - engineering-playbook checkpoint
+  failed: []
+  not_run: []
+blockers: []
+next_action: Fill docs/requirements/project-requirements.md.
