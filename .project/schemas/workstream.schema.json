@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["id", "role", "status", "branch", "worktree", "objective", "owned_paths", "forbidden_paths", "requirements", "validation_commands", "handoff", "started_at", "last_updated_at", "owner"],
+  "properties": {
+    "id": {"type": "string", "pattern": "^WS-[0-9]{3}$"},
+    "role": {"type": "string"},
+    "status": {"type": "string"},
+    "branch": {"type": "string"},
+    "worktree": {"type": "string"},
+    "objective": {"type": "string"},
+    "owned_paths": {"type": "array", "items": {"type": "string"}},
+    "forbidden_paths": {"type": "array", "items": {"type": "string"}},
+    "requirements": {"type": "array", "items": {"type": "string"}},
+    "validation_commands": {"type": "array", "items": {"type": "string"}},
+    "handoff": {"type": "object"},
+    "started_at": {"type": "string"},
+    "last_updated_at": {"type": "string"},
+    "owner": {"type": "string"}
+  }
+}
+

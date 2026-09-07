@@ -1,0 +1,10 @@
+id: "lite"
+use_for:
+  - "documentacao sem mudanca comportamental"
+  - "manutencao trivial"
+required:
+  - "issue ou tarefa"
+  - "criterio de validacao"
+  - "resultado da validacao"
+reviewer: "optional"
+

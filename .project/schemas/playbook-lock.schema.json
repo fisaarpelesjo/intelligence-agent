@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["schema_version", "playbook", "files"],
+  "properties": {
+    "schema_version": {"type": "string"},
+    "playbook": {
+      "type": "object",
+      "required": ["name", "version", "installed_at", "source", "profile", "stack", "agents", "ci"],
+      "properties": {
+        "name": {"type": "string"},
+        "version": {"type": "string"},
+        "installed_at": {"type": "string"},
+        "source": {"type": "string"},
+        "profile": {"type": "string", "enum": ["lite", "standard", "strict"]},
+        "stack": {"type": "string"},
+        "agents": {"type": "array", "items": {"type": "string"}},
+        "ci": {"type": "string", "enum": ["github", "none"]}
+      }
+    },
+    "files": {
+      "type": "object",
+      "required": ["managed", "customizable", "project_owned"],
+      "properties": {
+        "managed": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["path", "checksum"],
+            "properties": {
+              "path": {"type": "string"},
+              "checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+            }
+          }
+        },
+        "customizable": {"type": "array", "items": {"type": "string"}},
+        "project_owned": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "migrations": {"type": "array", "items": {"type": "object"}}
+  }
+}

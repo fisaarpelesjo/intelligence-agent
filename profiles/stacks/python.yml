@@ -1,0 +1,12 @@
+id: "python"
+supported_platforms: ["linux", "macos", "windows"]
+prerequisites: ["Python >=3.11", "uv"]
+setup_command: "uv sync --locked"
+format_command: "uv run ruff format ."
+lint_command: "uv run ruff check ."
+build_command: "project-specific"
+test_command: "uv run pytest"
+static_analysis_command: "uv run pyright"
+benchmark_command_when_applicable: "project-specific"
+ci_notes: "Use locked dependencies."
+

@@ -1,0 +1,32 @@
+[project]
+name = "intelligence-agent"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = []
+
+[dependency-groups]
+dev = [
+  "pytest>=8.3.0",
+  "ruff>=0.6.0",
+  "pyright>=1.1.380",
+  "engineering-playbook",
+]
+
+[tool.uv.sources]
+engineering-playbook = { git = "https://github.com/fisaarpelesjo/engineering-playbook" }
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = [".", "src"]
+
+[tool.pyright]
+pythonVersion = "3.11"
+include = ["src", "tests"]
+typeCheckingMode = "basic"

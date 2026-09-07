@@ -1,0 +1,12 @@
+id: "rust"
+supported_platforms: ["linux", "macos", "windows"]
+prerequisites: ["Rust toolchain"]
+setup_command: "cargo fetch --locked"
+format_command: "cargo fmt --check"
+lint_command: "cargo clippy --locked -- -D warnings"
+build_command: "cargo build --locked"
+test_command: "cargo test --locked"
+static_analysis_command: "cargo clippy --locked -- -D warnings"
+benchmark_command_when_applicable: "cargo bench"
+ci_notes: "Use Cargo.lock for applications."
+

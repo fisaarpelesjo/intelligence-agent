@@ -1,0 +1,12 @@
+id: "java"
+supported_platforms: ["linux", "macos", "windows"]
+prerequisites: ["JDK", "Maven or Gradle"]
+setup_command: "project-specific"
+format_command: "project-specific"
+lint_command: "project-specific"
+build_command: "mvn test or ./gradlew build"
+test_command: "mvn test or ./gradlew test"
+static_analysis_command: "project-specific"
+benchmark_command_when_applicable: "JMH when applicable"
+ci_notes: "Record JDK version."
+

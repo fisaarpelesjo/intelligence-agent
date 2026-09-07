@@ -1,0 +1,14 @@
+id: "standard"
+use_for:
+  - "funcionalidade normal"
+  - "correcao nao critica"
+  - "refatoracao delimitada"
+required:
+  - "specification"
+  - "plan"
+  - "tasks"
+  - "tests"
+  - "review"
+  - "convergence"
+reviewer: "required"
+

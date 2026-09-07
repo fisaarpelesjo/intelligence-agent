@@ -1,0 +1,132 @@
+schema_version: 1.0.0
+playbook:
+  name: engineering-playbook
+  version: 0.1.0
+  installed_at: '2026-09-07T22:07:02Z'
+  source: package
+  profile: standard
+  stack: python
+  agents:
+  - codex
+  - claude-code
+  ci: github
+files:
+  managed:
+  - path: .github/rulesets/main.yml
+    checksum: b2c21c163e988b28867e1b7844e2f61a910e7cd68c505422e1ba8c26acf1ac9d
+  - path: .github/workflows/quality.yml
+    checksum: 227de3e6f8075ee79ae4a3dab206c41f8e41d501e62b81977ec000052f3073e8
+  - path: .project/schemas/benchmark.schema.json
+    checksum: f8a8a7928fdfc1dc790e105cb748315674168bb1c04ae8549ad80f02bf0c8213
+  - path: .project/schemas/checkpoint.schema.json
+    checksum: de87652cc182d9e4a0b95067581beec167a9cda3e5ab18bafc67a62542baf276
+  - path: .project/schemas/playbook-lock.schema.json
+    checksum: 4df6610ff870e157aba486410195c7cee88677f470b1d17f7634c3655b42ed8c
+  - path: .project/schemas/project.schema.json
+    checksum: 70e6f510093b771613edada9cdd07af95febd56fc1c9facc2974c4035db3248c
+  - path: .project/schemas/state.schema.json
+    checksum: 4fb062fad257ec265f0cc07bb4b9ba4dae09f1eaf0e5c8649e486bfe710904a0
+  - path: .project/schemas/workstream.schema.json
+    checksum: 004531e9db84ebeeef8b7c27df5f6fbc0b91c0cd26d64f5f10014fd3b5f9914f
+  - path: profiles/stacks/README.md
+    checksum: f245a0175091e03769e5dfca1fe493d55117e9c275108ec0a8818d85b0b95315
+  - path: profiles/stacks/cpp.yml
+    checksum: ff7cd952988497b860d894370b78612c1730797fdf827aadbb7845cb87e77b73
+  - path: profiles/stacks/cuda.yml
+    checksum: dfdbc94eb91eae55ba4192033cba412f12a41a675f0ab33d9aba5eae06e0e604
+  - path: profiles/stacks/dotnet.yml
+    checksum: 65b4d90ee01134ac906d70b87879ebfe43eac63d098b7da96e05c689d63e8c11
+  - path: profiles/stacks/go.yml
+    checksum: b23e27de4b335d15c6b75846280028ddc7eec3d05e8c5ab1ea064ce9382fb62e
+  - path: profiles/stacks/java.yml
+    checksum: 391b66903cb9cae6d7b6c94429531e25bd8fd2d566b360551f14304a550cc174
+  - path: profiles/stacks/julia.yml
+    checksum: b80f6d41efe00c461616b33c26018057ebe745ac1b4383e54167425f6c61b445
+  - path: profiles/stacks/kotlin.yml
+    checksum: 25c7cd478fa451d55c650273a03971d451be3897986dd45305f650a3f692039d
+  - path: profiles/stacks/python.yml
+    checksum: b5519164a2bdf4feb0c9a4e88c74c4fda5ab46a21f662f400124a7ce7767e79d
+  - path: profiles/stacks/r.yml
+    checksum: 549d687906d4695b38cea59a3b6e10c147fbb4f3e66e488ccc1fc20608d9c2af
+  - path: profiles/stacks/rust.yml
+    checksum: 69172d2500ca987d6ee3ae06ec6ddb0de5ed371c7de5dab52269c5928953a52b
+  - path: profiles/stacks/sql.yml
+    checksum: 5bd49084649f08f6df102c2636f2c8b9a6c255416c32c2565a97e9fc423f5d9f
+  - path: profiles/stacks/swift.yml
+    checksum: 8e85a2aeef0e2ef91c91e03b28b88eed14650683ace1a3344e87082b38ec3fdb
+  - path: profiles/stacks/typescript.yml
+    checksum: 190753cd837c360fb806f8439207bd693d216fa1a1b6aee493453f15abb56efe
+  - path: profiles/workflows/lite.yml
+    checksum: 4176569bd967e8382d97bcb299c61ea1ea05538cc13bc5d139b92e88b2ebd49f
+  - path: profiles/workflows/standard.yml
+    checksum: 30bc1850098c7b1b6c9800a9c24776cacdaa350749711abe0bc4652a78c5a013
+  - path: profiles/workflows/strict.yml
+    checksum: b37e287e3344aa7a1e82f269da83f17b22afd0137d799fc6216b696ecb138ee2
+  - path: scripts/bootstrap.py
+    checksum: 2d34bafa1753ce5773b1dccffce94f868cad68dd6cd3d8a200fd191ed6edb792
+  - path: scripts/checkpoint.py
+    checksum: 4fc715f79aaaf6dc1ad4b21f43455e254be17e40e61c6da3c7f2d6f3cd35fa77
+  - path: scripts/delivery.py
+    checksum: 47829bea058718d5e9cb054ffdd1273307b70a498e16d621c185b3d1c67c1960
+  - path: scripts/doctor.py
+    checksum: 0ef501be5c662bd5d9a881426a29f2658fdb3924aa37084e30c8c28b11285df9
+  - path: scripts/migrate.py
+    checksum: fdab036711a1b788749b836366036fb13f27466b4027957d66bf9224c63bae3d
+  - path: scripts/playbook_core.py
+    checksum: bc002b1f8d4396067e3b58720574c55b085cc7d363b9d55875dbb1b5be6cadd1
+  - path: scripts/reconcile.py
+    checksum: 69b15174da0d95e67bbedd79ecdccf7e24bae005f15032cf3f26368da5b235b0
+  - path: scripts/resume.py
+    checksum: de2951418f31cf1f8f4043b7622ca3416896bf701f39b8370fe0b17fbf61c0a7
+  - path: scripts/verify.py
+    checksum: 6b7b0313fd90675fa4a5d8a140eae69fa7dff886459d64dff4d3941cbf753f11
+  - path: templates/benchmark/benchmark.yml
+    checksum: a19aa63ebd2a4394ec61352bf719735f39d9ea88c8b8eae0127889e181ffb68e
+  - path: templates/madr/template.md
+    checksum: 0d95374aa7df140a4b4c2b4a828126bb9efaf59bb65893e2b41907089030a51d
+  - path: templates/project/README.md
+    checksum: 059f18a6d08622554884fefb8ce1202be768a55ae60d1d3d1f704ac966f1cd9b
+  - path: templates/project/requirements.md
+    checksum: ddd075e501b3f50e16ea5a081db8d4e75b4175164992c44e3c47736ec2fd56e5
+  customizable:
+  - .github/ISSUE_TEMPLATE/bug.yml
+  - .github/ISSUE_TEMPLATE/feature.yml
+  - .github/pull_request_template.md
+  - .gitignore
+  - .pre-commit-config.yaml
+  - AGENTS.md
+  - CHANGELOG.md
+  - CLAUDE.md
+  - CONTRIBUTING.md
+  - ENGINEERING.md
+  - LICENSE
+  - MIGRATIONS.md
+  - README.md
+  - REVIEW.md
+  - SECURITY.md
+  - THIRD_PARTY_NOTICES.md
+  - docs/agents/AGENT_POLICY.md
+  - docs/agents/HANDOFF_PROTOCOL.md
+  - docs/agents/RECOVERY_PROTOCOL.md
+  - docs/delivery/README.md
+  - docs/delivery/github-ruleset.md
+  - docs/requirements/README.md
+  - docs/standards/common/README.md
+  - docs/standards/stacks/README.md
+  - extensions/README.md
+  - uv.lock
+  project_owned:
+  - .project/project.yml
+  - .project/state.yml
+  - docs/context/architecture.md
+  - docs/context/constraints.md
+  - docs/context/product.md
+  - docs/context/terminology.md
+  - docs/decisions/0000-use-madr.md
+  - docs/requirements/project-requirements.md
+  - pyproject.toml
+migrations:
+- id: update-0.1.0
+  applied_at: '2026-09-07T22:07:02Z'
+  files:
+  - .project/schemas/checkpoint.schema.json

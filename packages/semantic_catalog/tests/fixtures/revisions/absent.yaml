@@ -1,8 +1,0 @@
-# T079 data-revision fixture — UNIT FIXTURE ONLY.
-#
-# Never production data and never a claim that EXT-A (D-12) is ready.
-# `load_revisions` forces `is_fixture: true` whatever this file says.
-
-# The producer said nothing at all about the source.
-observed_at: 2026-06-20T06:00:00Z
-revisions: []

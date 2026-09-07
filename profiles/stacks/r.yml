@@ -1,0 +1,12 @@
+id: "r"
+supported_platforms: ["linux", "macos", "windows"]
+prerequisites: ["R", "project package manager when used"]
+setup_command: "project-specific"
+format_command: "project-specific"
+lint_command: "lintr::lint_package() when configured"
+build_command: "R CMD build ."
+test_command: "devtools::test() or project-specific"
+static_analysis_command: "project-specific"
+benchmark_command_when_applicable: "bench or microbenchmark when applicable"
+ci_notes: "Record R version and package snapshot."
+

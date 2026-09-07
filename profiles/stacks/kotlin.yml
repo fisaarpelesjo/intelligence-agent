@@ -1,0 +1,12 @@
+id: "kotlin"
+supported_platforms: ["linux", "macos", "windows"]
+prerequisites: ["JDK", "Gradle or Maven"]
+setup_command: "project-specific"
+format_command: "project-specific"
+lint_command: "project-specific"
+build_command: "./gradlew build"
+test_command: "./gradlew test"
+static_analysis_command: "project-specific"
+benchmark_command_when_applicable: "project-specific"
+ci_notes: "Record JDK and Kotlin versions."
+
