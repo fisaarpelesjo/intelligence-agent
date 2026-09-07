@@ -1,5 +1,5 @@
 schema_version: 1.0.0
-updated_at: '2026-09-07T21:56:47Z'
+updated_at: '2026-09-07T22:48:51Z'
 active_workstream: null
 current_branch: chore/001-adopt-playbook
 current_phase: requirements
@@ -8,8 +8,8 @@ active_specification: null
 active_plan: null
 active_tasks: null
 active_task: null
-last_checkpoint: .project/checkpoints/CP-20260907-001.yml
-last_verified_commit: 61d3a9a20eaecaba4d8df9a879eb35a9fb19516c
+last_checkpoint: .project/checkpoints/CP-20260907-002.yml
+last_verified_commit: d965068f5ee9c65da8b761c1858fb0c3361e1f9a
 validation:
   passed:
   - engineering-playbook checkpoint
