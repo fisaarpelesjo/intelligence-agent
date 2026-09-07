@@ -1,15 +1,15 @@
 schema_version: 1.0.0
-updated_at: '2026-09-07T22:52:49Z'
+updated_at: '2026-09-07T23:02:03Z'
 active_workstream: null
 current_branch: chore/001-adopt-playbook
-current_phase: requirements
-status: proposed
-active_specification: null
-active_plan: null
-active_tasks: null
-active_task: null
-last_checkpoint: .project/checkpoints/CP-20260907-003.yml
-last_verified_commit: 0917b458d8bdc91f130f114f66f69ea41a7aa29c
+current_phase: tasks
+status: planned
+active_specification: specs/001-catalogo-semantico/spec.md
+active_plan: specs/001-catalogo-semantico/plan.md
+active_tasks: specs/001-catalogo-semantico/tasks.md
+active_task: T001
+last_checkpoint: .project/checkpoints/CP-20260907-004.yml
+last_verified_commit: 9c70b204a38864c43a56a5d916d093b591e267f5
 validation:
   passed:
   - engineering-playbook checkpoint
@@ -17,4 +17,4 @@ validation:
   not_run: []
 blockers: []
 next_actions:
-- Fill docs/requirements/project-requirements.md.
+- 'Implementar T001: criar packages/catalogo_semantico/ conforme specs/001-catalogo-semantico/plan.md'

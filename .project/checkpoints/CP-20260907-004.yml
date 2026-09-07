@@ -1,0 +1,23 @@
+schema_version: 1.0.0
+checkpoint_id: CP-20260907-004
+created_at: '2026-09-07T23:02:03Z'
+workstream: null
+task: T001
+branch: chore/001-adopt-playbook
+head: 9c70b204a38864c43a56a5d916d093b591e267f5
+working_tree:
+  status: dirty
+  modified_paths:
+  - M .project/state.yml
+  - ?? specs/
+completed_work:
+- Implemented playbook artifacts or recorded current progress.
+commands:
+- engineering-playbook checkpoint
+validation:
+  passed:
+  - engineering-playbook checkpoint
+  failed: []
+  not_run: []
+blockers: []
+next_action: 'Implementar T001: criar packages/catalogo_semantico/ conforme specs/001-catalogo-semantico/plan.md'
