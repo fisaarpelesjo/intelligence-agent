@@ -1050,6 +1050,7 @@ QUESTION: nenhuma alternativa de produto, processo ou solucao tecnica foi formal
 | ADR-0003 | Cadencia do relatorio periodico: diaria | Define o escopo do pacote de relatorio periodico | `docs/decisions/0003-cadencia-relatorio-diaria.md` |
 | ADR-0004 | Observabilidade: apenas `correlation_id` por enquanto, OpenTelemetry adiado | Satisfaz NFR-002 sem dependencia externa prematura | `docs/decisions/0004-observabilidade-adiada-correlation-id.md` |
 | ADR-0005 | LLM provider: stub/fake para o MVP, provider real adiado | Destrava a spec de interacao conversacional sem custo/credencial de API | `docs/decisions/0005-llm-provider-stub.md` |
+| ADR-0006 | Regra de deteccao de anomalia: media movel de N dias + limiar percentual configuravel (`Proposed`, nao `Accepted`) | Destrava a spec de deteccao de anomalia; regra simples e auditavel, a validar com dado real | `docs/decisions/0006-regra-de-baseline-media-movel.md` |
 
 ## Releases e marcos
 
