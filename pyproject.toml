@@ -10,6 +10,7 @@ dependencies = [
   "deteccao-anomalia",
   "priorizacao-insights",
   "integracao-canal",
+  "distribuicao-proativa",
 ]
 
 [dependency-groups]
@@ -29,6 +30,7 @@ relatorio-periodico = { workspace = true }
 deteccao-anomalia = { workspace = true }
 priorizacao-insights = { workspace = true }
 integracao-canal = { workspace = true }
+distribuicao-proativa = { workspace = true }
 
 [tool.uv.workspace]
 members = ["packages/*"]
