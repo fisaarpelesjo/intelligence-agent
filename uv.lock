@@ -7,6 +7,7 @@ members = [
     "catalogo-semantico",
     "execucao-query",
     "intelligence-agent",
+    "interacao-conversacional",
 ]
 
 [[package]]
@@ -74,6 +75,7 @@ source = { virtual = "." }
 dependencies = [
     { name = "catalogo-semantico" },
     { name = "execucao-query" },
+    { name = "interacao-conversacional" },
 ]
 
 [package.dev-dependencies]
@@ -88,6 +90,7 @@ dev = [
 requires-dist = [
     { name = "catalogo-semantico", editable = "packages/catalogo_semantico" },
     { name = "execucao-query", editable = "packages/execucao_query" },
+    { name = "interacao-conversacional", editable = "packages/interacao_conversacional" },
 ]
 
 [package.metadata.requires-dev]
@@ -96,6 +99,21 @@ dev = [
     { name = "pyright", specifier = ">=1.1.380" },
     { name = "pytest", specifier = ">=8.3.0" },
     { name = "ruff", specifier = ">=0.6.0" },
+]
+
+[[package]]
+name = "interacao-conversacional"
+version = "0.1.0"
+source = { editable = "packages/interacao_conversacional" }
+dependencies = [
+    { name = "catalogo-semantico" },
+    { name = "execucao-query" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "catalogo-semantico", editable = "packages/catalogo_semantico" },
+    { name = "execucao-query", editable = "packages/execucao_query" },
 ]
 
 [[package]]

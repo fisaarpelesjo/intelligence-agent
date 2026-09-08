@@ -5,6 +5,7 @@ requires-python = ">=3.11"
 dependencies = [
   "catalogo-semantico",
   "execucao-query",
+  "interacao-conversacional",
 ]
 
 [dependency-groups]
@@ -19,6 +20,7 @@ dev = [
 engineering-playbook = { git = "https://github.com/fisaarpelesjo/engineering-playbook" }
 catalogo-semantico = { workspace = true }
 execucao-query = { workspace = true }
+interacao-conversacional = { workspace = true }
 
 [tool.uv.workspace]
 members = ["packages/*"]
