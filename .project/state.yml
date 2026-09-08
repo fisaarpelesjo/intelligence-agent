@@ -1,15 +1,15 @@
 schema_version: 1.0.0
-updated_at: '2026-09-08T00:30:42Z'
+updated_at: '2026-09-08T00:46:20Z'
 active_workstream: null
-current_branch: feat/004-relatorio-periodico
-current_phase: implement
-status: in_progress
-active_specification: specs/004-relatorio-periodico/spec.md
-active_plan: specs/004-relatorio-periodico/plan.md
-active_tasks: specs/004-relatorio-periodico/tasks.md
-active_task: null
-last_checkpoint: .project/checkpoints/CP-20260908-003.yml
-last_verified_commit: 8010a40b11e8cb506b1f9a2d82b08037eeb767c6
+current_branch: feat/005-deteccao-anomalia
+current_phase: tasks
+status: planned
+active_specification: specs/005-deteccao-anomalia/spec.md
+active_plan: specs/005-deteccao-anomalia/plan.md
+active_tasks: specs/005-deteccao-anomalia/tasks.md
+active_task: T001
+last_checkpoint: .project/checkpoints/CP-20260908-004.yml
+last_verified_commit: e5b025d3f109d16760d57dabd8fed8cd709ce6ad
 validation:
   passed:
   - engineering-playbook checkpoint
@@ -17,5 +17,4 @@ validation:
   not_run: []
 blockers: []
 next_actions:
-- Revisar recorte 004-relatorio-periodico e converger via engineering-playbook delivery
-  prepare/commit/publish
+- 'Implementar T001: criar packages/deteccao_anomalia/ conforme specs/005-deteccao-anomalia/plan.md'
