@@ -1,15 +1,15 @@
 schema_version: 1.0.0
-updated_at: '2026-09-08T01:03:46Z'
+updated_at: '2026-09-08T01:13:45Z'
 active_workstream: null
 current_branch: feat/006-priorizacao-insights
-current_phase: tasks
-status: planned
+current_phase: implement
+status: in_progress
 active_specification: specs/006-priorizacao-insights/spec.md
 active_plan: specs/006-priorizacao-insights/plan.md
 active_tasks: specs/006-priorizacao-insights/tasks.md
-active_task: T001
-last_checkpoint: .project/checkpoints/CP-20260908-006.yml
-last_verified_commit: 737ef52c2180ccd5086c797e97e3dd5bc7923c92
+active_task: null
+last_checkpoint: .project/checkpoints/CP-20260908-007.yml
+last_verified_commit: 02761b9de9eab96d7ba184135c40c9588ce6acd3
 validation:
   passed:
   - engineering-playbook checkpoint
@@ -17,4 +17,5 @@ validation:
   not_run: []
 blockers: []
 next_actions:
-- 'Implementar T001: criar packages/priorizacao_insights/ conforme specs/006-priorizacao-insights/plan.md'
+- Revisar recorte 006-priorizacao-insights e converger via engineering-playbook delivery
+  prepare/commit/publish

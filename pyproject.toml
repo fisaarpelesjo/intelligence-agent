@@ -8,6 +8,7 @@ dependencies = [
   "interacao-conversacional",
   "relatorio-periodico",
   "deteccao-anomalia",
+  "priorizacao-insights",
 ]
 
 [dependency-groups]
@@ -25,6 +26,7 @@ execucao-query = { workspace = true }
 interacao-conversacional = { workspace = true }
 relatorio-periodico = { workspace = true }
 deteccao-anomalia = { workspace = true }
+priorizacao-insights = { workspace = true }
 
 [tool.uv.workspace]
 members = ["packages/*"]
