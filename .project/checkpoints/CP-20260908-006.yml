@@ -1,0 +1,23 @@
+schema_version: 1.0.0
+checkpoint_id: CP-20260908-006
+created_at: '2026-09-08T01:03:46Z'
+workstream: null
+task: T001
+branch: feat/006-priorizacao-insights
+head: 737ef52c2180ccd5086c797e97e3dd5bc7923c92
+working_tree:
+  status: dirty
+  modified_paths:
+  - M .project/state.yml
+  - ?? specs/006-priorizacao-insights/
+completed_work:
+- Implemented playbook artifacts or recorded current progress.
+commands:
+- engineering-playbook checkpoint
+validation:
+  passed:
+  - engineering-playbook checkpoint
+  failed: []
+  not_run: []
+blockers: []
+next_action: 'Implementar T001: criar packages/priorizacao_insights/ conforme specs/006-priorizacao-insights/plan.md'
