@@ -9,7 +9,7 @@ active_plan: specs/009-memoria-conversa/plan.md
 active_tasks: specs/009-memoria-conversa/tasks.md
 active_task: null
 last_checkpoint: .project/checkpoints/CP-20260908-013.yml
-last_verified_commit: 249a43ab4b11b6ea085808dd25d3def38a9de1ad
+last_verified_commit: bde5f495f46476809f773c681010a2839ceb5864
 validation:
   passed:
   - engineering-playbook checkpoint
