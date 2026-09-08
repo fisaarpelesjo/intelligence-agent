@@ -11,6 +11,7 @@ members = [
     "integracao-canal",
     "intelligence-agent",
     "interacao-conversacional",
+    "memoria-conversa",
     "priorizacao-insights",
     "relatorio-periodico",
 ]
@@ -119,6 +120,7 @@ dependencies = [
     { name = "execucao-query" },
     { name = "integracao-canal" },
     { name = "interacao-conversacional" },
+    { name = "memoria-conversa" },
     { name = "priorizacao-insights" },
     { name = "relatorio-periodico" },
 ]
@@ -139,6 +141,7 @@ requires-dist = [
     { name = "execucao-query", editable = "packages/execucao_query" },
     { name = "integracao-canal", editable = "packages/integracao_canal" },
     { name = "interacao-conversacional", editable = "packages/interacao_conversacional" },
+    { name = "memoria-conversa", editable = "packages/memoria_conversa" },
     { name = "priorizacao-insights", editable = "packages/priorizacao_insights" },
     { name = "relatorio-periodico", editable = "packages/relatorio_periodico" },
 ]
@@ -192,6 +195,17 @@ sdist = { url = "https://files.pythonhosted.org/packages/19/74/a633ee74eb36c44aa
 wheels = [
     { url = "https://files.pythonhosted.org/packages/41/45/1a4ed80516f02155c51f51e8cedb3c1902296743db0bbc66608a0db2814f/jsonschema_specifications-2025.9.1-py3-none-any.whl", hash = "sha256:98802fee3a11ee76ecaca44429fda8a41bff98b00a0f2838151b113f210cc6fe", size = 18437, upload-time = "2025-09-08T01:34:57.871Z" },
 ]
+
+[[package]]
+name = "memoria-conversa"
+version = "0.1.0"
+source = { editable = "packages/memoria_conversa" }
+dependencies = [
+    { name = "integracao-canal" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "integracao-canal", editable = "packages/integracao_canal" }]
 
 [[package]]
 name = "nodeenv"

@@ -1,0 +1,21 @@
+[project]
+name = "memoria-conversa"
+version = "0.1.0"
+description = "Memoria de turno de conversa de curto prazo, com inbound estruturalmente desligado."
+requires-python = ">=3.12"
+dependencies = [
+  "integracao-canal",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/memoria_conversa"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.uv.sources]
+integracao-canal = { workspace = true }

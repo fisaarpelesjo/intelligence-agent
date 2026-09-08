@@ -11,6 +11,7 @@ dependencies = [
   "priorizacao-insights",
   "integracao-canal",
   "distribuicao-proativa",
+  "memoria-conversa",
 ]
 
 [dependency-groups]
@@ -31,6 +32,7 @@ deteccao-anomalia = { workspace = true }
 priorizacao-insights = { workspace = true }
 integracao-canal = { workspace = true }
 distribuicao-proativa = { workspace = true }
+memoria-conversa = { workspace = true }
 
 [tool.uv.workspace]
 members = ["packages/*"]
