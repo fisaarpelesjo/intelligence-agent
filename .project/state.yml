@@ -1,15 +1,15 @@
 schema_version: 1.0.0
-updated_at: '2026-09-08T00:03:57Z'
+updated_at: '2026-09-08T00:30:42Z'
 active_workstream: null
-current_branch: feat/003-interacao-conversacional
+current_branch: feat/004-relatorio-periodico
 current_phase: implement
 status: in_progress
-active_specification: specs/003-interacao-conversacional/spec.md
-active_plan: specs/003-interacao-conversacional/plan.md
-active_tasks: specs/003-interacao-conversacional/tasks.md
+active_specification: specs/004-relatorio-periodico/spec.md
+active_plan: specs/004-relatorio-periodico/plan.md
+active_tasks: specs/004-relatorio-periodico/tasks.md
 active_task: null
-last_checkpoint: .project/checkpoints/CP-20260908-001.yml
-last_verified_commit: 4b51bdbc9455490e5a00ebdb11d0e1000f2adb9d
+last_checkpoint: .project/checkpoints/CP-20260908-003.yml
+last_verified_commit: 8010a40b11e8cb506b1f9a2d82b08037eeb767c6
 validation:
   passed:
   - engineering-playbook checkpoint
@@ -17,5 +17,5 @@ validation:
   not_run: []
 blockers: []
 next_actions:
-- Revisar recorte 003-interacao-conversacional e converger via engineering-playbook
-  delivery prepare/commit/publish
+- Revisar recorte 004-relatorio-periodico e converger via engineering-playbook delivery
+  prepare/commit/publish

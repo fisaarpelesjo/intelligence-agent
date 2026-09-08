@@ -1,0 +1,23 @@
+schema_version: 1.0.0
+checkpoint_id: CP-20260908-002
+created_at: '2026-09-08T00:26:22Z'
+workstream: null
+task: T001
+branch: feat/004-relatorio-periodico
+head: b2d19c1d593ba364185acf1dd759e6db5217ea2f
+working_tree:
+  status: dirty
+  modified_paths:
+  - M .project/state.yml
+  - ?? specs/004-relatorio-periodico/
+completed_work:
+- Implemented playbook artifacts or recorded current progress.
+commands:
+- engineering-playbook checkpoint
+validation:
+  passed:
+  - engineering-playbook checkpoint
+  failed: []
+  not_run: []
+blockers: []
+next_action: 'Implementar T001: criar packages/relatorio_periodico/ conforme specs/004-relatorio-periodico/plan.md'
