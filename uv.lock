@@ -6,6 +6,7 @@ requires-python = ">=3.12"
 members = [
     "catalogo-semantico",
     "deteccao-anomalia",
+    "distribuicao-proativa",
     "execucao-query",
     "integracao-canal",
     "intelligence-agent",
@@ -59,6 +60,21 @@ requires-dist = [
 ]
 
 [[package]]
+name = "distribuicao-proativa"
+version = "0.1.0"
+source = { editable = "packages/distribuicao_proativa" }
+dependencies = [
+    { name = "integracao-canal" },
+    { name = "priorizacao-insights" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "integracao-canal", editable = "packages/integracao_canal" },
+    { name = "priorizacao-insights", editable = "packages/priorizacao_insights" },
+]
+
+[[package]]
 name = "engineering-playbook"
 version = "0.1.0"
 source = { git = "https://github.com/fisaarpelesjo/engineering-playbook#3716a24a0b834dc17eae4dfa0f86db7c882b6878" }
@@ -99,6 +115,7 @@ source = { virtual = "." }
 dependencies = [
     { name = "catalogo-semantico" },
     { name = "deteccao-anomalia" },
+    { name = "distribuicao-proativa" },
     { name = "execucao-query" },
     { name = "integracao-canal" },
     { name = "interacao-conversacional" },
@@ -118,6 +135,7 @@ dev = [
 requires-dist = [
     { name = "catalogo-semantico", editable = "packages/catalogo_semantico" },
     { name = "deteccao-anomalia", editable = "packages/deteccao_anomalia" },
+    { name = "distribuicao-proativa", editable = "packages/distribuicao_proativa" },
     { name = "execucao-query", editable = "packages/execucao_query" },
     { name = "integracao-canal", editable = "packages/integracao_canal" },
     { name = "interacao-conversacional", editable = "packages/interacao_conversacional" },

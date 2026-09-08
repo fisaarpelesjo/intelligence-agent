@@ -1,0 +1,27 @@
+schema_version: 1.0.0
+checkpoint_id: CP-20260908-011
+created_at: '2026-09-08T01:40:54Z'
+workstream: null
+task: null
+branch: feat/008-distribuicao-proativa
+head: 66c04b9f8577ae68105fc267a09a0c6647ba827d
+working_tree:
+  status: dirty
+  modified_paths:
+  - M .project/state.yml
+  - ' M pyproject.toml'
+  - ' M specs/008-distribuicao-proativa/tasks.md'
+  - ' M uv.lock'
+  - ?? packages/distribuicao_proativa/
+completed_work:
+- Implemented playbook artifacts or recorded current progress.
+commands:
+- engineering-playbook checkpoint
+validation:
+  passed:
+  - engineering-playbook checkpoint
+  failed: []
+  not_run: []
+blockers: []
+next_action: Revisar recorte 008-distribuicao-proativa e converger via engineering-playbook
+  delivery prepare/commit/publish

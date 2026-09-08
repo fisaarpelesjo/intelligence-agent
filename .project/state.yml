@@ -1,15 +1,15 @@
 schema_version: 1.0.0
-updated_at: '2026-09-08T01:26:54Z'
+updated_at: '2026-09-08T01:40:54Z'
 active_workstream: null
-current_branch: feat/007-integracao-canal
+current_branch: feat/008-distribuicao-proativa
 current_phase: implement
 status: in_progress
-active_specification: specs/007-integracao-canal/spec.md
-active_plan: specs/007-integracao-canal/plan.md
-active_tasks: specs/007-integracao-canal/tasks.md
+active_specification: specs/008-distribuicao-proativa/spec.md
+active_plan: specs/008-distribuicao-proativa/plan.md
+active_tasks: specs/008-distribuicao-proativa/tasks.md
 active_task: null
-last_checkpoint: .project/checkpoints/CP-20260908-009.yml
-last_verified_commit: 246dfe56d0c444f8e0f40d8dc062c8d367c65432
+last_checkpoint: .project/checkpoints/CP-20260908-011.yml
+last_verified_commit: 66c04b9f8577ae68105fc267a09a0c6647ba827d
 validation:
   passed:
   - engineering-playbook checkpoint
@@ -17,5 +17,5 @@ validation:
   not_run: []
 blockers: []
 next_actions:
-- Revisar recorte 007-integracao-canal e converger via engineering-playbook delivery
+- Revisar recorte 008-distribuicao-proativa e converger via engineering-playbook delivery
   prepare/commit/publish

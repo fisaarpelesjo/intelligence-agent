@@ -1,0 +1,23 @@
+[project]
+name = "distribuicao-proativa"
+version = "0.1.0"
+description = "Gate de 3 condicoes para originar mensagem proativa com campos rotulados."
+requires-python = ">=3.12"
+dependencies = [
+  "priorizacao-insights",
+  "integracao-canal",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/distribuicao_proativa"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.uv.sources]
+priorizacao-insights = { workspace = true }
+integracao-canal = { workspace = true }

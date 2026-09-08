@@ -1,0 +1,23 @@
+schema_version: 1.0.0
+checkpoint_id: CP-20260908-010
+created_at: '2026-09-08T01:34:15Z'
+workstream: null
+task: T001
+branch: feat/008-distribuicao-proativa
+head: c0152f1ee91d2baa0be7b903a79316ec6ae1e023
+working_tree:
+  status: dirty
+  modified_paths:
+  - M .project/state.yml
+  - ?? specs/008-distribuicao-proativa/
+completed_work:
+- Implemented playbook artifacts or recorded current progress.
+commands:
+- engineering-playbook checkpoint
+validation:
+  passed:
+  - engineering-playbook checkpoint
+  failed: []
+  not_run: []
+blockers: []
+next_action: 'Implementar T001: criar packages/distribuicao_proativa/ conforme specs/008-distribuicao-proativa/plan.md'
