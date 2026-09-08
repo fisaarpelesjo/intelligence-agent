@@ -1,15 +1,15 @@
 schema_version: 1.0.0
-updated_at: '2026-09-08T00:26:22Z'
+updated_at: '2026-09-08T00:30:42Z'
 active_workstream: null
 current_branch: feat/004-relatorio-periodico
-current_phase: tasks
-status: planned
+current_phase: implement
+status: in_progress
 active_specification: specs/004-relatorio-periodico/spec.md
 active_plan: specs/004-relatorio-periodico/plan.md
 active_tasks: specs/004-relatorio-periodico/tasks.md
-active_task: T001
-last_checkpoint: .project/checkpoints/CP-20260908-002.yml
-last_verified_commit: b2d19c1d593ba364185acf1dd759e6db5217ea2f
+active_task: null
+last_checkpoint: .project/checkpoints/CP-20260908-003.yml
+last_verified_commit: 8010a40b11e8cb506b1f9a2d82b08037eeb767c6
 validation:
   passed:
   - engineering-playbook checkpoint
@@ -17,4 +17,5 @@ validation:
   not_run: []
 blockers: []
 next_actions:
-- 'Implementar T001: criar packages/relatorio_periodico/ conforme specs/004-relatorio-periodico/plan.md'
+- Revisar recorte 004-relatorio-periodico e converger via engineering-playbook delivery
+  prepare/commit/publish
