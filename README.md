@@ -1,39 +1,68 @@
-# Engineering Playbook
+# Intelligence Agent
 
-Playbook reutilizavel para desenvolvimento assistido por agentes em projetos independentes de portfolio. O repositorio e a memoria canonica: especificacoes, planos, tarefas, decisoes, checkpoints e evidencias vivem aqui, nao no historico de chat.
+Agente de inteligencia de produto **governado**: responde perguntas de negocio em portugues brasileiro sobre metricas, detecta anomalias e distribui insights proativamente por canal de mensagem. Todo numero e calculado por codigo deterministico (nunca pelo LLM), toda resposta carrega proveniencia ou o sistema se abstem explicitamente, e nenhuma mensagem proativa sai sem canal e destinatario aprovados.
 
-O nucleo de SDD e o GitHub Spec Kit fixado em `v1.0.4`. Este repositorio nao reimplementa os comandos do Spec Kit; ele governa como usa-los junto com TDD seletivo, MADR, revisao independente, estado versionado, retomada, reconciliacao, CI e governanca de Git.
+Projeto pessoal, original, com dominio de negocio generico/sintetico (metricas de um SaaS de exemplo). Construido do zero seguindo o fluxo do [engineering-playbook](https://github.com/fisaarpelesjo/engineering-playbook): PRD -> spec -> plan -> tasks -> implement -> verify -> checkpoint -> delivery.
+
+PRD completo: `docs/requirements/project-requirements.md`. Constitution (5 principios nao-negociaveis): `.specify/memory/constitution.md`.
+
+## Arquitetura
+
+Pipeline de 9 pacotes Python independentes em `packages/`, cada um com fronteira de dependencia unidirecional:
+
+```mermaid
+flowchart LR
+  User[Usuario via canal] -->|pergunta pt-BR| Interaction[interacao_conversacional]
+  Interaction --> Catalog[catalogo_semantico]
+  Interaction --> Query[execucao_query]
+  Query --> Interaction
+  Interaction --> Channel[integracao_canal]
+
+  Anomaly[deteccao_anomalia] --> Prioritise[priorizacao_insights]
+  Prioritise --> Proactive[distribuicao_proativa]
+  Proactive --> Channel
+
+  Daily[relatorio_periodico] --> Channel
+  Interaction <--> Memory[memoria_conversa]
+```
+
+| Pacote | Responsabilidade |
+|---|---|
+| `catalogo_semantico` | Decisao de autorizacao deny-by-default por metrica/dimensao; auditoria por decisao |
+| `execucao_query` | Query read-only, estruturalmente restrita, sob teto de bytes/linhas |
+| `interacao_conversacional` | Resolve pergunta pt-BR, vocabulario de periodo, comparacao, narrativa via LLM stub |
+| `relatorio_periodico` | Relatorio diario de KPIs e avaliacao de alerta, sempre como saidas distintas |
+| `deteccao_anomalia` | Candidate finding por desvio de baseline (media movel); nunca se auto-origina |
+| `priorizacao_insights` | Ordena findings por tupla (impacto, alcance), nunca por score unico |
+| `integracao_canal` | Identidade derivada por canal (nunca identificador bruto), matriz de capacidade |
+| `distribuicao_proativa` | Gate: prioridade + canal habilitado + allow-list antes de originar mensagem |
+| `memoria_conversa` | Memoria de turno de curto prazo; inbound estruturalmente desligado |
 
 ## Uso
 
-1. Instale dependencias: `uv sync --locked`.
-2. Leia o contexto: `uv run python scripts/resume.py`.
-3. Valide o playbook: `uv run python scripts/verify.py`.
-4. Diagnostique o ambiente: `uv run python scripts/doctor.py`.
-5. Ao interromper ou trocar agente: `uv run python scripts/checkpoint.py`.
+```bash
+uv sync
+uv run pytest                              # 83 testes, todos os pacotes
+uv run ruff check . && uv run ruff format --check .
+uv run pyright
+uv run engineering-playbook verify         # convergencia PRD/estado
+uv run engineering-playbook doctor         # diagnostico de ambiente
+```
 
-## Entrega Git
+Cada pacote roda isolado: `uv run pytest packages/<nome>`.
 
-Use `uv run python scripts/delivery.py` para conduzir entregas em etapas: `start`, `prepare`, `commit`, `publish`, `merge --auto` e `status`. Operacoes remotas exigem `--yes-remote` e nao sao executadas por `prepare` ou `status`. A documentacao completa esta em `docs/delivery/README.md`.
+## Decisoes registradas (ADR)
 
-## Project Requirements Document — PRD
+`docs/decisions/`: canal real adiado (0001), catalogo sintetico (0002), cadencia diaria do relatorio (0003), observabilidade adiada (0004), LLM provider stub (0005), regra de baseline por media movel (0006, `Proposed`).
 
-Antes de executar o fluxo do GitHub Spec Kit, preencha `docs/requirements/project-requirements.md` a partir de `templates/project/requirements.md`. O PRD e a fonte mestre de requisitos do produto; o Spec Kit transforma recortes aprovados em specification, plan, tasks, implementation, validation e convergence.
+## Estado atual e debito conhecido
 
-Use `uv run python scripts/bootstrap.py` para criar a copia editavel quando ela ainda nao existir. O bootstrap nao sobrescreve PRD existente.
+MVP funcional: todos os requisitos funcionais do PRD (FR-001..FR-015) implementados e testados nos 9 pacotes. PRD ainda em `status: draft` (sem aprovacao humana formal).
 
-## Fluxo
+Debito conhecido, registrado em `docs/requirements/project-requirements.md` (secao Waiting room):
 
-- `lite`: documentacao, manutencao trivial e configuracao reversivel.
-- `standard`: funcionalidades normais, correcoes nao criticas e refatoracoes delimitadas.
-- `strict`: arquitetura, seguranca, persistencia, performance critica, CUDA, contratos publicos ou mudancas caras de reverter.
+- **NFR-002** — rastreabilidade ponta a ponta: `correlation_id` ainda nao implementado.
+- **NFR-003** — dedupe idempotente de entrega: outbox transacional e fingerprint ainda nao implementados.
+- **NFR-006** — fronteira de pacote garantida por teste estatico generico: existe so um teste AST especifico em `deteccao_anomalia` (FR-005), nao um gate de fronteira por pacote.
 
-Produtos derivados deste playbook nao devem consumir APIs de LLM nem incorporar modelos de linguagem locais. IA pode auxiliar o desenvolvimento, mas nao vira dependencia do produto.
-
-## Projetos suportados
-
-O playbook governa projetos separados em Python, C++, CUDA, Rust, Go, TypeScript, Java, C#, Kotlin, Swift, R, Julia e SQL. Ele nao transforma essas stacks em um monorepo.
-
-## Limitacoes
-
-Este repositorio fornece governanca, templates, validadores e perfis. Ele nao instala OpenSpec, BMAD ou Agent OS, nao publica releases e nao executa operacoes remotas sem autorizacao humana explicita.
+Canal real e LLM provider real seguem adiados (fake/stub) ate decisao explicita de sair do MVP.
