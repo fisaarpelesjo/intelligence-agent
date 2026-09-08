@@ -1,7 +1,7 @@
 ---
 document_id: PRD-INTELLIGENCE-AGENT-001
 title: "Project Requirements Document — Intelligence Agent"
-version: "0.4.0"
+version: "0.5.0"
 status: draft
 owners: ["Filipe Sales Araujo"]
 reviewers: []
@@ -42,6 +42,7 @@ Status atual: draft. Nenhuma aprovacao humana ainda ocorreu. `owners` reflete o 
 | 2026-09-07 | 0.2.0 | Agente (Claude, sessao com Filipe Sales Araujo) | Reescrita para remover qualquer referencia, citacao ou dado especifico de um produto de terceiros; o documento passa a descrever um produto original com dominio de negocio generico/sintetico | Elimina risco de propriedade intelectual de terceiros no PRD; nao muda a arquitetura pretendida |
 | 2026-09-07 | 0.3.0 | Agente (Claude, sessao com Filipe Sales Araujo) | Resolvidas as decisoes ADR-0001 a ADR-0005 (canal/LLM/observabilidade adiados com fake/stub; cadencia diaria do relatorio; catalogo sintetico) apos decisao explicita do autor | Destrava a spec `003-interacao-conversacional`; recortes `001` e `002` ja implementados e convergidos |
 | 2026-09-08 | 0.4.0 | Agente (Claude, sessao com Filipe Sales Araujo) | Os 9 pacotes do pipeline original convergidos e mergeados; NFR-002 (correlation_id/rastreabilidade), NFR-003 (dedupe/outbox) e NFR-006 (teste de fronteira estatico generico) registrados como debito conhecido em waiting room, apos decisao explicita do autor de nao implementa-los agora | MVP funcional completo (FR-001..FR-015); 3 NFRs must/should ficam pendentes e documentados, nao implementados silenciosamente |
+| 2026-09-08 | 0.5.0 | Agente (Claude, sessao com Filipe Sales Araujo) | Secao "Decisoes pendentes" atualizada: ordem de recorte marcada como concluida; adicionadas 3 pendencias explicitas (promover/substituir ADR-0006, decidir canal/LLM real, decidir prazo dos 3 debitos de NFR), apos pedido explicito do autor | Nao muda escopo tecnico; consolida decisoes humanas ainda em aberto num unico lugar |
 
 ## Aprovacoes
 
@@ -1078,7 +1079,10 @@ QUESTION: nenhum marco ou data de release foi definido ainda. Proposta inicial: 
 
 - Aprovacao humana deste PRD (status permanece `draft` ate entao).
 - ~~Escolha do primeiro canal de distribuicao real~~ — adiada por decisao registrada (ADR-0001).
-- Ordem de recorte dos pacotes em specs do Spec Kit — confirmada e em andamento: `001-catalogo-semantico` (feito) -> `002-execucao-query` (feito) -> `003-interacao-conversacional` (proximo) -> integracao de canal -> deteccao de anomalia -> priorizacao de insights -> distribuicao proativa -> relatorio periodico -> memoria de conversa.
+- ~~Ordem de recorte dos pacotes em specs do Spec Kit~~ — concluida: os 9 pacotes (`001-catalogo-semantico` a `009-memoria-conversa`) foram especificados, implementados, testados e mergeados em `main`.
+- Promover ADR-0006 (regra de baseline por media movel) de `Proposed` para `Accepted`, ou substitui-la, apos validacao com dado real.
+- Decidir quando sair do MVP fake/stub e integrar um canal de distribuicao real (ADR-0001) e um LLM provider real (ADR-0005) — sem prazo definido.
+- Decidir se e quando implementar os 3 debitos de NFR registrados em Waiting room (NFR-002 correlation_id, NFR-003 dedupe/outbox, NFR-006 teste de fronteira generico) antes de qualquer operacao real.
 
 ## Waiting room ou requisitos futuros
 
