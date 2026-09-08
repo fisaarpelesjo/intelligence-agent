@@ -1,15 +1,15 @@
 schema_version: 1.0.0
-updated_at: '2026-09-08T00:46:20Z'
+updated_at: '2026-09-08T00:55:29Z'
 active_workstream: null
 current_branch: feat/005-deteccao-anomalia
-current_phase: tasks
-status: planned
+current_phase: implement
+status: in_progress
 active_specification: specs/005-deteccao-anomalia/spec.md
 active_plan: specs/005-deteccao-anomalia/plan.md
 active_tasks: specs/005-deteccao-anomalia/tasks.md
-active_task: T001
-last_checkpoint: .project/checkpoints/CP-20260908-004.yml
-last_verified_commit: e5b025d3f109d16760d57dabd8fed8cd709ce6ad
+active_task: null
+last_checkpoint: .project/checkpoints/CP-20260908-005.yml
+last_verified_commit: cc1e1fcc70405b34eea5538ab803e17bb31352f8
 validation:
   passed:
   - engineering-playbook checkpoint
@@ -17,4 +17,5 @@ validation:
   not_run: []
 blockers: []
 next_actions:
-- 'Implementar T001: criar packages/deteccao_anomalia/ conforme specs/005-deteccao-anomalia/plan.md'
+- Revisar recorte 005-deteccao-anomalia e converger via engineering-playbook delivery
+  prepare/commit/publish
