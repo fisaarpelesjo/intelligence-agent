@@ -1,0 +1,23 @@
+schema_version: 1.0.0
+checkpoint_id: CP-20260908-008
+created_at: '2026-09-08T01:21:23Z'
+workstream: null
+task: T001
+branch: feat/007-integracao-canal
+head: 5d08f62927f475678bd2edf2a2e21b4c01cba826
+working_tree:
+  status: dirty
+  modified_paths:
+  - M .project/state.yml
+  - ?? specs/007-integracao-canal/
+completed_work:
+- Implemented playbook artifacts or recorded current progress.
+commands:
+- engineering-playbook checkpoint
+validation:
+  passed:
+  - engineering-playbook checkpoint
+  failed: []
+  not_run: []
+blockers: []
+next_action: 'Implementar T001: criar packages/integracao_canal/ conforme specs/007-integracao-canal/plan.md'

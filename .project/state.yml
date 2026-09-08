@@ -1,15 +1,15 @@
 schema_version: 1.0.0
-updated_at: '2026-09-08T01:13:45Z'
+updated_at: '2026-09-08T01:21:23Z'
 active_workstream: null
-current_branch: feat/006-priorizacao-insights
-current_phase: implement
-status: in_progress
-active_specification: specs/006-priorizacao-insights/spec.md
-active_plan: specs/006-priorizacao-insights/plan.md
-active_tasks: specs/006-priorizacao-insights/tasks.md
-active_task: null
-last_checkpoint: .project/checkpoints/CP-20260908-007.yml
-last_verified_commit: 02761b9de9eab96d7ba184135c40c9588ce6acd3
+current_branch: feat/007-integracao-canal
+current_phase: tasks
+status: planned
+active_specification: specs/007-integracao-canal/spec.md
+active_plan: specs/007-integracao-canal/plan.md
+active_tasks: specs/007-integracao-canal/tasks.md
+active_task: T001
+last_checkpoint: .project/checkpoints/CP-20260908-008.yml
+last_verified_commit: 5d08f62927f475678bd2edf2a2e21b4c01cba826
 validation:
   passed:
   - engineering-playbook checkpoint
@@ -17,5 +17,4 @@ validation:
   not_run: []
 blockers: []
 next_actions:
-- Revisar recorte 006-priorizacao-insights e converger via engineering-playbook delivery
-  prepare/commit/publish
+- 'Implementar T001: criar packages/integracao_canal/ conforme specs/007-integracao-canal/plan.md'
