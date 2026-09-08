@@ -1,15 +1,15 @@
 schema_version: 1.0.0
-updated_at: '2026-09-08T01:21:23Z'
+updated_at: '2026-09-08T01:26:54Z'
 active_workstream: null
 current_branch: feat/007-integracao-canal
-current_phase: tasks
-status: planned
+current_phase: implement
+status: in_progress
 active_specification: specs/007-integracao-canal/spec.md
 active_plan: specs/007-integracao-canal/plan.md
 active_tasks: specs/007-integracao-canal/tasks.md
-active_task: T001
-last_checkpoint: .project/checkpoints/CP-20260908-008.yml
-last_verified_commit: 5d08f62927f475678bd2edf2a2e21b4c01cba826
+active_task: null
+last_checkpoint: .project/checkpoints/CP-20260908-009.yml
+last_verified_commit: 246dfe56d0c444f8e0f40d8dc062c8d367c65432
 validation:
   passed:
   - engineering-playbook checkpoint
@@ -17,4 +17,5 @@ validation:
   not_run: []
 blockers: []
 next_actions:
-- 'Implementar T001: criar packages/integracao_canal/ conforme specs/007-integracao-canal/plan.md'
+- Revisar recorte 007-integracao-canal e converger via engineering-playbook delivery
+  prepare/commit/publish

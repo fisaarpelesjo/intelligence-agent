@@ -7,6 +7,7 @@ members = [
     "catalogo-semantico",
     "deteccao-anomalia",
     "execucao-query",
+    "integracao-canal",
     "intelligence-agent",
     "interacao-conversacional",
     "priorizacao-insights",
@@ -87,6 +88,11 @@ wheels = [
 ]
 
 [[package]]
+name = "integracao-canal"
+version = "0.1.0"
+source = { editable = "packages/integracao_canal" }
+
+[[package]]
 name = "intelligence-agent"
 version = "0.1.0"
 source = { virtual = "." }
@@ -94,6 +100,7 @@ dependencies = [
     { name = "catalogo-semantico" },
     { name = "deteccao-anomalia" },
     { name = "execucao-query" },
+    { name = "integracao-canal" },
     { name = "interacao-conversacional" },
     { name = "priorizacao-insights" },
     { name = "relatorio-periodico" },
@@ -112,6 +119,7 @@ requires-dist = [
     { name = "catalogo-semantico", editable = "packages/catalogo_semantico" },
     { name = "deteccao-anomalia", editable = "packages/deteccao_anomalia" },
     { name = "execucao-query", editable = "packages/execucao_query" },
+    { name = "integracao-canal", editable = "packages/integracao_canal" },
     { name = "interacao-conversacional", editable = "packages/interacao_conversacional" },
     { name = "priorizacao-insights", editable = "packages/priorizacao_insights" },
     { name = "relatorio-periodico", editable = "packages/relatorio_periodico" },
