@@ -1,0 +1,23 @@
+schema_version: 1.0.0
+checkpoint_id: CP-20260908-012
+created_at: '2026-09-08T01:49:50Z'
+workstream: null
+task: T001
+branch: feat/009-memoria-conversa
+head: 192c2aa380e220d3af3efc344902606a475c7b42
+working_tree:
+  status: dirty
+  modified_paths:
+  - M .project/state.yml
+  - ?? specs/009-memoria-conversa/
+completed_work:
+- Implemented playbook artifacts or recorded current progress.
+commands:
+- engineering-playbook checkpoint
+validation:
+  passed:
+  - engineering-playbook checkpoint
+  failed: []
+  not_run: []
+blockers: []
+next_action: 'Implementar T001: criar packages/memoria_conversa/ conforme specs/009-memoria-conversa/plan.md'
