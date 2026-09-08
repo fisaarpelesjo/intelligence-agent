@@ -1,13 +1,13 @@
 ---
 document_id: PRD-INTELLIGENCE-AGENT-001
 title: "Project Requirements Document — Intelligence Agent"
-version: "0.3.0"
+version: "0.4.0"
 status: draft
 owners: ["Filipe Sales Araujo"]
 reviewers: []
 approvers: []
 created_at: "2026-09-07"
-updated_at: "2026-09-07"
+updated_at: "2026-09-08"
 approval_date: ""
 supersedes: null
 related_specs: []
@@ -41,6 +41,7 @@ Status atual: draft. Nenhuma aprovacao humana ainda ocorreu. `owners` reflete o 
 | 2026-09-07 | 0.1.0 | Agente (Claude, sessao com Filipe Sales Araujo) | Rascunho inicial do PRD para o projeto Intelligence Agent | Baseline de requisitos para iniciar a reconstrucao seguindo o fluxo canonico do playbook |
 | 2026-09-07 | 0.2.0 | Agente (Claude, sessao com Filipe Sales Araujo) | Reescrita para remover qualquer referencia, citacao ou dado especifico de um produto de terceiros; o documento passa a descrever um produto original com dominio de negocio generico/sintetico | Elimina risco de propriedade intelectual de terceiros no PRD; nao muda a arquitetura pretendida |
 | 2026-09-07 | 0.3.0 | Agente (Claude, sessao com Filipe Sales Araujo) | Resolvidas as decisoes ADR-0001 a ADR-0005 (canal/LLM/observabilidade adiados com fake/stub; cadencia diaria do relatorio; catalogo sintetico) apos decisao explicita do autor | Destrava a spec `003-interacao-conversacional`; recortes `001` e `002` ja implementados e convergidos |
+| 2026-09-08 | 0.4.0 | Agente (Claude, sessao com Filipe Sales Araujo) | Os 9 pacotes do pipeline original convergidos e mergeados; NFR-002 (correlation_id/rastreabilidade), NFR-003 (dedupe/outbox) e NFR-006 (teste de fronteira estatico generico) registrados como debito conhecido em waiting room, apos decisao explicita do autor de nao implementa-los agora | MVP funcional completo (FR-001..FR-015); 3 NFRs must/should ficam pendentes e documentados, nao implementados silenciosamente |
 
 ## Aprovacoes
 
@@ -1090,6 +1091,9 @@ QUESTION: nenhum marco ou data de release foi definido ainda. Proposta inicial: 
 - Cadencia semanal do relatorio periodico, alem da diaria decidida (ADR-0003).
 - Onboarding self-service de novas metricas pelo usuario final (hoje fora de escopo, fluxo permanece governado/manual).
 - API de administracao do catalogo semantico fora de um CLI, caso venha a ser necessaria.
+- **DEBITO CONHECIDO — NFR-002 (rastreabilidade ponta a ponta)**: nenhuma propagacao de `correlation_id` implementada ainda, nem a versao minima decidida na ADR-0004 (correlation_id sem OpenTelemetry). Os 9 pacotes do MVP funcionam sem ele; fica registrado como pendente antes de qualquer operacao real.
+- **DEBITO CONHECIDO — NFR-003 (dedupe idempotente de entrega)**: nao ha outbox transacional nem dedupe por fingerprint implementados em `distribuicao_proativa`/`integracao_canal`. O gate de allow-list + canal habilitado (FR-007) esta implementado; reentrega idempotente nao. Risco real de mensagem duplicada em producao ate isso ser feito.
+- **DEBITO CONHECIDO — NFR-006 (fronteira de pacote garantida por teste estatico)**: existe teste AST apenas em `deteccao_anomalia` (checa ausencia de import de scheduler/timer/thread, especifico do FR-005), nao um teste generico de fronteira de dependencia unidirecional por pacote em CI. Fronteiras hoje sao garantidas so pela estrutura de `pyproject.toml`/`uv.lock`, sem gate automatizado.
 
 ## Referencias e anexos
 
