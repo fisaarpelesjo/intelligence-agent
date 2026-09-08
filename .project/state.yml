@@ -1,7 +1,7 @@
 schema_version: 1.0.0
 updated_at: '2026-09-08T01:54:28Z'
 active_workstream: null
-current_branch: feat/009-memoria-conversa
+current_branch: main
 current_phase: converge
 status: converged
 active_specification: specs/009-memoria-conversa/spec.md
@@ -9,7 +9,7 @@ active_plan: specs/009-memoria-conversa/plan.md
 active_tasks: specs/009-memoria-conversa/tasks.md
 active_task: null
 last_checkpoint: .project/checkpoints/CP-20260908-013.yml
-last_verified_commit: ec7d3b88c0b7cb4376ec4042385b8a95823f3f7e
+last_verified_commit: 249a43ab4b11b6ea085808dd25d3def38a9de1ad
 validation:
   passed:
   - engineering-playbook checkpoint
